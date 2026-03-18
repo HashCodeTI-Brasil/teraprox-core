@@ -1,0 +1,105 @@
+.menu-bar {
+    background-color: #0763A6;
+    box-shadow: 0 2px 8px rgba(7, 99, 166, 0.08);
+    border-bottom: 3px solid #FFC72C;
+    min-height: 56px;
+    z-index: 1030;
+}
+
+.menu-bar .navbar {
+    padding: 0.25rem 0.75rem;
+}
+
+.menu-bar .navbar-brand,
+.menu-bar .nav-link,
+.menu-bar {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.menu-bar .navbar-logo {
+    height: 50px;
+    width: 50px;
+    margin-right: 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.menu-bar .company-name {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-left: 16px;
+}
+
+.menu-bar .connection-status {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-left: 24px;
+}
+
+.mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease, width 0.3s ease;
+    background: #fff;
+    z-index: 1050;
+    overflow-y: auto;
+}
+
+.mobile-drawer.open {
+    width: 80%;
+    transform: translateX(0);
+}
+
+.mobile-drawer-header {
+    padding: 12px;
+    background: #0763A6;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-drawer-nav {
+    padding: 15px;
+}
+
+.drawer-section-title {
+    color: #0763A6;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.drawer-link {
+    display: block;
+    padding: 8px 0;
+    color: #333;
+    text-decoration: none;
+}
+
+.mobile-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.mobile-drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
