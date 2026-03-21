@@ -42,19 +42,56 @@ const useLogin = () => {
     }
 
     const authPlataform = async () => {
+        if (!email || !password) {
+            toastManager.addToast("Informe usuário e senha", {
+                appearance: "warning",
+                autoDismiss: true,
+            })
+            return
+        }
+
         try {
-            const res = await controller("user", endPointUser).post("authPlataform", { email, password })
-            if (res && res.company) {
-                const finalAuth = await authOnSGP({
+            const companyFromState = global.company || process.env.REACT_APP_DEFAULT_COMPANY
+
+            // Prefer direct auth when company is already known.
+            if (companyFromState) {
+                const directAuth = await authOnSGP({
                     email,
                     password,
-                    company: res.company.identifier,
-                    token: res.token,
-                    companyId: res.company.id,
-                    companyName: res.company.nome
+                    company: companyFromState,
                 })
-                authHandler(finalAuth)
+
+                if (directAuth?.token) {
+                    authHandler(directAuth)
+                    return
+                }
             }
+
+            // Fallback flow: discover company in platform auth and then complete auth.
+            const res = await controller("user", endPointUser).post("authPlataform", { email, password })
+            const companyIdentifier =
+                res?.company?.identifier ||
+                res?.identifier ||
+                process.env.REACT_APP_DEFAULT_COMPANY
+
+            if (!companyIdentifier) {
+                toastManager.addToast("Usuário sem empresa vinculada para autenticação", {
+                    appearance: "warning",
+                    autoDismiss: true,
+                })
+                return
+            }
+
+            const finalAuth = await authOnSGP({
+                email,
+                password,
+                company: companyIdentifier,
+                token: res?.token,
+                companyId: res?.company?.id || res?.companyId,
+                companyName: res?.company?.nome || res?.companyName,
+            })
+
+            authHandler(finalAuth)
         } catch (error) {
             console.error("Login error", error)
             toastManager.addToast("Erro ao conectar com o servidor", {
