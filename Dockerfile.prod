@@ -1,0 +1,19 @@
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+
+ARG REMOTE_SGP_URL=https://teraprox-app-sgp-7ggpsfrixq-rj.a.run.app
+ARG REMOTE_SGM_URL=https://teraprox-app-sgm-7ggpsfrixq-rj.a.run.app
+ENV REMOTE_SGP_URL=${REMOTE_SGP_URL}
+ENV REMOTE_SGM_URL=${REMOTE_SGM_URL}
+
+RUN npm run build
+
+FROM node:24-alpine
+RUN npm install -g serve
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+EXPOSE 3001
+CMD ["serve", "-s", "dist", "-l", "3001"]

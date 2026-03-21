@@ -51,8 +51,8 @@ module.exports = {
                 './useWebInterface': './src/Services/http/webInterface',
             },
             remotes: {
-                teraprox_app_sgp: 'teraprox_app_sgp@http://localhost:3002/remoteEntry.js',
-                teraprox_app_sgm: 'teraprox_app_sgm@http://localhost:3003/remoteEntry.js',
+                teraprox_app_sgp: `teraprox_app_sgp@${process.env.REMOTE_SGP_URL || 'http://localhost:3002'}/remoteEntry.js`,
+                teraprox_app_sgm: `teraprox_app_sgm@${process.env.REMOTE_SGM_URL || 'http://localhost:3003'}/remoteEntry.js`,
             },
             shared: {
                 ...(() => {
