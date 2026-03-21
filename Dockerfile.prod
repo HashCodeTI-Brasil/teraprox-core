@@ -1,7 +1,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY . .
 
 ARG REMOTE_SGP_URL=https://teraprox-app-sgp-7ggpsfrixq-rj.a.run.app
