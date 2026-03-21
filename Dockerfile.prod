@@ -4,8 +4,8 @@ COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY . .
 
-ARG REMOTE_SGP_URL=https://teraprox-app-sgp-7ggpsfrixq-rj.a.run.app
-ARG REMOTE_SGM_URL=https://teraprox-app-sgm-7ggpsfrixq-rj.a.run.app
+ARG REMOTE_SGP_URL=https://teraprox-sgp.web.app
+ARG REMOTE_SGM_URL=https://teraprox-sgm.web.app
 ENV REMOTE_SGP_URL=${REMOTE_SGP_URL}
 ENV REMOTE_SGM_URL=${REMOTE_SGM_URL}
 
