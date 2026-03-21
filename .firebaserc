@@ -1,5 +1,15 @@
 {
   "projects": {
-    "default": "teraprox-4c76c"
-  }
+    "default": "teraprox"
+  },
+  "targets": {
+    "teraprox": {
+      "hosting": {
+        "teraprox-core": [
+          "teraprox-core"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
