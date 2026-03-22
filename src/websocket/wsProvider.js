@@ -9,17 +9,16 @@ import React, {
 } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useToasts } from "react-toast-notifications"
-import { io } from "socket.io-client"
 import {
     logOut,
     setSocketConnectionStatus,
     setToken,
 } from "../Reducers/default-reducers/globalConfigReducer"
-import { endPointNotification, endPointRabbit } from "../models/constantes"
+import { endPointNotification } from "../models/constantes"
 import { routesConfig } from "../models/routesConfig"
 import { useNavigate } from "react-router-dom"
 import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
-import { createNotificationSocket } from "../Services/NotificationService"
+import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
 import { store } from "../store"
 
 const WebProvider = createContext(null)
@@ -38,14 +37,14 @@ export default function WebProviderComponent({ children }) {
     const [notificationSocket, setNotificationSocket] = useState(null)
 
     useEffect(() => {
-        if (token && userId) {
-            const nSocket = createNotificationSocket(endPointNotification, token, userName, company)
+        if (token && userId && company) {
+            const nSocket = createNotificationFirebaseClient(company, userId)
             setNotificationSocket(nSocket)
             return () => {
                 if (nSocket) nSocket.disconnect()
             }
         }
-    }, [token, userId, userName, company])
+    }, [token, userId, company])
 
     const handleLogout = useCallback(async () => {
         if (socket) socket.disconnect()
