@@ -27,7 +27,9 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
                 const status = err.response?.status;
                 const data = err.response?.data;
                 const requestUrl = err.config?.url || "";
-                const isNotificationRequest = typeof requestUrl === "string" && requestUrl.includes("/notification/");
+                const requestBaseUrl = err.config?.baseURL || "";
+                const requestFingerprint = `${requestBaseUrl}${requestUrl}`;
+                const isNotificationRequest = typeof requestFingerprint === "string" && requestFingerprint.includes("/notification/");
 
                 if (status === 400 || status === 404) {
                     if (status === 400 && Array.isArray(data.errors)) {

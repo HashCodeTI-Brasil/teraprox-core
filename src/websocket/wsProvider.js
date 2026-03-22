@@ -78,7 +78,9 @@ export default function WebProviderComponent({ children }) {
             err => {
                 const status = err.response?.status
                 const requestUrl = err.config?.url || ""
-                const isNotificationRequest = typeof requestUrl === "string" && requestUrl.includes("/notification/")
+                const requestBaseUrl = err.config?.baseURL || ""
+                const requestFingerprint = `${requestBaseUrl}${requestUrl}`
+                const isNotificationRequest = typeof requestFingerprint === "string" && requestFingerprint.includes("/notification/")
                 if (status === 401) {
                     const currentToken = store.getState().global.token
                     const canRetry = !!currentToken && !err.config?._retry
