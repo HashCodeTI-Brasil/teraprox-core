@@ -6,6 +6,19 @@ import globalConfigReducer from './Reducers/default-reducers/globalConfigReducer
 import globalErrorReducer from './Reducers/default-reducers/globalErrorReducer';
 import notificationReducer from './Reducers/default-reducers/notificationReducer';
 
+const PERSIST_KEY = 'teraprox-core-root';
+
+const cleanupLegacyPersistKey = () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+        window.localStorage.removeItem('persist:root');
+    } catch (_) {
+    }
+};
+
+cleanupLegacyPersistKey();
+
 const staticReducers = {
     global: globalConfigReducer,
     errors: globalErrorReducer,
@@ -20,7 +33,7 @@ function createReducer(asyncReducers = {}) {
 }
 
 const persistConfig = {
-    key: 'root',
+    key: PERSIST_KEY,
     storage,
     whitelist: ['global'],
 };
