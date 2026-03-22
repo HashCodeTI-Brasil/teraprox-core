@@ -26,6 +26,8 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
             err => {
                 const status = err.response?.status;
                 const data = err.response?.data;
+                const requestUrl = err.config?.url || "";
+                const isNotificationRequest = typeof requestUrl === "string" && requestUrl.includes("/notification/");
 
                 if (status === 400 || status === 404) {
                     if (status === 400 && Array.isArray(data.errors)) {
@@ -48,6 +50,10 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
                         err.config.headers = err.config.headers || {};
                         err.config.headers.Authorization = `${currentToken}`;
                         return http.request(err.config);
+                    }
+
+                    if (isNotificationRequest) {
+                        return Promise.reject({});
                     }
 
                     const isStillAuth = store.getState().global.isAuth;

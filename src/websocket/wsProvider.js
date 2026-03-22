@@ -77,6 +77,8 @@ export default function WebProviderComponent({ children }) {
             },
             err => {
                 const status = err.response?.status
+                const requestUrl = err.config?.url || ""
+                const isNotificationRequest = typeof requestUrl === "string" && requestUrl.includes("/notification/")
                 if (status === 401) {
                     const currentToken = store.getState().global.token
                     const canRetry = !!currentToken && !err.config?._retry
@@ -86,6 +88,10 @@ export default function WebProviderComponent({ children }) {
                         err.config.headers = err.config.headers || {}
                         err.config.headers.Authorization = `${currentToken}`
                         return http.request(err.config)
+                    }
+
+                    if (isNotificationRequest) {
+                        return Promise.reject(err)
                     }
 
                     const isStillAuth = store.getState().global.isAuth
