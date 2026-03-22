@@ -5,6 +5,35 @@ import { Button } from 'react-bootstrap';
 import { useStore } from 'react-redux';
 import { WebProvider as CoreWebProvider } from '../websocket/wsProvider';
 import FederatedErrorBoundary from '../Components/error-handling/FederatedErrorBoundary';
+import FederatedLoadingPlaceholder from '../Components/loading/FederatedLoadingPlaceholder';
+
+/**
+ * Wraps a dynamic import to auto-reload on stale chunk errors.
+ */
+const lazyWithChunkReload = (importFn) => {
+    return lazy(() =>
+        importFn().catch((error) => {
+            const msg = error?.message || '';
+            const isChunkError =
+                msg.includes('Loading chunk') ||
+                msg.includes('Loading CSS chunk') ||
+                msg.includes('ChunkLoadError') ||
+                msg.includes('Failed to fetch dynamically imported module');
+
+            if (isChunkError) {
+                const reloadKey = 'federated_chunk_reload_ts';
+                const lastReload = sessionStorage.getItem(reloadKey);
+                const now = Date.now();
+                if (!lastReload || now - Number(lastReload) > 10000) {
+                    sessionStorage.setItem(reloadKey, String(now));
+                    window.location.reload();
+                    return new Promise(() => {});
+                }
+            }
+            throw error;
+        })
+    );
+};
 
 /**
  * Registro de componentes federados conhecidos.
@@ -15,90 +44,90 @@ import FederatedErrorBoundary from '../Components/error-handling/FederatedErrorB
  */
 const componentRegistry = {
     // === Telas de listagem (Menu) ===
-    'teraprox_app_sgp/Processos': lazy(() => import('teraprox_app_sgp/Processos')),
-    'teraprox_app_sgp/Fluxos': lazy(() => import('teraprox_app_sgp/Fluxos')),
-    'teraprox_app_sgp/Operacoes': lazy(() => import('teraprox_app_sgp/Operacoes')),
-    'teraprox_app_sgp/ParametrosView': lazy(() => import('teraprox_app_sgp/ParametrosView')),
-    'teraprox_app_sgp/PlanosDeControle': lazy(() => import('teraprox_app_sgp/PlanosDeControle')),
-    'teraprox_app_sgp/C-E-P': lazy(() => import('teraprox_app_sgp/C-E-P')),
-    'teraprox_app_sgp/ReportScreen': lazy(() => import('teraprox_app_sgp/ReportScreen')),
-    'teraprox_app_sgp/OrdemDeCorrecaoList': lazy(() => import('teraprox_app_sgp/OrdemDeCorrecaoList')),
-    'teraprox_app_sgp/MaterialConsumptionDashboard': lazy(() => import('teraprox_app_sgp/MaterialConsumptionDashboard')),
-    'teraprox_app_sgp/Recursos': lazy(() => import('teraprox_app_sgp/Recursos')),
-    'teraprox_app_sgp/Acoes': lazy(() => import('teraprox_app_sgp/Acoes')),
-    'teraprox_app_sgp/Materiais': lazy(() => import('teraprox_app_sgp/Materiais')),
-    'teraprox_app_sgp/Unidades': lazy(() => import('teraprox_app_sgp/Unidades')),
+    'teraprox_app_sgp/Processos': lazyWithChunkReload(() => import('teraprox_app_sgp/Processos')),
+    'teraprox_app_sgp/Fluxos': lazyWithChunkReload(() => import('teraprox_app_sgp/Fluxos')),
+    'teraprox_app_sgp/Operacoes': lazyWithChunkReload(() => import('teraprox_app_sgp/Operacoes')),
+    'teraprox_app_sgp/ParametrosView': lazyWithChunkReload(() => import('teraprox_app_sgp/ParametrosView')),
+    'teraprox_app_sgp/PlanosDeControle': lazyWithChunkReload(() => import('teraprox_app_sgp/PlanosDeControle')),
+    'teraprox_app_sgp/C-E-P': lazyWithChunkReload(() => import('teraprox_app_sgp/C-E-P')),
+    'teraprox_app_sgp/ReportScreen': lazyWithChunkReload(() => import('teraprox_app_sgp/ReportScreen')),
+    'teraprox_app_sgp/OrdemDeCorrecaoList': lazyWithChunkReload(() => import('teraprox_app_sgp/OrdemDeCorrecaoList')),
+    'teraprox_app_sgp/MaterialConsumptionDashboard': lazyWithChunkReload(() => import('teraprox_app_sgp/MaterialConsumptionDashboard')),
+    'teraprox_app_sgp/Recursos': lazyWithChunkReload(() => import('teraprox_app_sgp/Recursos')),
+    'teraprox_app_sgp/Acoes': lazyWithChunkReload(() => import('teraprox_app_sgp/Acoes')),
+    'teraprox_app_sgp/Materiais': lazyWithChunkReload(() => import('teraprox_app_sgp/Materiais')),
+    'teraprox_app_sgp/Unidades': lazyWithChunkReload(() => import('teraprox_app_sgp/Unidades')),
     // === Telas com Factory (useWebInterface - inject controller) ===
-    'teraprox_app_sgp/Cadernos': lazy(() => import('teraprox_app_sgp/CadernosFactory').then(m => ({ default: m.CadernosContainer }))),
-    'teraprox_app_sgp/RecursoForm': lazy(() => import('teraprox_app_sgp/RecursoFormFactory')),
-    'teraprox_app_sgp/UnidadeForm': lazy(() => import('teraprox_app_sgp/UnidadeFormFactory').then(m => ({ default: m.UnidadeFormContainer }))),
+    'teraprox_app_sgp/Cadernos': lazyWithChunkReload(() => import('teraprox_app_sgp/CadernosFactory').then(m => ({ default: m.CadernosContainer }))),
+    'teraprox_app_sgp/RecursoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/RecursoFormFactory')),
+    'teraprox_app_sgp/UnidadeForm': lazyWithChunkReload(() => import('teraprox_app_sgp/UnidadeFormFactory').then(m => ({ default: m.UnidadeFormContainer }))),
     // === Formulários ===
-    'teraprox_app_sgp/ProcessoForm': lazy(() => import('teraprox_app_sgp/ProcessoForm')),
-    'teraprox_app_sgp/FluxoDeProcessoForm': lazy(() => import('teraprox_app_sgp/FluxoDeProcessoForm')),
-    'teraprox_app_sgp/OperacaoForm': lazy(() => import('teraprox_app_sgp/OperacaoForm')),
-    'teraprox_app_sgp/ParametroForm': lazy(() => import('teraprox_app_sgp/ParametroForm')),
-    'teraprox_app_sgp/PlanoDeControleForm': lazy(() => import('teraprox_app_sgp/PlanoDeControleForm')),
-    'teraprox_app_sgp/LinhaDePlanoDeControleForm': lazy(() => import('teraprox_app_sgp/LinhaDePlanoDeControleForm')),
-    'teraprox_app_sgp/CadernoDeVerificacaoForm': lazy(() => import('teraprox_app_sgp/CadernoDeVerificacaoForm')),
-    'teraprox_app_sgp/CadernoDeVerificacao': lazy(() => import('teraprox_app_sgp/CadernoDeVerificacao')),
-    'teraprox_app_sgp/OrdenacaoDeFolhas': lazy(() => import('teraprox_app_sgp/OrdenacaoDeFolhas')),
-    'teraprox_app_sgp/Formularios': lazy(() => import('teraprox_app_sgp/Formularios')),
-    'teraprox_app_sgp/FormularioForm': lazy(() => import('teraprox_app_sgp/FormularioForm')),
-    'teraprox_app_sgp/AcaoForm': lazy(() => import('teraprox_app_sgp/AcaoForm')),
-    'teraprox_app_sgp/MaterialForm': lazy(() => import('teraprox_app_sgp/MaterialForm')),
-    'teraprox_app_sgp/FrequenciaForm': lazy(() => import('teraprox_app_sgp/FrequenciaForm')),
-    'teraprox_app_sgp/SetorForm': lazy(() => import('teraprox_app_sgp/SetorForm')),
-    'teraprox_app_sgp/TurnoForm': lazy(() => import('teraprox_app_sgp/TurnoForm')),
-    'teraprox_app_sgp/OrdemDeCorrecaoForm': lazy(() => import('teraprox_app_sgp/OrdemDeCorrecaoForm')),
-    'teraprox_app_sgp/OrdemDeCorrecaoApontar': lazy(() => import('teraprox_app_sgp/OrdemDeCorrecaoApontar')),
-    'teraprox_app_sgp/RegraDeCorrecaoForm': lazy(() => import('teraprox_app_sgp/RegraDeCorrecaoForm')),
-    'teraprox_app_sgp/RegistroDeCampoChart': lazy(() => import('teraprox_app_sgp/RegistroDeCampoChart')),
-    'teraprox_app_sgp/RegistroForm': lazy(() => import('teraprox_app_sgp/RegistroForm')),
+    'teraprox_app_sgp/ProcessoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/ProcessoForm')),
+    'teraprox_app_sgp/FluxoDeProcessoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/FluxoDeProcessoForm')),
+    'teraprox_app_sgp/OperacaoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/OperacaoForm')),
+    'teraprox_app_sgp/ParametroForm': lazyWithChunkReload(() => import('teraprox_app_sgp/ParametroForm')),
+    'teraprox_app_sgp/PlanoDeControleForm': lazyWithChunkReload(() => import('teraprox_app_sgp/PlanoDeControleForm')),
+    'teraprox_app_sgp/LinhaDePlanoDeControleForm': lazyWithChunkReload(() => import('teraprox_app_sgp/LinhaDePlanoDeControleForm')),
+    'teraprox_app_sgp/CadernoDeVerificacaoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/CadernoDeVerificacaoForm')),
+    'teraprox_app_sgp/CadernoDeVerificacao': lazyWithChunkReload(() => import('teraprox_app_sgp/CadernoDeVerificacao')),
+    'teraprox_app_sgp/OrdenacaoDeFolhas': lazyWithChunkReload(() => import('teraprox_app_sgp/OrdenacaoDeFolhas')),
+    'teraprox_app_sgp/Formularios': lazyWithChunkReload(() => import('teraprox_app_sgp/Formularios')),
+    'teraprox_app_sgp/FormularioForm': lazyWithChunkReload(() => import('teraprox_app_sgp/FormularioForm')),
+    'teraprox_app_sgp/AcaoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/AcaoForm')),
+    'teraprox_app_sgp/MaterialForm': lazyWithChunkReload(() => import('teraprox_app_sgp/MaterialForm')),
+    'teraprox_app_sgp/FrequenciaForm': lazyWithChunkReload(() => import('teraprox_app_sgp/FrequenciaForm')),
+    'teraprox_app_sgp/SetorForm': lazyWithChunkReload(() => import('teraprox_app_sgp/SetorForm')),
+    'teraprox_app_sgp/TurnoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/TurnoForm')),
+    'teraprox_app_sgp/OrdemDeCorrecaoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/OrdemDeCorrecaoForm')),
+    'teraprox_app_sgp/OrdemDeCorrecaoApontar': lazyWithChunkReload(() => import('teraprox_app_sgp/OrdemDeCorrecaoApontar')),
+    'teraprox_app_sgp/RegraDeCorrecaoForm': lazyWithChunkReload(() => import('teraprox_app_sgp/RegraDeCorrecaoForm')),
+    'teraprox_app_sgp/RegistroDeCampoChart': lazyWithChunkReload(() => import('teraprox_app_sgp/RegistroDeCampoChart')),
+    'teraprox_app_sgp/RegistroForm': lazyWithChunkReload(() => import('teraprox_app_sgp/RegistroForm')),
 
     // ====================================================================
     // === SGM - Manutenção: Telas de listagem (Menu) ===
     // ====================================================================
-    'teraprox_app_sgm/VisaoGeral': lazy(() => import('teraprox_app_sgm/VisaoGeral')),
-    'teraprox_app_sgm/Agregador': lazy(() => import('teraprox_app_sgm/Agregador')),
-    'teraprox_app_sgm/PlanejamentoDeOsComFiltrosAvancados': lazy(() => import('teraprox_app_sgm/PlanejamentoDeOsComFiltrosAvancados')),
-    'teraprox_app_sgm/OrdensDeServico': lazy(() => import('teraprox_app_sgm/OrdensDeServico')),
-    'teraprox_app_sgm/OrdensDeManutencao': lazy(() => import('teraprox_app_sgm/OrdensDeManutencao')),
-    'teraprox_app_sgm/SolicitacoesDeServico': lazy(() => import('teraprox_app_sgm/SolicitacoesDeServico')),
-    'teraprox_app_sgm/MonitoramentoRecursos': lazy(() => import('teraprox_app_sgm/MonitoramentoRecursos')),
-    'teraprox_app_sgm/ArvoreEstruturalFormV2': lazy(() => import('teraprox_app_sgm/ArvoreEstruturalFormV2')),
-    'teraprox_app_sgm/Acoes': lazy(() => import('teraprox_app_sgm/Acoes')),
-    'teraprox_app_sgm/Tarefas': lazy(() => import('teraprox_app_sgm/Tarefas')),
-    'teraprox_app_sgm/Materiais': lazy(() => import('teraprox_app_sgm/Materiais')),
-    'teraprox_app_sgm/Unidades': lazy(() => import('teraprox_app_sgm/Unidades')),
-    'teraprox_app_sgm/ModelosDeOrdemDeServico': lazy(() => import('teraprox_app_sgm/ModelosDeOrdemDeServico')),
-    'teraprox_app_sgm/Mantenedores': lazy(() => import('teraprox_app_sgm/Mantenedores')),
-    'teraprox_app_sgm/TiposDeOrdem': lazy(() => import('teraprox_app_sgm/TiposDeOrdem')),
-    'teraprox_app_sgm/OsChart': lazy(() => import('teraprox_app_sgm/OsChart')),
-    'teraprox_app_sgm/Inspecoes': lazy(() => import('teraprox_app_sgm/Inspecoes')),
-    'teraprox_app_sgm/VisaoGeralDeMateriaPrima': lazy(() => import('teraprox_app_sgm/VisaoGeralDeMateriaPrima')),
+    'teraprox_app_sgm/VisaoGeral': lazyWithChunkReload(() => import('teraprox_app_sgm/VisaoGeral')),
+    'teraprox_app_sgm/Agregador': lazyWithChunkReload(() => import('teraprox_app_sgm/Agregador')),
+    'teraprox_app_sgm/PlanejamentoDeOsComFiltrosAvancados': lazyWithChunkReload(() => import('teraprox_app_sgm/PlanejamentoDeOsComFiltrosAvancados')),
+    'teraprox_app_sgm/OrdensDeServico': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdensDeServico')),
+    'teraprox_app_sgm/OrdensDeManutencao': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdensDeManutencao')),
+    'teraprox_app_sgm/SolicitacoesDeServico': lazyWithChunkReload(() => import('teraprox_app_sgm/SolicitacoesDeServico')),
+    'teraprox_app_sgm/MonitoramentoRecursos': lazyWithChunkReload(() => import('teraprox_app_sgm/MonitoramentoRecursos')),
+    'teraprox_app_sgm/ArvoreEstruturalFormV2': lazyWithChunkReload(() => import('teraprox_app_sgm/ArvoreEstruturalFormV2')),
+    'teraprox_app_sgm/Acoes': lazyWithChunkReload(() => import('teraprox_app_sgm/Acoes')),
+    'teraprox_app_sgm/Tarefas': lazyWithChunkReload(() => import('teraprox_app_sgm/Tarefas')),
+    'teraprox_app_sgm/Materiais': lazyWithChunkReload(() => import('teraprox_app_sgm/Materiais')),
+    'teraprox_app_sgm/Unidades': lazyWithChunkReload(() => import('teraprox_app_sgm/Unidades')),
+    'teraprox_app_sgm/ModelosDeOrdemDeServico': lazyWithChunkReload(() => import('teraprox_app_sgm/ModelosDeOrdemDeServico')),
+    'teraprox_app_sgm/Mantenedores': lazyWithChunkReload(() => import('teraprox_app_sgm/Mantenedores')),
+    'teraprox_app_sgm/TiposDeOrdem': lazyWithChunkReload(() => import('teraprox_app_sgm/TiposDeOrdem')),
+    'teraprox_app_sgm/OsChart': lazyWithChunkReload(() => import('teraprox_app_sgm/OsChart')),
+    'teraprox_app_sgm/Inspecoes': lazyWithChunkReload(() => import('teraprox_app_sgm/Inspecoes')),
+    'teraprox_app_sgm/VisaoGeralDeMateriaPrima': lazyWithChunkReload(() => import('teraprox_app_sgm/VisaoGeralDeMateriaPrima')),
     // === SGM - Formulários ===
-    'teraprox_app_sgm/AcaoForm': lazy(() => import('teraprox_app_sgm/AcaoForm')),
-    'teraprox_app_sgm/TarefaForm': lazy(() => import('teraprox_app_sgm/TarefaForm')),
-    'teraprox_app_sgm/MaterialForm': lazy(() => import('teraprox_app_sgm/MaterialForm')),
-    'teraprox_app_sgm/UnidadeForm': lazy(() => import('teraprox_app_sgm/UnidadeForm')),
-    'teraprox_app_sgm/MantenedorForm': lazy(() => import('teraprox_app_sgm/MantenedorForm')),
-    'teraprox_app_sgm/TipoDeOrdemForm': lazy(() => import('teraprox_app_sgm/TipoDeOrdemForm')),
-    'teraprox_app_sgm/SolicitacaoDeServicoForm': lazy(() => import('teraprox_app_sgm/SolicitacaoDeServicoForm')),
-    'teraprox_app_sgm/OrdemDeServicoFormV2': lazy(() => import('teraprox_app_sgm/OrdemDeServicoFormV2')),
-    'teraprox_app_sgm/OrdemDeManutencaoForm': lazy(() => import('teraprox_app_sgm/OrdemDeManutencaoForm')),
-    'teraprox_app_sgm/ExecutarOrdemDeManutencao': lazy(() => import('teraprox_app_sgm/ExecutarOrdemDeManutencao')),
-    'teraprox_app_sgm/RecursoFormV2': lazy(() => import('teraprox_app_sgm/RecursoFormV2')),
-    'teraprox_app_sgm/BranchLevelForm': lazy(() => import('teraprox_app_sgm/BranchLevelForm')),
-    'teraprox_app_sgm/ComponenteForm': lazy(() => import('teraprox_app_sgm/ComponenteForm')),
-    'teraprox_app_sgm/ClasseDeComponenteForm': lazy(() => import('teraprox_app_sgm/ClasseDeComponenteForm')),
-    'teraprox_app_sgm/ClasseDeRecursoForm': lazy(() => import('teraprox_app_sgm/ClasseDeRecursoForm')),
-    'teraprox_app_sgm/ModoDeFalhaForm': lazy(() => import('teraprox_app_sgm/ModoDeFalhaForm')),
-    'teraprox_app_sgm/RegistroDeTarefaForm': lazy(() => import('teraprox_app_sgm/RegistroDeTarefaForm')),
-    'teraprox_app_sgm/DimensaoPicker': lazy(() => import('teraprox_app_sgm/DimensaoPicker')),
-    'teraprox_app_sgm/AprovacaoStatus': lazy(() => import('teraprox_app_sgm/AprovacaoStatus')),
-    'teraprox_app_sgm/OrdemDeServico': lazy(() => import('teraprox_app_sgm/OrdemDeServico')),
-    'teraprox_app_sgm/SetorForm': lazy(() => import('teraprox_app_sgm/SetorForm')),
-    'teraprox_app_sgm/TurnoForm': lazy(() => import('teraprox_app_sgm/TurnoForm')),
+    'teraprox_app_sgm/AcaoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/AcaoForm')),
+    'teraprox_app_sgm/TarefaForm': lazyWithChunkReload(() => import('teraprox_app_sgm/TarefaForm')),
+    'teraprox_app_sgm/MaterialForm': lazyWithChunkReload(() => import('teraprox_app_sgm/MaterialForm')),
+    'teraprox_app_sgm/UnidadeForm': lazyWithChunkReload(() => import('teraprox_app_sgm/UnidadeForm')),
+    'teraprox_app_sgm/MantenedorForm': lazyWithChunkReload(() => import('teraprox_app_sgm/MantenedorForm')),
+    'teraprox_app_sgm/TipoDeOrdemForm': lazyWithChunkReload(() => import('teraprox_app_sgm/TipoDeOrdemForm')),
+    'teraprox_app_sgm/SolicitacaoDeServicoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/SolicitacaoDeServicoForm')),
+    'teraprox_app_sgm/OrdemDeServicoFormV2': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdemDeServicoFormV2')),
+    'teraprox_app_sgm/OrdemDeManutencaoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdemDeManutencaoForm')),
+    'teraprox_app_sgm/ExecutarOrdemDeManutencao': lazyWithChunkReload(() => import('teraprox_app_sgm/ExecutarOrdemDeManutencao')),
+    'teraprox_app_sgm/RecursoFormV2': lazyWithChunkReload(() => import('teraprox_app_sgm/RecursoFormV2')),
+    'teraprox_app_sgm/BranchLevelForm': lazyWithChunkReload(() => import('teraprox_app_sgm/BranchLevelForm')),
+    'teraprox_app_sgm/ComponenteForm': lazyWithChunkReload(() => import('teraprox_app_sgm/ComponenteForm')),
+    'teraprox_app_sgm/ClasseDeComponenteForm': lazyWithChunkReload(() => import('teraprox_app_sgm/ClasseDeComponenteForm')),
+    'teraprox_app_sgm/ClasseDeRecursoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/ClasseDeRecursoForm')),
+    'teraprox_app_sgm/ModoDeFalhaForm': lazyWithChunkReload(() => import('teraprox_app_sgm/ModoDeFalhaForm')),
+    'teraprox_app_sgm/RegistroDeTarefaForm': lazyWithChunkReload(() => import('teraprox_app_sgm/RegistroDeTarefaForm')),
+    'teraprox_app_sgm/DimensaoPicker': lazyWithChunkReload(() => import('teraprox_app_sgm/DimensaoPicker')),
+    'teraprox_app_sgm/AprovacaoStatus': lazyWithChunkReload(() => import('teraprox_app_sgm/AprovacaoStatus')),
+    'teraprox_app_sgm/OrdemDeServico': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdemDeServico')),
+    'teraprox_app_sgm/SetorForm': lazyWithChunkReload(() => import('teraprox_app_sgm/SetorForm')),
+    'teraprox_app_sgm/TurnoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/TurnoForm')),
 };
 
 /**
@@ -203,6 +232,26 @@ export const FederatedComponentHost = ({ modulePath, actionEndPoint, hideFooter,
                 }
             } catch (error) {
                 console.error('Falha ao carregar infraestrutura remota:', error);
+                
+                // Se é erro de chunk stale, recarrega a página para obter bundles novos
+                const msg = error?.message || '';
+                const isChunkError =
+                    msg.includes('Loading chunk') ||
+                    msg.includes('Loading CSS chunk') ||
+                    msg.includes('ChunkLoadError') ||
+                    msg.includes('Failed to fetch dynamically imported module');
+
+                if (isChunkError) {
+                    const reloadKey = 'federated_chunk_reload_ts';
+                    const lastReload = sessionStorage.getItem(reloadKey);
+                    const now = Date.now();
+                    if (!lastReload || now - Number(lastReload) > 10000) {
+                        sessionStorage.setItem(reloadKey, String(now));
+                        window.location.reload();
+                        return;
+                    }
+                }
+
                 if (active) {
                     setLoadError(error);
                 }
@@ -254,16 +303,16 @@ export const FederatedComponentHost = ({ modulePath, actionEndPoint, hideFooter,
     }
 
     if (!ready) {
-        return <div>Carregando estrutura remota...</div>;
+        return <FederatedLoadingPlaceholder />;
     }
 
     // Guard: se o bridge não corresponde ao módulo atual, aguardar recarga
     if (expectedRemote && bridgeRemote && bridgeRemote !== expectedRemote) {
-        return <div>Recarregando contexto do módulo...</div>;
+        return <FederatedLoadingPlaceholder />;
     }
 
     const remoteContent = (
-        <Suspense fallback={<div>Carregando componente remoto {modulePath}...</div>}>
+        <Suspense fallback={<FederatedLoadingPlaceholder />}>
             <RemoteComponent
                 initialData={initialData}
                 onDataChange={handleDataChange}

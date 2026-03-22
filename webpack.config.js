@@ -1,11 +1,27 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
+const webpack = require('webpack');
 const path = require('path');
 const deps = require('./package.json').dependencies;
 
+require('dotenv').config();
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const REMOTE_SGP_URL = process.env.REMOTE_SGP_URL || (isProd ? 'https://teraprox-sgp.web.app' : 'http://localhost:3002');
+const REMOTE_SGM_URL = process.env.REMOTE_SGM_URL || (isProd ? 'https://teraprox-sgm.web.app' : 'http://localhost:3003');
+
+// Collect all REACT_APP_* env vars for DefinePlugin
+const envKeys = Object.keys(process.env)
+    .filter(key => key.startsWith('REACT_APP_'))
+    .reduce((acc, key) => {
+        acc[`process.env.${key}`] = JSON.stringify(process.env[key]);
+        return acc;
+    }, {});
+
 module.exports = {
     entry: './src/index.js',
-    mode: 'development',
+    mode: isProd ? 'production' : 'development',
     devServer: {
         port: 3000,
         historyApiFallback: true,
@@ -21,6 +37,9 @@ module.exports = {
     },
     output: {
         publicPath: 'auto',
+        filename: '[name].[contenthash].js',
+        chunkFilename: '[id].[contenthash].js',
+        clean: true,
     },
     module: {
         rules: [
@@ -51,8 +70,8 @@ module.exports = {
                 './useWebInterface': './src/Services/http/webInterface',
             },
             remotes: {
-                teraprox_app_sgp: `teraprox_app_sgp@${process.env.REMOTE_SGP_URL || 'http://localhost:3002'}/remoteEntry.js`,
-                teraprox_app_sgm: `teraprox_app_sgm@${process.env.REMOTE_SGM_URL || 'http://localhost:3003'}/remoteEntry.js`,
+                teraprox_app_sgp: `teraprox_app_sgp@${REMOTE_SGP_URL}/remoteEntry.js`,
+                teraprox_app_sgm: `teraprox_app_sgm@${REMOTE_SGM_URL}/remoteEntry.js`,
             },
             shared: {
                 ...(() => {
@@ -86,5 +105,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './public/index.html',
         }),
+        new webpack.DefinePlugin(envKeys),
     ],
 };

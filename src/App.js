@@ -41,6 +41,8 @@ const App = () => {
                                         }
                                     />
                                 ))}
+
+                                <Route path="*" element={<Navigate to={defaultRoute} replace />} />
                             </>
                         )}
                     </Routes>

@@ -41,7 +41,7 @@ const useLogin = () => {
         }
     }
 
-    const authPlataform = async () => {
+    const handleLogin = async () => {
         if (!email || !password) {
             toastManager.addToast("Informe usuário e senha", {
                 appearance: "warning",
@@ -51,44 +51,9 @@ const useLogin = () => {
         }
 
         try {
-            const companyFromState = global.company || process.env.REACT_APP_DEFAULT_COMPANY
-
-            // Prefer direct auth when company is already known.
-            if (companyFromState) {
-                const directAuth = await authOnSGP({
-                    email,
-                    password,
-                    company: companyFromState,
-                })
-
-                if (directAuth?.token) {
-                    authHandler(directAuth)
-                    return
-                }
-            }
-
-            // Fallback flow: discover company in platform auth and then complete auth.
-            const res = await controller("user", endPointUser).post("authPlataform", { email, password })
-            const companyIdentifier =
-                res?.company?.identifier ||
-                res?.identifier ||
-                process.env.REACT_APP_DEFAULT_COMPANY
-
-            if (!companyIdentifier) {
-                toastManager.addToast("Usuário sem empresa vinculada para autenticação", {
-                    appearance: "warning",
-                    autoDismiss: true,
-                })
-                return
-            }
-
             const finalAuth = await authOnSGP({
                 email,
                 password,
-                company: companyIdentifier,
-                token: res?.token,
-                companyId: res?.company?.id || res?.companyId,
-                companyName: res?.company?.nome || res?.companyName,
             })
 
             authHandler(finalAuth)
@@ -106,7 +71,7 @@ const useLogin = () => {
         setUsuario,
         password,
         setSenha,
-        authPlataform,
+        authPlataform: handleLogin,
     }
 }
 

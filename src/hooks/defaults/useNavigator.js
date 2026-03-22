@@ -19,7 +19,7 @@ const useNavigator = () => {
 			dispatch(setPageLocation(global.prevPage));
 			return navigate(-1);
 		} else {
-			if (global.role.permissao[0].frontEndPerms.length > 0) {
+			if (global.role?.permissao?.[0]?.frontEndPerms?.length > 0) {
 				const currentUserFrontEndPerms = global.role.permissao[0].frontEndPerms;
 				for (let frontEndPerms of currentUserFrontEndPerms) {
 					const locationBloqueado = `/${frontEndPerms.locationBloqueado}`

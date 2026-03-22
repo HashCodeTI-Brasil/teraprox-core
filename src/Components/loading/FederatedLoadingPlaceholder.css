@@ -1,0 +1,28 @@
+.federated-placeholder {
+    padding: 1.5rem;
+    animation: fadeInPlaceholder 0.2s ease-in;
+}
+
+.federated-placeholder-bar {
+    height: 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.federated-placeholder-bar.w-60  { width: 60%;  }
+.federated-placeholder-bar.w-80  { width: 80%;  }
+.federated-placeholder-bar.w-45  { width: 45%;  }
+.federated-placeholder-bar.w-70  { width: 70%;  }
+.federated-placeholder-bar.h-lg  { height: 22px; }
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes fadeInPlaceholder {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

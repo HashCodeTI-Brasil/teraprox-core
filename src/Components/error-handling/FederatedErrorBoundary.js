@@ -1,5 +1,15 @@
 import React from 'react';
 
+const isChunkLoadError = (error) => {
+    const msg = error?.message || '';
+    return (
+        msg.includes('Loading chunk') ||
+        msg.includes('Loading CSS chunk') ||
+        msg.includes('Failed to fetch dynamically imported module') ||
+        msg.includes('ChunkLoadError')
+    );
+};
+
 /**
  * ErrorBoundary especializado para Module Federation.
  * Captura erros de rede ou de chunk quando uma aplicação remota cai.
@@ -11,18 +21,26 @@ class FederatedErrorBoundary extends React.Component {
     }
 
     static getDerivedStateFromError(error) {
-        // Atualiza o estado para que o próximo render mostre a UI de fallback.
         return { hasError: true, error };
     }
 
     componentDidCatch(error, errorInfo) {
-        // Você pode logar o erro em um serviço de monitoramento aqui
         console.error("Erro detectado no Federated Component:", error, errorInfo);
+
+        // Auto-reload para erros de chunk stale (deploy novo invalidou bundles)
+        if (isChunkLoadError(error)) {
+            const reloadKey = 'federated_chunk_reload_ts';
+            const lastReload = sessionStorage.getItem(reloadKey);
+            const now = Date.now();
+            if (!lastReload || now - Number(lastReload) > 10000) {
+                sessionStorage.setItem(reloadKey, String(now));
+                window.location.reload();
+            }
+        }
     }
 
     handleRetry = () => {
         this.setState({ hasError: false, error: null });
-        // Força o recarregamento (opcional, ou apenas tenta renderizar de novo)
         window.location.reload();
     };
 

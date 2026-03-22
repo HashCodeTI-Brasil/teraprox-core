@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../worksapeces/teraprox-api-manutencao"
+		},
+		{
+			"path": "../worksapeces/teraprox-api-processo"
+		},
+		{
+			"path": "../worksapeces/teraprox-app-sgm"
+		},
+		{
+			"path": "../worksapeces/teraprox-app-sgp"
+		},
+		{
+			"path": "../teraprox-gateway"
+		},
+		{
+			"path": "../teraprox-api-user"
+		},
+		{
+			"path": "../teraprox-notification-api"
+		}
+	],
+	"settings": {}
+}
