@@ -78,6 +78,16 @@ export default function WebProviderComponent({ children }) {
             err => {
                 const status = err.response?.status
                 if (status === 401) {
+                    const currentToken = store.getState().global.token
+                    const canRetry = !!currentToken && !err.config?._retry
+
+                    if (canRetry) {
+                        err.config._retry = true
+                        err.config.headers = err.config.headers || {}
+                        err.config.headers.Authorization = `${currentToken}`
+                        return http.request(err.config)
+                    }
+
                     const isStillAuth = store.getState().global.isAuth
                     if (isStillAuth) {
                         toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
