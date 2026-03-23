@@ -65,9 +65,6 @@ module.exports = {
         new ModuleFederationPlugin({
             name: 'teraprox_core',
             filename: 'remoteEntry.js',
-            exposes: {
-                './SharedHooks': './src/hooks/SharedHooks',
-            },
             remotes: {
                 teraprox_app_sgp: `teraprox_app_sgp@${REMOTE_SGP_URL}/remoteEntry.js`,
                 teraprox_app_sgm: `teraprox_app_sgm@${REMOTE_SGM_URL}/remoteEntry.js`,

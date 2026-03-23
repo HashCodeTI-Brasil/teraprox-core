@@ -161,3 +161,52 @@ Situação atual recomendada para `gcp-migration`:
 
 - **Apto para homologação funcional completa** com foco nos itens do checklist acima.
 - **Sem bloqueios arquiteturais** para manter o core como shell puro.
+
+---
+
+## Refactor: Arquitetura Baseada em Contratos (Remoção de Proxy Hooks)
+
+### Contexto
+
+A implementação anterior usava um padrão de **proxy hooks** onde SGP e SGM importavam hooks do Core via Module Federation (`teraprox_core/SharedHooks`) com fallback local (`_local/`). Isso criava acoplamento bidirecional: remotes consumiam do host.
+
+### Nova Arquitetura
+
+**Zero imports do Core nos remotes.** A integração funciona por:
+
+1. **Shared Singletons** — `react`, `react-redux`, `react-router-dom`, `react-toast-notifications`, etc. são singletons. Quando SGP/SGM rodam dentro do Core, `useNavigate()`, `useDispatch()`, `useToasts()` automaticamente usam as instâncias do Core.
+
+2. **FederatedBridge** — Injeta o contexto `WebProvider` do Core no contexto local do remote via `<WebProvider.Provider value={coreValue}>`. Define `window.__TERAPROX_HOSTED_BY_CORE__ = true`.
+
+3. **ReducersBundle + injectReducer** — Core injeta dinamicamente os reducers que o remote precisa no seu store.
+
+### O Que Mudou
+
+| Repo | Arquivo | Alteração |
+|---|---|---|
+| **Core** | `webpack.config.js` | Removido `exposes: { './SharedHooks' }` — Core não expõe mais módulos. |
+| **SGP** | `config-overrides.js` | Removido `remotes: { teraprox_core }` e `REMOTE_CORE_URL`. SGP não consome do Core. |
+| **SGM** | `config-overrides.js` | Idem SGP. |
+| **SGP** | `src/hooks/defaults/*.js` (5 arquivos) | Hooks restaurados para implementação local completa (sem proxy/fallback). |
+| **SGM** | `src/hooks/defaults/*.js` (5 arquivos) | Idem SGP. |
+| **SGP/SGM** | `src/hooks/defaults/_local/` | Diretório removido — não é mais necessário. |
+| **SGM** | `src/websocket/wsProvider.js` | Adicionado `hostedByCore` (via `window.__TERAPROX_HOSTED_BY_CORE__`). LoginModal agora condicional: `{!hostedByCore && <LoginModal />}`. Paridade com SGP. |
+
+### Modo Standalone vs Federado
+
+| Aspecto | Standalone | Federado (dentro do Core) |
+|---|---|---|
+| Redux Store | Próprio (40+ reducers SGM, 33+ SGP) | Core store + injectReducer dinâmico |
+| Router | Próprio `<BrowserRouter>` | Core's `<BrowserRouter>` (shared singleton) |
+| Toast | Próprio `<ToastProvider>` | Core's `<ToastProvider>` (shared singleton) |
+| WebSocket | Próprio `<WebProviderComponent>` | Core's WebProvider via FederatedBridge |
+| LoginModal | Renderizado normalmente | **Oculto** (`hostedByCore = true`) |
+| Hooks | Usam providers locais | Usam providers do Core (mesma instância via singleton) |
+
+### Hooks Restaurados (5 por app)
+
+- `useWebProvider` — Consumer do contexto WebProvider. Inclui `hostedByCore` flag e noop fallbacks.
+- `useBasicService` — Factory de serviço com injeção de controller via `useWebProvider`.
+- `useFetchData` — Hook de GET com loading/error state.
+- `usePostData` — Hook de POST com loading/error state.
+- `useNavigator` — Navegação com verificação de permissões frontend.
