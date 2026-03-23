@@ -39,17 +39,21 @@ export default function WebProviderComponent({ children }) {
 
     useEffect(() => {
         if (token && userId && company) {
+            console.log(`[Core][Notification] Conectando listener de notificacao: company=${company}, userId=${userId}`)
             const nSocket = createNotificationFirebaseClient(company, userId)
             setNotificationSocket(nSocket)
             return () => {
                 if (nSocket) nSocket.disconnect()
             }
         }
+        console.log(`[Core][Notification] Listener nao iniciado (token=${!!token}, userId=${!!userId}, company=${!!company})`)
     }, [token, userId, company])
 
     const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {
         if (typeof incomingMatchingObject !== "object") return
         const subscribers = matchingObjectsRef.current || []
+        console.log("[Core][MO] Mensagem recebida:", incomingMatchingObject)
+        console.log(`[Core][MO] Subscribers ativos: ${subscribers.length}`)
         const matches = subscribers.filter((mO) => {
             const sameContext = mO.context === incomingMatchingObject.context
             const subscriberLocation = mO.location
@@ -62,6 +66,7 @@ export default function WebProviderComponent({ children }) {
                 !incomingLocation
             return sameContext && sameLocation
         })
+        console.log(`[Core][MO] Matches encontrados: ${matches.length}`)
         for (const mO of matches) {
             try {
                 if (mO.refresher) {
@@ -81,12 +86,14 @@ export default function WebProviderComponent({ children }) {
 
     useEffect(() => {
         if (token && company) {
+            console.log(`[Core][MO] Conectando listener de matchingObjects: company=${company}`)
             const moSocket = createMoFirebaseClient(company, onMessageReceive)
             setSocket(moSocket)
             return () => {
                 moSocket.disconnect()
             }
         }
+        console.log(`[Core][MO] Listener nao iniciado (token=${!!token}, company=${!!company})`)
     }, [token, company]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleLogout = useCallback(async () => {
@@ -223,6 +230,8 @@ export default function WebProviderComponent({ children }) {
         const current = matchingObjectsRef.current || []
         if (!current.find((mO) => mO.context === matchingObject.context && mO.location === matchingObject.location)) {
             matchingObjectsRef.current = [...current, matchingObject]
+            console.log(`[Core][MO] Subscreveu ${matchingObject.context}${matchingObject.location}`)
+            console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
         }
     }, [userId])
 
@@ -230,6 +239,8 @@ export default function WebProviderComponent({ children }) {
         matchingObjectsRef.current = (matchingObjectsRef.current || []).filter(
             (c) => c.context !== matchingObject.context
         )
+        console.log(`[Core][MO] Unsubscribe ${matchingObject.context}${matchingObject.location || ""}`)
+        console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
     }, [])
     const subscribeEvent = useCallback((context, location, eventHandler) => {
         const eventName = context + location

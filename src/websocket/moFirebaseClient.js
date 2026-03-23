@@ -11,7 +11,11 @@ import { getDatabase, ref, onChildAdded, off } from "firebase/database"
 function getFirebaseDb() {
     if (!getApps().length) {
         const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "{}")
+        if (!config || Object.keys(config).length === 0) {
+            console.warn("[MoFirebase] REACT_APP_FIREBASE_CONFIG vazio ou ausente")
+        }
         initializeApp(config)
+        console.log("[MoFirebase] Firebase app inicializado")
     }
     return getDatabase()
 }
@@ -28,11 +32,14 @@ export function createMoFirebaseClient(company, onMessage) {
     console.log(`[MoFirebase] Listening for matching objects on /${company}/matchingObjects`)
 
     const unsub = onChildAdded(moRef, (snapshot) => {
+        console.log(`[MoFirebase] child_added em key=${snapshot.key}`)
         const data = snapshot.val()
         if (!data) return
         if (Array.isArray(data)) {
+            console.log(`[MoFirebase] Payload array com ${data.length} item(ns)`)
             data.forEach((mo) => onMessage(mo, true, "firebase"))
         } else {
+            console.log("[MoFirebase] Payload objeto unico")
             onMessage(data, true, "firebase")
         }
     })
