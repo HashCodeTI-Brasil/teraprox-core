@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../teraprox-notification-api"
+		},
+		{
+			"path": "../teraprox-terraform"
 		}
 	],
 	"settings": {}
