@@ -50,11 +50,18 @@ export default function WebProviderComponent({ children }) {
     const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {
         if (typeof incomingMatchingObject !== "object") return
         const subscribers = matchingObjectsRef.current || []
-        const matches = subscribers.filter(
-            (mO) =>
-                mO.context === incomingMatchingObject.context &&
-                incomingMatchingObject.location === mO.location
-        )
+        const matches = subscribers.filter((mO) => {
+            const sameContext = mO.context === incomingMatchingObject.context
+            const subscriberLocation = mO.location
+            const incomingLocation = incomingMatchingObject.location
+            const sameLocation =
+                subscriberLocation === incomingLocation ||
+                subscriberLocation === "*" ||
+                incomingLocation === "*" ||
+                !subscriberLocation ||
+                !incomingLocation
+            return sameContext && sameLocation
+        })
         for (const mO of matches) {
             try {
                 if (mO.refresher) {
