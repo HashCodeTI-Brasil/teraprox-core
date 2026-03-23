@@ -69,7 +69,67 @@
 }
 
 .mobile-drawer-nav {
-    padding: 15px;
+    padding: 8px 0;
+}
+
+.drawer-accordion {
+    border-bottom: 1px solid #eee;
+}
+
+.drawer-accordion-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0763A6;
+    transition: background-color 0.2s;
+}
+
+.drawer-accordion-toggle:hover {
+    background-color: #f5f8fb;
+}
+
+.drawer-accordion-toggle.active {
+    background-color: #eaf1f8;
+}
+
+.drawer-accordion-icon {
+    transition: transform 0.25s ease;
+    color: #0763A6;
+    flex-shrink: 0;
+}
+
+.drawer-accordion-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.drawer-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.drawer-accordion-content.expanded {
+    max-height: 600px;
+}
+
+.drawer-subsection-title {
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 24px 4px;
+}
+
+.drawer-section {
+    padding-bottom: 4px;
 }
 
 .drawer-section-title {
@@ -81,9 +141,22 @@
 
 .drawer-link {
     display: block;
-    padding: 8px 0;
+    padding: 10px 24px 10px 32px;
     color: #333;
     text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.15s;
+}
+
+.drawer-link:hover {
+    background-color: #f0f4f8;
+    color: #0763A6;
+}
+
+.drawer-divider {
+    height: 1px;
+    background: #eee;
+    margin: 2px 24px;
 }
 
 .mobile-drawer-backdrop {

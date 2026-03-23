@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image, Nav, Navbar, NavDropdown, NavItem } from 'react-bootstrap';
 import { BiUserCircle } from 'react-icons/bi';
-import { FiLogOut, FiMenu } from 'react-icons/fi';
+import { FiChevronDown, FiLogOut, FiMenu } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import PermissionContainer from '../Hocs/withPermission';
@@ -25,6 +25,7 @@ const MenuBar = () => {
 
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const [drawerOpen, setDrawerOpen] = useState(false)
+    const [expandedMenu, setExpandedMenu] = useState(null)
     const drawerRef = useRef(null)
 
     useEffect(() => {
@@ -61,6 +62,7 @@ const MenuBar = () => {
     }
 
     const toggleDrawer = () => setDrawerOpen(!drawerOpen)
+    const toggleMenu = (menuKey) => setExpandedMenu(prev => prev === menuKey ? null : menuKey)
 
     if (isAuthenticated(global.token)) {
         return (
@@ -184,88 +186,47 @@ const MenuBar = () => {
                                     </div>
                                 </div>
                                 <nav className="mobile-drawer-nav">
-                                    {sgpMenuSections.map((section, sIdx) => (
-                                        <React.Fragment key={section.title}>
-                                            {sIdx > 0 && <div className="drawer-divider" />}
-                                            <div className="drawer-section">
-                                                <div className="drawer-section-title">{section.title}</div>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="drawer-link"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                                onClick={() => setDrawerOpen(false)}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
+                                    {[{ key: 'processo', title: 'Processo', sections: sgpMenuSections },
+                                      { key: 'manutencao', title: 'Manutenção', sections: sgmMenuSections },
+                                      { key: 'cadastros', title: 'Cadastros', sections: cadastroMenuSections }
+                                    ].map((group) => (
+                                        <div className="drawer-accordion" key={group.key}>
+                                            <button
+                                                className={`drawer-accordion-toggle ${expandedMenu === group.key ? 'active' : ''}`}
+                                                onClick={() => toggleMenu(group.key)}
+                                                aria-expanded={expandedMenu === group.key}
+                                            >
+                                                <span>{group.title}</span>
+                                                <FiChevronDown className={`drawer-accordion-icon ${expandedMenu === group.key ? 'rotated' : ''}`} size={18} />
+                                            </button>
+                                            <div className={`drawer-accordion-content ${expandedMenu === group.key ? 'expanded' : ''}`}>
+                                                {group.sections.map((section, sIdx) => (
+                                                    <React.Fragment key={`${group.key}-${section.title}`}>
+                                                        {sIdx > 0 && <div className="drawer-divider" />}
+                                                        <div className="drawer-section">
+                                                            <div className="drawer-subsection-title">{section.title}</div>
+                                                            {section.items.map((item) => (
+                                                                <PermissionContainer
+                                                                    key={item.routePath}
+                                                                    menubar={true}
+                                                                    component={(componenteRef) => (
+                                                                        <Link
+                                                                            className="drawer-link"
+                                                                            id={item.routePath}
+                                                                            ref={componenteRef}
+                                                                            to={item.routePath}
+                                                                            onClick={() => setDrawerOpen(false)}
+                                                                        >
+                                                                            {item.label}
+                                                                        </Link>
+                                                                    )}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </React.Fragment>
                                                 ))}
                                             </div>
-                                        </React.Fragment>
-                                    ))}
-
-                                    <div className="drawer-divider" />
-                                    <div className="drawer-section-title" style={{ padding: '8px 16px', fontWeight: 'bold' }}>Manutenção</div>
-
-                                    {sgmMenuSections.map((section, sIdx) => (
-                                        <React.Fragment key={`sgm-${section.title}`}>
-                                            {sIdx > 0 && <div className="drawer-divider" />}
-                                            <div className="drawer-section">
-                                                <div className="drawer-section-title">{section.title}</div>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="drawer-link"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                                onClick={() => setDrawerOpen(false)}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </React.Fragment>
-                                    ))}
-
-                                    <div className="drawer-divider" />
-                                    <div className="drawer-section-title" style={{ padding: '8px 16px', fontWeight: 'bold' }}>Cadastros</div>
-
-                                    {cadastroMenuSections.map((section, sIdx) => (
-                                        <React.Fragment key={`cad-${section.title}`}>
-                                            {sIdx > 0 && <div className="drawer-divider" />}
-                                            <div className="drawer-section">
-                                                <div className="drawer-section-title">{section.title}</div>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="drawer-link"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                                onClick={() => setDrawerOpen(false)}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </React.Fragment>
+                                        </div>
                                     ))}
                                 </nav>
                             </div>
