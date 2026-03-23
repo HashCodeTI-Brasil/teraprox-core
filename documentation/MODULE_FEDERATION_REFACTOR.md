@@ -93,3 +93,71 @@ src/
     └── loading/
         └── FederatedLoadingPlaceholder.js
 ```
+
+---
+
+## Revisão de Paridade por Branches
+
+Comparativo entre:
+
+- `master` (produção com apps separados)
+- `feature/module-federation-setup` (setup inicial de MF)
+- `gcp-migration` (estado atual)
+
+### Resumo Executivo
+
+O estado atual em `gcp-migration` está alinhado com as funcionalidades da `master`, com a adição esperada de:
+
+- Federation host-only no core
+- Firebase Hosting para deploy
+- Firebase RTDB para matching objects/notificações
+- Isolamento de persistência Redux por app
+
+Não foi identificado gap estrutural de rotas/telas no `remoteRegistry` do core para os módulos SGP/SGM.
+
+### Evolução Técnica
+
+| Tema | master | module-federation | gcp-migration |
+|---|---|---|---|
+| Arquitetura de frontend | SGP/SGM standalone | setup inicial em remotes | core host-only + remotes federados |
+| Real-time (matching objects) | Socket.IO + Rabbit Agent | mantido | Firebase RTDB |
+| Notificações | socket dedicado | mantido | Firebase RTDB |
+| Persistência Redux | `persist:root` | `persist:root` | chaves isoladas por app |
+| Resiliência de chunks | baixa | parcial | `lazyWithRetry` / chunk reload |
+| Deploy | Cloud Run | híbrido | Firebase Hosting |
+
+### Itens Confirmados como Alinhados
+
+- Rotas de processo e manutenção carregadas pelo host via `remoteRegistry`.
+- Contrato de shared singletons compatível entre host e remotes.
+- Padrão de DI via `FederatedBridge` preservando contexto `WebProvider`.
+- Interface de store simétrica (`injectReducer`/`unmountReducer`) nos três apps.
+- Fluxo de negócio principal mantido (CRUDs e consumo dos serviços REST por contexto).
+
+### Pontos de Atenção
+
+1. `teraprox-app-sgp`: revisão sugerida no fluxo de login standalone para manter tolerância a falhas de chamadas auxiliares (setores/unidades/timers) sem quebrar autenticação.
+2. `teraprox-app-sgp`: validar remoção de `TimeDurationInput.js` contra eventuais imports residuais.
+3. Dependências legadas de Socket.IO podem ser removidas em hardening posterior, após validação final dos fluxos Firebase.
+
+---
+
+## Checklist de Validação de Paridade
+
+Executar após deploy dos três apps:
+
+1. Login/logout via core com navegação para rotas SGP e SGM.
+2. CRUD completo de cadastros compartilhados (Recursos, Ações, Tarefas, Materiais, Unidades) via telas federadas.
+3. Propagação de MatchingObjects em tempo real via Firebase RTDB entre contextos.
+4. Atualização de notificações no sino sem logout indevido por `401` transitório.
+5. Reload de rota federada após novo deploy sem erro persistente de chunk.
+6. Persistência isolada no browser (sem colisão entre `persist:teraprox-core-root`, `persist:teraprox-sgp-root`, `persist:teraprox-sgm-root`).
+
+---
+
+## Status
+
+Situação atual recomendada para `gcp-migration`:
+
+- **Apto para homologação funcional completa** com foco nos itens do checklist acima.
+- **Sem bloqueios arquiteturais** para manter o core como shell puro.
