@@ -3,8 +3,8 @@ import { useWebProvider } from "../hooks/useWebProvider"
 import { endPointNotification } from "../models/constantes"
 
 export const useNotificationService = () => {
-    const { basicController } = useWebProvider()
-    const notificationController = basicController(null, endPointNotification)
+    const { controller } = useWebProvider()
+    const notificationController = controller(null, endPointNotification)
     const controllerRef = useRef(notificationController)
     controllerRef.current = notificationController
 
