@@ -224,8 +224,17 @@ export default function WebProviderComponent({ children }) {
             (c) => c.context !== matchingObject.context
         )
     }, [])
-    const subscribeEvent = useCallback(() => {}, [])
-    const unsubscribeEvent = useCallback(() => {}, [])
+    const subscribeEvent = useCallback((context, location, eventHandler) => {
+        const eventName = context + location
+        wsEvent.addEventListener(eventName, eventHandler)
+        subscribe({ context, location, userId })
+    }, [wsEvent, subscribe, userId])
+
+    const unsubscribeEvent = useCallback((context, location, eventHandler) => {
+        const eventName = context + location
+        wsEvent.removeEventListener(eventName, eventHandler)
+        unsubscribe({ context, location })
+    }, [wsEvent, unsubscribe])
     const sendMessage = useCallback(() => {}, [])
     const connectSocket = useCallback(() => {}, [])
     const connectNotificationSocket = useCallback(() => {}, [])
