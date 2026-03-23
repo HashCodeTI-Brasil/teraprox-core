@@ -64,11 +64,6 @@ module.exports = {
     plugins: [
         new ModuleFederationPlugin({
             name: 'teraprox_core',
-            filename: 'remoteEntry.js',
-            exposes: {
-                './useInjectReducer': './src/hooks/useInjectReducer',
-                './useWebInterface': './src/Services/http/webInterface',
-            },
             remotes: {
                 teraprox_app_sgp: `teraprox_app_sgp@${REMOTE_SGP_URL}/remoteEntry.js`,
                 teraprox_app_sgm: `teraprox_app_sgm@${REMOTE_SGM_URL}/remoteEntry.js`,
@@ -89,12 +84,13 @@ module.exports = {
                         'react-dnd-html5-backend',
                         'redux-persist',
                         'axios',
+                        'dayjs',
                     ].forEach(pkg => {
                         if (deps[pkg]) {
                             shared[pkg] = {
                                 singleton: true,
                                 requiredVersion: false,
-                                eager: false,
+                                eager: true,
                             };
                         }
                     });

@@ -51,6 +51,7 @@ export const store = configureStore({
 store.asyncReducers = {};
 
 store.injectReducer = (key, asyncReducer) => {
+    if (store.asyncReducers[key]) return;
     store.asyncReducers[key] = asyncReducer;
     store.replaceReducer(persistReducer(persistConfig, createReducer(store.asyncReducers)));
 };
