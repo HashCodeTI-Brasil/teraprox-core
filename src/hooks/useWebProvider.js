@@ -1,10 +1,43 @@
 import { useContext } from 'react';
 import { WebProvider } from '../websocket/wsProvider';
 
+const noop = () => {};
+const emptyPromise = Promise.resolve([]);
+const noopController = () => ({
+    get: () => emptyPromise, post: () => emptyPromise,
+    put: () => emptyPromise, delete: () => emptyPromise,
+    save: () => emptyPromise, read: () => emptyPromise,
+    readAll: () => emptyPromise, readAllwithPage: () => emptyPromise,
+    patch: () => emptyPromise, bulkDelete: () => emptyPromise,
+    deleteSimple: () => emptyPromise,
+});
+
 export const useWebProvider = () => {
     const webProvider = useContext(WebProvider);
+
+    if (!webProvider) {
+        return {
+            socket: null, notificationSocket: null,
+            sendMessage: noop, subscribe: noop, unsubscribe: noop,
+            controller: noopController,
+            connectSocket: noop, connectNotificationSocket: noop,
+            handleLogout: noop, subscribeEvent: noop, unsubscribeEvent: noop,
+            wsProvider: null,
+        };
+    }
+
     return {
-        ...webProvider,
-        controller: webProvider?.basicController
+        socket: webProvider.socket,
+        notificationSocket: webProvider.notificationSocket,
+        sendMessage: webProvider.sendMessage || noop,
+        subscribe: webProvider.subscribe || noop,
+        unsubscribe: webProvider.unsubscribe || noop,
+        controller: webProvider.basicController,
+        connectSocket: webProvider.connectSocket || noop,
+        connectNotificationSocket: webProvider.connectNotificationSocket || noop,
+        handleLogout: webProvider.handleLogout || noop,
+        subscribeEvent: webProvider.subscribeEvent || noop,
+        unsubscribeEvent: webProvider.unsubscribeEvent || noop,
+        wsProvider: webProvider,
     };
 };
