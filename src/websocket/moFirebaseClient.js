@@ -10,11 +10,14 @@ import { getDatabase, ref, onChildAdded, off } from "firebase/database"
 
 function getFirebaseDb() {
     if (!getApps().length) {
-        let configString = "{}"
-        if (typeof process !== "undefined" && process && process.env && process.env.REACT_APP_FIREBASE_CONFIG) {
-            configString = process.env.REACT_APP_FIREBASE_CONFIG
+        let config = {}
+        try {
+            const configString = process.env.REACT_APP_FIREBASE_CONFIG || "{}"
+            config = JSON.parse(configString)
+        } catch (e) {
+            console.error("[MoFirebase] Erro ao carregar config:", e)
         }
-        const config = JSON.parse(configString)
+
         if (!config || Object.keys(config).length === 0) {
             console.warn("[MoFirebase] REACT_APP_FIREBASE_CONFIG vazio ou ausente")
         }
