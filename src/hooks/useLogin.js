@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom"
 import { useWebProvider } from "./useWebProvider"
 import { useNotifications } from "./useNotifications"
 import { useUserService } from "../Services/default/userService"
-import { endPointTimer, endPointUser } from "../models/constantes"
 import {
     logIn,
     setToken,
+    setCompanySetores,
 } from "../Reducers/default-reducers/globalConfigReducer"
+import { endPointUser } from "../models/constantes"
 
 const useLogin = () => {
     const [email, setUsuario] = useState("")
@@ -31,6 +32,19 @@ const useLogin = () => {
         if (authResponse && authResponse.token) {
             dispatch(logIn({ ...authResponse }))
             dispatch(setToken(authResponse.token))
+
+            const companyId = authResponse.companyId
+            if (companyId) {
+                try {
+                    const setores = await controller("user", endPointUser).get(
+                        `findSetoresByCompanyId/${companyId}`
+                    )
+                    dispatch(setCompanySetores(setores))
+                } catch (err) {
+                    console.error("Erro ao carregar setores:", err)
+                }
+            }
+
             connect(authResponse.userName, authResponse.identifier, authResponse.id)
             navigate("/")
         } else {
