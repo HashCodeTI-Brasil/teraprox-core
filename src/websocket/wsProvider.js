@@ -29,7 +29,8 @@ export default function WebProviderComponent({ children }) {
     const dispatch = useDispatch()
     const toast = useToasts()
     const rawNavigate = useNavigate()
-    const { userId, companyId, userName, company, token } = useSelector((state) => state.global)
+    const { userId, companyId, userName, company: legacyCompany, companyName, token } = useSelector((state) => state.global)
+    const company = companyName || legacyCompany
     const matchingObjectsRef = useRef([]);
     const eventRef = useRef(null);
     const wsEvent = eventRef.current = eventRef.current || new EventTarget();
