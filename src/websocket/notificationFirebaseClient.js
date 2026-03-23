@@ -12,7 +12,11 @@ import { addNotification } from "../Reducers/default-reducers/notificationReduce
 
 function getFirebaseDb() {
     if (!getApps().length) {
-        const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "{}")
+        let configString = "{}"
+        if (typeof process !== "undefined" && process && process.env && process.env.REACT_APP_FIREBASE_CONFIG) {
+            configString = process.env.REACT_APP_FIREBASE_CONFIG
+        }
+        const config = JSON.parse(configString)
         initializeApp(config)
     }
     return getDatabase()

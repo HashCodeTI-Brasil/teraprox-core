@@ -10,7 +10,11 @@ import { getDatabase, ref, onChildAdded, off } from "firebase/database"
 
 function getFirebaseDb() {
     if (!getApps().length) {
-        const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "{}")
+        let configString = "{}"
+        if (typeof process !== "undefined" && process && process.env && process.env.REACT_APP_FIREBASE_CONFIG) {
+            configString = process.env.REACT_APP_FIREBASE_CONFIG
+        }
+        const config = JSON.parse(configString)
         if (!config || Object.keys(config).length === 0) {
             console.warn("[MoFirebase] REACT_APP_FIREBASE_CONFIG vazio ou ausente")
         }
