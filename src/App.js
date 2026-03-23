@@ -29,11 +29,11 @@ const App = () => {
 
                                 {allFederatedRoutes.map((screen) => (
                                     <Route
-                                        key={screen.modulePath}
+                                        key={screen.routePath}
                                         path={screen.routePath}
                                         element={
                                             <FederatedComponentHost
-                                                key={screen.modulePath}
+                                                key={screen.routePath}
                                                 modulePath={screen.modulePath}
                                                 context={screen.context}
                                                 hideFooter
