@@ -19,6 +19,7 @@ import { routesConfig } from "../models/routesConfig"
 import { useNavigate } from "react-router-dom"
 import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
 import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
+import { createMoFirebaseClient } from "./moFirebaseClient"
 import { store } from "../store"
 
 const WebProvider = createContext(null)
@@ -45,6 +46,41 @@ export default function WebProviderComponent({ children }) {
             }
         }
     }, [token, userId, company])
+
+    const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {
+        if (typeof incomingMatchingObject !== "object") return
+        const subscribers = matchingObjectsRef.current || []
+        const matches = subscribers.filter(
+            (mO) =>
+                mO.context === incomingMatchingObject.context &&
+                incomingMatchingObject.location === mO.location
+        )
+        for (const mO of matches) {
+            try {
+                if (mO.refresher) {
+                    mO.refresher(incomingMatchingObject.payload, dispatch)
+                } else {
+                    wsEvent.dispatchEvent(
+                        new CustomEvent(mO.context + mO.location, {
+                            detail: incomingMatchingObject.payload,
+                        })
+                    )
+                }
+            } catch (error) {
+                console.error("[Core] Falha ao processar MO context:", incomingMatchingObject.context)
+            }
+        }
+    }, [dispatch]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (token && company) {
+            const moSocket = createMoFirebaseClient(company, onMessageReceive)
+            setSocket(moSocket)
+            return () => {
+                moSocket.disconnect()
+            }
+        }
+    }, [token, company]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleLogout = useCallback(async () => {
         if (socket) socket.disconnect()
@@ -174,9 +210,20 @@ export default function WebProviderComponent({ children }) {
         }
     }, [setRestApi])
 
-    // Stubs para métodos de WebSocket/STOMP que SGP espera mas Core não implementa
-    const subscribe = useCallback(() => {}, [])
-    const unsubscribe = useCallback(() => {}, [])
+    // API de subscrição de Matching Objects — alimentada pelo Firebase RTDB
+    const subscribe = useCallback((matchingObject) => {
+        matchingObject.userId = userId
+        const current = matchingObjectsRef.current || []
+        if (!current.find((mO) => mO.context === matchingObject.context && mO.location === matchingObject.location)) {
+            matchingObjectsRef.current = [...current, matchingObject]
+        }
+    }, [userId])
+
+    const unsubscribe = useCallback((matchingObject) => {
+        matchingObjectsRef.current = (matchingObjectsRef.current || []).filter(
+            (c) => c.context !== matchingObject.context
+        )
+    }, [])
     const subscribeEvent = useCallback(() => {}, [])
     const unsubscribeEvent = useCallback(() => {}, [])
     const sendMessage = useCallback(() => {}, [])
