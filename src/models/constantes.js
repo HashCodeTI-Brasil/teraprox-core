@@ -25,6 +25,7 @@ export const paths = {
     // Controle de Processo
     cadernos: "/cadernos",
     cadernoDeVerificacao: "/cadernoDeVerificacao",
+    reporte: "/reporte/:dataInicio/:dataFim/:caderId",
     cadernoDeVerificacaoForm: "/cadernoDeVerificacaoForm",
     ordenacaoDeFolhas: "/ordenacaoDeFolhas",
     formularios: "/formularios",
