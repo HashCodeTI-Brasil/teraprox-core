@@ -52,6 +52,7 @@ const globalConfig = createSlice({
             state.userName = action.payload.userName
             state.setor = action.payload.setor
             state.setorId = action.payload.userSetor.setorId
+            state.company = action.payload.identifier
             state.companyName = action.payload.companyName
             state.companyId = action.payload.companyId
             state.fullName = `${action.payload.firstName} ${action.payload.lastName}`
