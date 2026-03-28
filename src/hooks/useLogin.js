@@ -7,6 +7,7 @@ import { useNotifications } from "./useNotifications"
 import { useUserService } from "../Services/default/userService"
 import {
     logIn,
+    setNeedUserLogin,
     setToken,
     setCompanySetores,
 } from "../Reducers/default-reducers/globalConfigReducer"
@@ -32,6 +33,7 @@ const useLogin = () => {
         if (authResponse && authResponse.token) {
             dispatch(logIn({ ...authResponse }))
             dispatch(setToken(authResponse.token))
+            dispatch(setNeedUserLogin(false))
 
             const companyId = authResponse.companyId
             if (companyId) {

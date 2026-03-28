@@ -14,10 +14,12 @@ const noopController = () => ({
 
 export const useWebProvider = () => {
     const webProvider = useContext(WebProvider);
+    const hostedByCore = typeof window !== 'undefined' && window.__TERAPROX_HOSTED_BY_CORE__ === true;
 
     if (!webProvider) {
         return {
             socket: null, notificationSocket: null,
+            hostedByCore,
             sendMessage: noop, subscribe: noop, unsubscribe: noop,
             controller: noopController,
             connectSocket: noop, connectNotificationSocket: noop,
@@ -29,6 +31,7 @@ export const useWebProvider = () => {
     return {
         socket: webProvider.socket,
         notificationSocket: webProvider.notificationSocket,
+        hostedByCore: !!webProvider.hostedByCore || hostedByCore,
         sendMessage: webProvider.sendMessage || noop,
         subscribe: webProvider.subscribe || noop,
         unsubscribe: webProvider.unsubscribe || noop,

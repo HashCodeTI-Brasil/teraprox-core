@@ -1,9 +1,9 @@
-import { Client } from "@stomp/stompjs"
 import axios from "axios"
 import React, {
     createContext,
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState
 } from "react"
@@ -11,10 +11,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { useToasts } from "react-toast-notifications"
 import {
     logOut,
-    setSocketConnectionStatus,
+    setNeedUserLogin,
     setToken,
 } from "../Reducers/default-reducers/globalConfigReducer"
-import { endPointNotification } from "../models/constantes"
 import { routesConfig } from "../models/routesConfig"
 import { useNavigate } from "react-router-dom"
 import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
@@ -29,14 +28,36 @@ export default function WebProviderComponent({ children }) {
     const dispatch = useDispatch()
     const toast = useToasts()
     const rawNavigate = useNavigate()
-    const { userId, companyId, userName, company: legacyCompany, companyName, token } = useSelector((state) => state.global)
+    const { userId, company: legacyCompany, companyName, token } = useSelector((state) => state.global)
     const company = legacyCompany || companyName
     const matchingObjectsRef = useRef([]);
     const eventRef = useRef(null);
     const wsEvent = eventRef.current = eventRef.current || new EventTarget();
+    const successToastTimerRef = useRef(null)
 
     const [socket, setSocket] = useState(null)
     const [notificationSocket, setNotificationSocket] = useState(null)
+
+    const enqueueSuccessToast = useCallback((message, options = {}, delay = 1000) => {
+        if (successToastTimerRef.current) {
+            clearTimeout(successToastTimerRef.current)
+        }
+        successToastTimerRef.current = setTimeout(() => {
+            if (toast?.addToast) {
+                toast.addToast(message, options)
+            }
+            successToastTimerRef.current = null
+        }, delay)
+    }, [toast])
+
+    useEffect(() => {
+        return () => {
+            if (successToastTimerRef.current) {
+                clearTimeout(successToastTimerRef.current)
+                successToastTimerRef.current = null
+            }
+        }
+    }, [])
 
     useEffect(() => {
         if (token && userId && company) {
@@ -104,6 +125,14 @@ export default function WebProviderComponent({ children }) {
         rawNavigate("/Login")
     }, [socket, notificationSocket, dispatch, rawNavigate])
 
+    const processResponseMatchingObjects = useCallback((matchingObjects) => {
+        if (!matchingObjects) return
+        const mos = Array.isArray(matchingObjects) ? matchingObjects : [matchingObjects]
+        for (const mo of mos) {
+            onMessageReceive(mo, false, "http-response")
+        }
+    }, [onMessageReceive])
+
     const setRestApi = useCallback((context, baseEndPoint) => {
         let endPointToConfig = baseEndPoint
         if (!endPointToConfig) {
@@ -120,18 +149,37 @@ export default function WebProviderComponent({ children }) {
 
         http.interceptors.response.use(
             res => {
-                if (res.config.method !== "get") {
-                    toast.addToast("Sucesso", { appearance: "success", autoDismiss: true })
+                if (res.config.method !== "get" && res.config.method !== "patch") {
+                    enqueueSuccessToast("Dados processados com sucesso", {
+                        appearance: "success",
+                        autoDismiss: true,
+                        autoDismissTimeout: 2000,
+                    })
                 }
                 if (res.data?.newToken) dispatch(setToken(res.data.newToken))
+                processResponseMatchingObjects(res.data?.matchingObjects)
                 return res.data?.content || res.data
             },
             err => {
                 const status = err.response?.status
+                const data = err.response?.data
                 const requestUrl = err.config?.url || ""
                 const requestBaseUrl = err.config?.baseURL || ""
                 const requestFingerprint = `${requestBaseUrl}${requestUrl}`
                 const isNotificationRequest = typeof requestFingerprint === "string" && requestFingerprint.includes("/notification/")
+
+                if (status === 400 || status === 404) {
+                    if (status === 400 && Array.isArray(data?.errors)) {
+                        data.errors.forEach((msg) =>
+                            toast.addToast(msg, { appearance: "warning", autoDismiss: true })
+                        )
+                    }
+                    if (status === 404) {
+                        toast.addToast("Recurso não encontrado.", { appearance: "info", autoDismiss: true })
+                    }
+                    return Promise.resolve(data)
+                }
+
                 if (status === 401) {
                     const currentToken = store.getState().global.token
                     const canRetry = !!currentToken && !err.config?._retry
@@ -147,15 +195,38 @@ export default function WebProviderComponent({ children }) {
                         return Promise.reject(err)
                     }
 
-                    const isStillAuth = store.getState().global.isAuth
-                    if (isStillAuth) {
-                        toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
-                        dispatch(logOut())
-                    }
-                    return Promise.reject(err)
+                    dispatch(setNeedUserLogin(true))
+                    toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
+                    dispatch(logOut())
+
+                    return new Promise((resolve, reject) => {
+                        const unsubscribe = store.subscribe(() => {
+                            const state = store.getState().global
+                            const refreshedToken = state.token
+                            const needLogin = state.needUserLogin
+
+                            if (refreshedToken && !needLogin) {
+                                unsubscribe()
+                                err.config.headers = err.config.headers || {}
+                                err.config.headers.Authorization = `${refreshedToken}`
+                                http.request(err.config).then(resolve).catch(reject)
+                            }
+                        })
+                    })
                 }
-                dispatch(setGlobalError(err.message))
-                return Promise.reject(err)
+
+                if (status === 403) {
+                    toast.addToast("Você não tem permissão para acessar este recurso.", { autoDismiss: true })
+                }
+                if (status === 500 && Array.isArray(data?.errors)) {
+                    data.errors.forEach((errMsg) =>
+                        toast.addToast(errMsg, { autoDismiss: true, autoDismissTimeout: 2000 })
+                    )
+                }
+
+                const customError = { message: err.message, status, data, stack: err.stack }
+                dispatch(setGlobalError(customError))
+                return Promise.reject(customError)
             }
         )
 
@@ -166,7 +237,7 @@ export default function WebProviderComponent({ children }) {
         })
 
         return http
-    }, [dispatch, toast])
+    }, [dispatch, enqueueSuccessToast, processResponseMatchingObjects, toast])
 
     const basicController = useCallback((context, baseEndPoint) => {
         const api = setRestApi(context, baseEndPoint)
@@ -258,7 +329,8 @@ export default function WebProviderComponent({ children }) {
     const connectSocket = useCallback(() => {}, [])
     const connectNotificationSocket = useCallback(() => {}, [])
 
-    const value = {
+    const value = useMemo(() => ({
+        hostedByCore: true,
         wsEvent,
         socket,
         notificationSocket,
@@ -273,7 +345,21 @@ export default function WebProviderComponent({ children }) {
         connectSocket,
         connectNotificationSocket,
         stompClient: null,
-    }
+    }), [
+        wsEvent,
+        socket,
+        notificationSocket,
+        handleLogout,
+        setRestApi,
+        basicController,
+        subscribe,
+        unsubscribe,
+        subscribeEvent,
+        unsubscribeEvent,
+        sendMessage,
+        connectSocket,
+        connectNotificationSocket,
+    ])
 
     return (
         <WebProvider.Provider value={value}>
