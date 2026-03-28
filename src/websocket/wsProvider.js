@@ -265,7 +265,7 @@ export default function WebProviderComponent({ children }) {
             },
             readAll: (path, extraHeaders, query) => {
                 const p = path || context
-                return api.get(`${p}/all${query ? "?" + query : ""}`)
+                return api.get(`${p}${query ? "?" + query : ""}`)
             },
             read: (path, id, extraHeaders, query) => {
                 const p = path || context

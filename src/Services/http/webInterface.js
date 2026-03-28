@@ -168,7 +168,7 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
             },
             readAll: (path, extraHeaders, query) => {
                 const pathh = path || context;
-                return http.get(`${pathh}/all${query ? "?" + query : ""}`, {
+                return http.get(`${pathh}${query ? "?" + query : ""}`, {
                     headers: { Contexto: context, ...extraHeaders },
                 });
             },
