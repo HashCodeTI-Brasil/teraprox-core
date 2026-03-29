@@ -10,6 +10,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const REMOTE_SGP_URL = process.env.REMOTE_SGP_URL || (isProd ? 'https://teraprox-sgp.web.app' : 'http://localhost:3002');
 const REMOTE_SGM_URL = process.env.REMOTE_SGM_URL || (isProd ? 'https://teraprox-sgm.web.app' : 'http://localhost:3003');
+const REMOTE_SOLICITACAO_URL = process.env.REMOTE_SOLICITACAO_URL || (isProd ? 'https://teraprox-solicitacoes.web.app' : 'http://localhost:3004');
 
 // Collect all REACT_APP_* env vars for DefinePlugin
 const envKeys = Object.keys(process.env)
@@ -18,6 +19,33 @@ const envKeys = Object.keys(process.env)
         acc[`process.env.${key}`] = JSON.stringify(process.env[key]);
         return acc;
     }, {});
+
+// Promise-based remote loader — remotes offline não crasham o Core
+function promiseRemote(remoteName, remoteUrl) {
+    return `promise new Promise((resolve, reject) => {
+        const url = '${remoteUrl}/remoteEntry.js';
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = () => {
+            const proxy = {
+                get: (request) => window['${remoteName}'].get(request),
+                init: (arg) => {
+                    try { return window['${remoteName}'].init(arg); }
+                    catch(e) { console.warn('${remoteName} already initialized'); }
+                }
+            };
+            resolve(proxy);
+        };
+        script.onerror = () => {
+            const error = new Error('Loading script failed.\\n(error: ' + url + ')');
+            error.name = 'ScriptExternalLoadError';
+            error.request = url;
+            console.warn('[Federation] Remote ${remoteName} offline (${remoteUrl})');
+            reject(error);
+        };
+        document.head.appendChild(script);
+    })`;
+}
 
 module.exports = {
     entry: './src/index.js',
@@ -36,7 +64,9 @@ module.exports = {
         poll: 1000, // Check for changes every second
     },
     output: {
-        publicPath: 'auto',
+        // Keep host bundles on absolute root path to avoid deep-route 404s
+        // like /ordemDeServico/main.hash.js when reloading nested routes.
+        publicPath: '/',
         filename: '[name].[contenthash].js',
         chunkFilename: '[id].[contenthash].js',
         clean: true,
@@ -66,8 +96,9 @@ module.exports = {
             name: 'teraprox_core',
             filename: 'remoteEntry.js',
             remotes: {
-                teraprox_app_sgp: `teraprox_app_sgp@${REMOTE_SGP_URL}/remoteEntry.js`,
-                teraprox_app_sgm: `teraprox_app_sgm@${REMOTE_SGM_URL}/remoteEntry.js`,
+                teraprox_app_sgp: promiseRemote('teraprox_app_sgp', REMOTE_SGP_URL),
+                teraprox_app_sgm: promiseRemote('teraprox_app_sgm', REMOTE_SGM_URL),
+                teraprox_app_solicitacao: promiseRemote('teraprox_app_solicitacao', REMOTE_SOLICITACAO_URL),
             },
             shared: {
                 ...(() => {

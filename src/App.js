@@ -4,11 +4,14 @@ import { useSelector } from 'react-redux';
 import { FederatedComponentHost } from './factories/FederatedComponentHOC';
 import MenuBar from './Components/Menu/MenuBar';
 import Login from './Screens/Login';
-import { allFederatedRoutes as sgpRoutes, defaultRoute } from './models/federatedProcessoScreens';
+import Home from './Screens/Home';
+import { allFederatedRoutes as sgpRoutes } from './models/federatedProcessoScreens';
 import { allFederatedRoutes as sgmRoutes } from './models/federatedManutencaoScreens';
 import { allFederatedRoutes as cadastroRoutes } from './models/federatedCadastroScreens';
+import { allFederatedRoutes as solicitacaoRoutes } from './models/federatedSolicitacaoScreens';
 
-const allFederatedRoutes = [...sgpRoutes, ...sgmRoutes, ...cadastroRoutes];
+const allFederatedRoutes = [...sgpRoutes, ...sgmRoutes, ...cadastroRoutes, ...solicitacaoRoutes];
+const homeRoute = '/home';
 
 const App = () => {
     const global = useSelector(state => state.global);
@@ -25,7 +28,8 @@ const App = () => {
                             <Route path="*" element={<Navigate to="/Login" replace />} />
                         ) : (
                             <>
-                                <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+                                <Route path="/" element={<Navigate to={homeRoute} replace />} />
+                                <Route path={homeRoute} element={<Home />} />
 
                                 {allFederatedRoutes.map((screen) => (
                                     <Route
@@ -42,7 +46,7 @@ const App = () => {
                                     />
                                 ))}
 
-                                <Route path="*" element={<Navigate to={defaultRoute} replace />} />
+                                <Route path="*" element={<Navigate to={homeRoute} replace />} />
                             </>
                         )}
                     </Routes>

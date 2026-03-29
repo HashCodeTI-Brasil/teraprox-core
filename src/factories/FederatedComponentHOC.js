@@ -1,13 +1,25 @@
 import React, { Suspense, useMemo, useContext } from 'react';
 import { useWebProvider } from '../hooks/useWebProvider';
 import { useLocation } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
 import { useStore } from 'react-redux';
 import { WebProvider as CoreWebProvider } from '../websocket/wsProvider';
 import FederatedErrorBoundary from '../Components/error-handling/FederatedErrorBoundary';
 import FederatedLoadingPlaceholder from '../Components/loading/FederatedLoadingPlaceholder';
+import FederatedUnavailableCard from '../Components/error-handling/FederatedUnavailableCard';
 import { componentRegistry, resolveRemoteName } from '../federation/remoteRegistry';
 import { useRemoteInfra } from '../hooks/useRemoteInfra';
+
+const FORWARD_REF_TYPE = Symbol.for('react.forward_ref');
+const MEMO_TYPE = Symbol.for('react.memo');
+const LAZY_TYPE = Symbol.for('react.lazy');
+
+const isRenderableComponentType = (type) => {
+    if (typeof type === 'function') return true;
+    if (!type || typeof type !== 'object') return false;
+
+    const marker = type.$$typeof;
+    return marker === FORWARD_REF_TYPE || marker === MEMO_TYPE || marker === LAZY_TYPE;
+};
 
 /**
  * Host component que orquestra o carregamento de componentes federados.
@@ -39,25 +51,32 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
 
     if (!RemoteComponent) {
         return (
-            <div className="alert alert-warning">
-                Módulo federado não encontrado: <strong>{modulePath}</strong>.
-                Registre-o em <code>src/federation/remoteRegistry.js</code>.
-            </div>
+            <FederatedUnavailableCard
+                modulePath={modulePath}
+                errorMessage="Componente nao registrado no catalogo federado do Core."
+                onRetry={retry}
+            />
+        );
+    }
+
+    if (!isRenderableComponentType(RemoteComponent)) {
+        return (
+            <FederatedUnavailableCard
+                modulePath={modulePath}
+                errorMessage="Componente remoto recebido em formato invalido."
+                onRetry={retry}
+            />
         );
     }
 
     if (loadError) {
         return (
             <FederatedErrorBoundary>
-                <div className="alert alert-danger">
-                    <strong>Falha ao Carregar Componente</strong>
-                    <p>Não foi possível carregar o módulo remoto. Provavelmente o servidor de origem está offline.</p>
-                    <hr />
-                    <p className="mb-0">Erro: {loadError.message}</p>
-                    <Button variant="outline-danger" className="mt-2" onClick={retry}>
-                        Tentar Novamente
-                    </Button>
-                </div>
+                <FederatedUnavailableCard
+                    modulePath={modulePath}
+                    errorMessage={loadError.message}
+                    onRetry={retry}
+                />
             </FederatedErrorBoundary>
         );
     }
@@ -69,6 +88,16 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
     // Guard: bridge stale — aguarda recarga quando navega entre SGP ↔ SGM
     if (expectedRemote && bridgeRemote && bridgeRemote !== expectedRemote) {
         return <FederatedLoadingPlaceholder />;
+    }
+
+    if (BridgeComponent && !isRenderableComponentType(BridgeComponent)) {
+        return (
+            <FederatedUnavailableCard
+                modulePath={modulePath}
+                errorMessage="Bridge federado recebido em formato invalido."
+                onRetry={retry}
+            />
+        );
     }
 
     const remoteContent = (

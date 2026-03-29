@@ -15,6 +15,7 @@ import NotificationBell from '../Notifications/NotificationBell';
 import { menuSections as sgpMenuSections } from '../../models/federatedProcessoScreens';
 import { menuSections as sgmMenuSections } from '../../models/federatedManutencaoScreens';
 import { menuSections as cadastroMenuSections } from '../../models/federatedCadastroScreens';
+import { menuSections as solicitacaoMenuSections } from '../../models/federatedSolicitacaoScreens';
 
 const MenuBar = () => {
     const { handleLogout, notificationSocket } = useWebProvider()
@@ -63,13 +64,35 @@ const MenuBar = () => {
 
     const toggleDrawer = () => setDrawerOpen(!drawerOpen)
     const toggleMenu = (menuKey) => setExpandedMenu(prev => prev === menuKey ? null : menuKey)
+    const manutencaoSections = (() => {
+        const solicitacaoItems = solicitacaoMenuSections.flatMap(section => section.items || [])
+        const operacaoIndex = sgmMenuSections.findIndex(section => section.title === 'Operação')
+
+        if (operacaoIndex === -1) {
+            return [...sgmMenuSections, ...solicitacaoMenuSections]
+        }
+
+        return sgmMenuSections.map((section, index) => {
+            if (index !== operacaoIndex) return section
+            return {
+                ...section,
+                items: [...section.items, ...solicitacaoItems],
+            }
+        })
+    })()
 
     if (isAuthenticated(global.token)) {
         return (
             <div className='App tc f3 menu-bar'>
                 <Navbar className="menu-bar" expand="lg" onClick={navClickHandler} >
                     <div className="navbar-logo">
-                        <Image style={{ cursor: "pointer" }} height={50} width={50} src={scqlogo} />
+                        <Image
+                            style={{ cursor: "pointer" }}
+                            height={50}
+                            width={50}
+                            src={scqlogo}
+                            onClick={() => navigate('/home')}
+                        />
                     </div>
 
                     {isMobile ? (
@@ -111,8 +134,8 @@ const MenuBar = () => {
 
                                 <PermissionContainer menubar component={cRef => (
                                     <NavDropdown ref={cRef} className="teraprox-dropdown" title="Manutenção" id={ids.menuBar.manutencaoDropdownMenu}>
-                                        {sgmMenuSections.map((section, sIdx) => (
-                                            <React.Fragment key={section.title}>
+                                        {manutencaoSections.map((section, sIdx) => (
+                                            <React.Fragment key={`${section.title}-${sIdx}`}>
                                                 {sIdx > 0 && <NavDropdown.Divider />}
                                                 <NavDropdown.Header>{section.title}</NavDropdown.Header>
                                                 {section.items.map((item) => (
@@ -172,7 +195,16 @@ const MenuBar = () => {
                             <div className={`mobile-drawer ${drawerOpen ? 'open' : ''}`} ref={drawerRef} role="dialog" aria-hidden={!drawerOpen} aria-label="Menu de navegação">
                                 <div className="mobile-drawer-header">
                                     <div className="navbar-logo small">
-                                        <Image style={{ cursor: "pointer" }} height={36} width={36} src={scqlogo} />
+                                        <Image
+                                            style={{ cursor: "pointer" }}
+                                            height={36}
+                                            width={36}
+                                            src={scqlogo}
+                                            onClick={() => {
+                                                navigate('/home')
+                                                setDrawerOpen(false)
+                                            }}
+                                        />
                                     </div>
                                     <div className="company-name"><strong>{global.companyName}</strong></div>
                                     <div className="connection-status">{socket ? "Connected" : "Offline"}</div>
@@ -187,8 +219,8 @@ const MenuBar = () => {
                                 </div>
                                 <nav className="mobile-drawer-nav">
                                     {[{ key: 'processo', title: 'Processo', sections: sgpMenuSections },
-                                      { key: 'manutencao', title: 'Manutenção', sections: sgmMenuSections },
-                                      { key: 'cadastros', title: 'Cadastros', sections: cadastroMenuSections }
+                                                                            { key: 'manutencao', title: 'Manutenção', sections: manutencaoSections },
+                                      { key: 'cadastros', title: 'Cadastros', sections: cadastroMenuSections },
                                     ].map((group) => (
                                         <div className="drawer-accordion" key={group.key}>
                                             <button
@@ -201,7 +233,7 @@ const MenuBar = () => {
                                             </button>
                                             <div className={`drawer-accordion-content ${expandedMenu === group.key ? 'expanded' : ''}`}>
                                                 {group.sections.map((section, sIdx) => (
-                                                    <React.Fragment key={`${group.key}-${section.title}`}>
+                                                    <React.Fragment key={`${group.key}-${section.title}-${sIdx}`}>
                                                         {sIdx > 0 && <div className="drawer-divider" />}
                                                         <div className="drawer-section">
                                                             <div className="drawer-subsection-title">{section.title}</div>

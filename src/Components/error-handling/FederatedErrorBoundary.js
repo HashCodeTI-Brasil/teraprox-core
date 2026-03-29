@@ -1,4 +1,5 @@
 import React from 'react';
+import FederatedUnavailableCard from './FederatedUnavailableCard';
 
 const isChunkLoadError = (error) => {
     const msg = error?.message || '';
@@ -47,22 +48,10 @@ class FederatedErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="alert alert-danger p-4 border-danger shadow-sm">
-                    <h4 className="alert-heading">Falha ao Carregar Componente</h4>
-                    <p>
-                        Não foi possível carregar o formulário remoto. Provavelmente o servidor de origem está offline.
-                    </p>
-                    <hr />
-                    <div className="d-flex justify-content-between align-items-center">
-                        <small className="text-muted">Erro: {this.state.error?.message}</small>
-                        <button
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={this.handleRetry}
-                        >
-                            Tentar Novamente
-                        </button>
-                    </div>
-                </div>
+                <FederatedUnavailableCard
+                    errorMessage={this.state.error?.message}
+                    onRetry={this.handleRetry}
+                />
             );
         }
 

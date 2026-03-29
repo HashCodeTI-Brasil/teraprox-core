@@ -13,7 +13,6 @@ export const menuSections = [
             { label: 'Planejamento', routePath: '/planejamentoDeOs', modulePath: 'teraprox_app_sgm/PlanejamentoDeOsComFiltrosAvancados', context: 'ordemDeServico' },
             { label: 'Ordens de Serviço', routePath: '/ordensDeServico', modulePath: 'teraprox_app_sgm/OrdensDeServico', context: 'ordemDeServico' },
             { label: 'Ordens de Manutenção', routePath: '/ordensDeManutencao', modulePath: 'teraprox_app_sgm/OrdensDeManutencao', context: 'ordemDeManutencao' },
-            { label: 'Solicitações de Serviço', routePath: '/solicitacoesDeServico', modulePath: 'teraprox_app_sgm/SolicitacoesDeServico', context: 'solicitacaoDeServico' },
             { label: 'Monitoramento de Ativos', routePath: '/monitoramento-recursos', modulePath: 'teraprox_app_sgm/MonitoramentoRecursos', context: 'monitoramentoRecursos' },
         ],
     },
@@ -45,7 +44,6 @@ export const menuSections = [
 export const formRoutes = [
     { routePath: '/mantenedorForm', modulePath: 'teraprox_app_sgm/MantenedorForm', context: 'mantenedor' },
     { routePath: '/tipoDeOrdemForm', modulePath: 'teraprox_app_sgm/TipoDeOrdemForm', context: 'tipoDeOrdem' },
-    { routePath: '/solicitacaoDeServicoForm', modulePath: 'teraprox_app_sgm/SolicitacaoDeServicoForm', context: 'solicitacaoDeServico' },
     { routePath: '/ordemDeServicoFormV2', modulePath: 'teraprox_app_sgm/OrdemDeServicoFormV2', context: 'ordemDeServico' },
     { routePath: '/ordemDeManutencaoForm', modulePath: 'teraprox_app_sgm/OrdemDeManutencaoForm', context: 'ordemDeManutencao' },
     { routePath: '/executarOrdemDeManutencao/:id', modulePath: 'teraprox_app_sgm/ExecutarOrdemDeManutencao', context: 'ordemDeManutencao' },

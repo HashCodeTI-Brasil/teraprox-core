@@ -1,5 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
 
+const FORWARD_REF_TYPE = Symbol.for('react.forward_ref');
+const MEMO_TYPE = Symbol.for('react.memo');
+const LAZY_TYPE = Symbol.for('react.lazy');
+
+const isRenderableComponentType = (type) => {
+    if (typeof type === 'function') return true;
+    if (!type || typeof type !== 'object') return false;
+
+    const marker = type.$$typeof;
+    return marker === FORWARD_REF_TYPE || marker === MEMO_TYPE || marker === LAZY_TYPE;
+};
+
+const resolveBridgeExport = (bridgeModule) => {
+    const candidate =
+        bridgeModule?.default?.default ||
+        bridgeModule?.default ||
+        bridgeModule?.FederatedBridge ||
+        bridgeModule?.Bridge ||
+        null;
+
+    return isRenderableComponentType(candidate) ? candidate : null;
+};
+
 /**
  * Hook para carregar a infraestrutura de um remote (ReducersBundle + FederatedBridge).
  * Injeta os reducers necessários no store do host, baseado no contexto da rota.
@@ -30,16 +53,26 @@ export const useRemoteInfra = (store, modulePath, context) => {
         const loadRemoteInfra = async () => {
             try {
                 const isSGM = modulePath.startsWith('teraprox_app_sgm/');
+                const isSolicitacao = modulePath.startsWith('teraprox_app_solicitacao/');
 
-                const [remoteModule, bridgeModule] = isSGM
-                    ? await Promise.all([
+                let remoteModule, bridgeModule;
+
+                if (isSolicitacao) {
+                    [remoteModule, bridgeModule] = await Promise.all([
+                        import('teraprox_app_solicitacao/ReducersBundle'),
+                        import('teraprox_app_solicitacao/FederatedBridge'),
+                    ]);
+                } else if (isSGM) {
+                    [remoteModule, bridgeModule] = await Promise.all([
                         import('teraprox_app_sgm/ReducersBundle'),
                         import('teraprox_app_sgm/FederatedBridge'),
-                    ])
-                    : await Promise.all([
+                    ]);
+                } else {
+                    [remoteModule, bridgeModule] = await Promise.all([
                         import('teraprox_app_sgp/ReducersBundle'),
                         import('teraprox_app_sgp/FederatedBridge'),
                     ]);
+                }
 
                 // Carrega os reducers por contexto ou fallback completo
                 let remoteReducers = {};
@@ -64,8 +97,9 @@ export const useRemoteInfra = (store, modulePath, context) => {
                 });
 
                 if (active) {
-                    setBridgeComponent(() => bridgeModule.default);
-                    setBridgeRemote(isSGM ? 'sgm' : 'sgp');
+                    const resolvedBridge = resolveBridgeExport(bridgeModule);
+                    setBridgeComponent(() => resolvedBridge);
+                    setBridgeRemote(isSolicitacao ? 'solicitacao' : isSGM ? 'sgm' : 'sgp');
                     setReady(true);
                 }
             } catch (error) {
