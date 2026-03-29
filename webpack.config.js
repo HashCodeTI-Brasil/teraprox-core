@@ -23,7 +23,7 @@ const envKeys = Object.keys(process.env)
 // Promise-based remote loader — remotes offline não crasham o Core
 function promiseRemote(remoteName, remoteUrl) {
     return `promise new Promise((resolve, reject) => {
-        const url = '${remoteUrl}/remoteEntry.js';
+        const url = '${remoteUrl}/remoteEntry.js?v=' + Date.now();
         const script = document.createElement('script');
         script.src = url;
         script.onload = () => {
