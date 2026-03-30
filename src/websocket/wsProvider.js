@@ -18,6 +18,7 @@ import { routesConfig } from "../models/routesConfig"
 import { useNavigate } from "react-router-dom"
 import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
 import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
+import { createAsyncResponseClient } from "./asyncResponseFirebaseClient"
 import { createMoFirebaseClient } from "./moFirebaseClient"
 import { store } from "../store"
 
@@ -69,6 +70,16 @@ export default function WebProviderComponent({ children }) {
             }
         }
         console.log(`[Core][Notification] Listener nao iniciado (token=${!!token}, userId=${!!userId}, company=${!!company})`)
+    }, [token, userId, company])
+
+    useEffect(() => {
+        if (token && userId && company) {
+            console.log(`[Core][AsyncResponse] Conectando listener: company=${company}, userId=${userId}`)
+            const asyncClient = createAsyncResponseClient(company, userId)
+            return () => {
+                if (asyncClient) asyncClient.disconnect()
+            }
+        }
     }, [token, userId, company])
 
     const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {

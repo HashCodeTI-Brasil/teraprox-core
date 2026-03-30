@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import globalConfigReducer from './Reducers/default-reducers/globalConfigReducer';
 import globalErrorReducer from './Reducers/default-reducers/globalErrorReducer';
 import notificationReducer from './Reducers/default-reducers/notificationReducer';
+import asyncResponseReducer from './Reducers/default-reducers/asyncResponseReducer';
 
 const PERSIST_KEY = 'teraprox-core-root';
 
@@ -23,6 +24,7 @@ const staticReducers = {
     global: globalConfigReducer,
     errors: globalErrorReducer,
     notification: notificationReducer,
+    asyncResponse: asyncResponseReducer,
 };
 
 function createReducer(asyncReducers = {}) {
