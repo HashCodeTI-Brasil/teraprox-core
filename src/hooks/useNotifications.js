@@ -39,11 +39,8 @@ export function useNotifications(notificationSocket) {
 
     const handleMarkAsRead = useCallback(async (id) => {
         dispatch(markAsRead(id))
-        if (notificationSocket?.connected) {
-            notificationSocket.emit("central_notification_ack", { notificationId: id })
-        }
         try { await markAsReadAPI(id) } catch (_) { }
-    }, [dispatch, notificationSocket, markAsReadAPI])
+    }, [dispatch, markAsReadAPI])
 
     const handleDismiss = useCallback(async (id) => {
         dispatch(dismissNotification(id))
@@ -54,13 +51,8 @@ export function useNotifications(notificationSocket) {
         const ids = unreadNotifications.map((n) => n.deliveryId ?? n._id ?? n.id).filter(Boolean)
         if (ids.length === 0) return
         dispatch(markAllAsRead(ids))
-        if (notificationSocket?.connected) {
-            ids.forEach((notificationId) => {
-                notificationSocket.emit("central_notification_ack", { notificationId })
-            })
-        }
         try { await markAllAsReadAPI(ids) } catch (_) { }
-    }, [dispatch, notificationSocket, unreadNotifications, markAllAsReadAPI])
+    }, [dispatch, unreadNotifications, markAllAsReadAPI])
 
     return {
         unreadNotifications,
