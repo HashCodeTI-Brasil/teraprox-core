@@ -168,6 +168,8 @@ export default function WebProviderComponent({ children }) {
                     })
                 }
                 if (res.data?.newToken) dispatch(setToken(res.data.newToken))
+                const gatewayNewToken = res.headers?.['x-new-token']
+                if (gatewayNewToken) dispatch(setToken(gatewayNewToken))
                 processResponseMatchingObjects(res.data?.matchingObjects)
                 return res.data?.content || res.data
             },

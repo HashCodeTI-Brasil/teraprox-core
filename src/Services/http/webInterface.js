@@ -20,6 +20,9 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
                     });
                 }
                 if (res.data?.newToken) store.dispatch(setToken(res.data?.newToken));
+                // Gateway centraliza JWT: token renovado vem via response header
+                const gatewayNewToken = res.headers?.['x-new-token'];
+                if (gatewayNewToken) store.dispatch(setToken(gatewayNewToken));
                 processResponseMatchingObjects(res.data.matchingObjects);
                 return res?.data?.content ? res.data.content : res.data;
             },
