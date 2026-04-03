@@ -57,6 +57,7 @@ const globalConfig = createSlice({
             state.companyId = action.payload.companyId
             state.fullName = `${action.payload.firstName} ${action.payload.lastName}`
             state.filters = action.payload.filters
+            state.needUserLogin = false
         },
 
         logOut(state, action) {
@@ -67,6 +68,7 @@ const globalConfig = createSlice({
             state.userId = ""
             state.company = ""
             state.role = ""
+            state.needUserLogin = false
         },
         setCompany(state, action) {
             state.company = action.payload

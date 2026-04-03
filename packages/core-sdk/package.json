@@ -1,5 +1,5 @@
 {
-  "name": "@teraprox/core-sdk",
+  "name": "teraprox-core-sdk",
   "version": "0.2.0",
   "description": "Contrato tipado Core ↔ Federados — interfaces, context, hooks e componentes compartilhados",
   "main": "dist/index.js",

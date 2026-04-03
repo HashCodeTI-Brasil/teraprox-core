@@ -5,6 +5,7 @@ import { FederatedComponentHost } from './factories/FederatedComponentHOC';
 import MenuBar from './Components/Menu/MenuBar';
 import Login from './Screens/Login';
 import Home from './Screens/Home';
+import ServerErrorScreen from './Components/error-handling/ServerErrorScreen';
 import { allFederatedRoutes as sgpRoutes } from './models/federatedProcessoScreens';
 import { allFederatedRoutes as sgmRoutes } from './models/federatedManutencaoScreens';
 import { allFederatedRoutes as cadastroRoutes } from './models/federatedCadastroScreens';
@@ -15,7 +16,18 @@ const homeRoute = '/home';
 
 const App = () => {
     const global = useSelector(state => state.global);
+    const globalError = useSelector(state => state.errors);
     const isAuth = global?.isAuth;
+
+    const isServerError = globalError && (
+        globalError.status === undefined ||   // network error (sem resposta do servidor)
+        (globalError.status >= 500 && globalError.status < 600)  // 5xx
+    );
+
+    if (isServerError) {
+        return <ServerErrorScreen />;
+    }
+
     return (
         <div className="teraprox-shell">
             {isAuth && <MenuBar />}

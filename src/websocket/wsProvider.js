@@ -208,9 +208,13 @@ export default function WebProviderComponent({ children }) {
                         return Promise.reject(err)
                     }
 
-                    dispatch(setNeedUserLogin(true))
-                    toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
-                    dispatch(logOut())
+                    // Evita criar múltiplos pending Promises se vários requests falharem simultaneamente
+                    const alreadyWaiting = store.getState().global.needUserLogin
+                    if (!alreadyWaiting) {
+                        dispatch(setNeedUserLogin(true))
+                        toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
+                        dispatch(logOut())
+                    }
 
                     return new Promise((resolve, reject) => {
                         const unsubscribe = store.subscribe(() => {
@@ -222,6 +226,9 @@ export default function WebProviderComponent({ children }) {
                                 unsubscribe()
                                 err.config.headers = err.config.headers || {}
                                 err.config.headers.Authorization = `${refreshedToken}`
+                                // Limpa o flag _retry para que, se o retry pós-login falhar
+                                // por motivo legítimo, o interceptor possa tratá-lo corretamente
+                                delete err.config._retry
                                 http.request(err.config).then(resolve).catch(reject)
                             }
                         })

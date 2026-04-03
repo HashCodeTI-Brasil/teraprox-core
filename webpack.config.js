@@ -101,6 +101,11 @@ module.exports = {
                 teraprox_app_solicitacao: promiseRemote('teraprox_app_solicitacao', REMOTE_SOLICITACAO_URL),
             },
             shared: {
+                'teraprox-core-sdk': {
+                    singleton: true,
+                    requiredVersion: false,
+                    eager: true,
+                },
                 ...(() => {
                     const shared = {};
                     [

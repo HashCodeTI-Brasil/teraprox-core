@@ -72,9 +72,10 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
                     toast?.addToast('Você não tem permissão para acessar este recurso.', { autoDismiss: true });
                 }
                 if (status === 500 && Array.isArray(data.errors)) {
-                    data.errors.forEach(errMsg =>
-                        toast?.addToast(errMsg, { autoDismiss: true, duration: 2000 })
-                    );
+                    data.errors.forEach(errMsg => {
+                        const msg = typeof errMsg === 'string' ? errMsg : (errMsg?.message || 'Erro interno do servidor')
+                        toast?.addToast(msg, { autoDismiss: true, duration: 2000 })
+                    });
                 }
 
                 const customError = { message: err.message, status, data, stack: err.stack };

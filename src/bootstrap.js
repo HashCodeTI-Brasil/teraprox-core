@@ -10,6 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { store, persistor } from './store';
 import { ValidateProvider } from './providers/ValidateProvider';
+import CoreServiceProvider from './providers/CoreServiceProvider';
 import WebProviderComponent from './websocket/wsProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,7 +25,9 @@ root.render(
                         <DndProvider backend={HTML5Backend}>
                             <BrowserRouter>
                                 <WebProviderComponent>
-                                    <App />
+                                    <CoreServiceProvider>
+                                        <App />
+                                    </CoreServiceProvider>
                                 </WebProviderComponent>
                             </BrowserRouter>
                         </DndProvider>
