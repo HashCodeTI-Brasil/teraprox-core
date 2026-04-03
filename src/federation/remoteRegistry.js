@@ -3,18 +3,26 @@ import { lazy } from 'react';
 /**
  * Wraps a dynamic import to auto-reload on stale chunk errors
  * (e.g. after a deploy that invalidates bundles).
+ * Remote offline (ScriptExternalLoadError) é tratado pelo FederatedErrorBoundary
+ * — não faz reload, deixa o erro subir para exibir o card de indisponível.
  */
 const lazyWithChunkReload = (importFn) => {
     return lazy(() =>
         importFn().catch((error) => {
             const msg = error?.message || '';
-            const isChunkError =
+
+            // Remote offline — deixa subir para o FederatedErrorBoundary
+            if (error?.name === 'ScriptExternalLoadError') {
+                throw error;
+            }
+
+            const isStaleChunkError =
                 msg.includes('Loading chunk') ||
                 msg.includes('Loading CSS chunk') ||
                 msg.includes('ChunkLoadError') ||
                 msg.includes('Failed to fetch dynamically imported module');
 
-            if (isChunkError) {
+            if (isStaleChunkError) {
                 const reloadKey = 'federated_chunk_reload_ts';
                 const lastReload = sessionStorage.getItem(reloadKey);
                 const now = Date.now();

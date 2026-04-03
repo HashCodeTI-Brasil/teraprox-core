@@ -7,7 +7,8 @@ const isChunkLoadError = (error) => {
         msg.includes('Loading chunk') ||
         msg.includes('Loading CSS chunk') ||
         msg.includes('Failed to fetch dynamically imported module') ||
-        msg.includes('ChunkLoadError')
+        msg.includes('ChunkLoadError') ||
+        error?.name === 'ScriptExternalLoadError'
     );
 };
 
