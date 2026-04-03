@@ -208,7 +208,8 @@ export default function WebProviderComponent({ children }) {
                         return Promise.reject(err)
                     }
 
-                    // Evita criar múltiplos pending Promises se vários requests falharem simultaneamente
+                    // Evita toast/logOut duplicado quando vários requests expiram simultaneamente.
+                    // needUserLogin só é resetado por logIn (não por logOut), então o guard é confiável.
                     const alreadyWaiting = store.getState().global.needUserLogin
                     if (!alreadyWaiting) {
                         dispatch(setNeedUserLogin(true))
@@ -216,23 +217,9 @@ export default function WebProviderComponent({ children }) {
                         dispatch(logOut())
                     }
 
-                    return new Promise((resolve, reject) => {
-                        const unsubscribe = store.subscribe(() => {
-                            const state = store.getState().global
-                            const refreshedToken = state.token
-                            const needLogin = state.needUserLogin
-
-                            if (refreshedToken && !needLogin) {
-                                unsubscribe()
-                                err.config.headers = err.config.headers || {}
-                                err.config.headers.Authorization = `${refreshedToken}`
-                                // Limpa o flag _retry para que, se o retry pós-login falhar
-                                // por motivo legítimo, o interceptor possa tratá-lo corretamente
-                                delete err.config._retry
-                                http.request(err.config).then(resolve).catch(reject)
-                            }
-                        })
-                    })
+                    // Rejeita o request. O route guard (isAuth=false) redireciona para /Login.
+                    // Após re-login os componentes remontam e fazem requests frescos com o novo token.
+                    return Promise.reject(err)
                 }
 
                 if (status === 403) {

@@ -68,7 +68,9 @@ const globalConfig = createSlice({
             state.userId = ""
             state.company = ""
             state.role = ""
-            state.needUserLogin = false
+            // needUserLogin NÃO é limpo aqui.
+            // Só logIn deve limpá-lo, garantindo que o guard `alreadyWaiting`
+            // funcione corretamente entre 401s concorrentes.
         },
         setCompany(state, action) {
             state.company = action.payload
