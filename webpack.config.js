@@ -13,12 +13,22 @@ const REMOTE_SGM_URL = process.env.REMOTE_SGM_URL || (isProd ? 'https://teraprox
 const REMOTE_SOLICITACAO_URL = process.env.REMOTE_SOLICITACAO_URL || (isProd ? 'https://teraprox-solicitacoes.web.app' : 'http://localhost:3004');
 
 // Collect all REACT_APP_* env vars for DefinePlugin
-const envKeys = Object.keys(process.env)
+// Define the entire process.env object so any process.env.* access (static or dynamic)
+// is safe in the browser even when vars are not set in the build environment (Webpack 5
+// no longer auto-polyfills `process` for browser targets).
+const reactAppVars = Object.keys(process.env)
     .filter(key => key.startsWith('REACT_APP_'))
     .reduce((acc, key) => {
-        acc[`process.env.${key}`] = JSON.stringify(process.env[key]);
+        acc[key] = process.env[key];
         return acc;
     }, {});
+
+const envKeys = {
+    'process.env': JSON.stringify({
+        NODE_ENV: isProd ? 'production' : 'development',
+        ...reactAppVars,
+    }),
+};
 
 // Promise-based remote loader — remotes offline não crasham o Core
 function promiseRemote(remoteName, remoteUrl) {
