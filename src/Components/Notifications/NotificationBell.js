@@ -14,7 +14,7 @@ const NotificationBell = ({ socket, className = "", shouldClose = false }) => {
     const [isMobileView, setIsMobileView] = useState(false)
     const userId = useSelector((state) => state.global?.userId)
     const {
-        unreadNotifications,
+        unreadNotifications: rawUnread,
         archivedNotifications,
         unreadCount,
         handleMarkAsRead,
@@ -23,6 +23,7 @@ const NotificationBell = ({ socket, className = "", shouldClose = false }) => {
         loadArchivedNotifications,
         loadInitialNotifications,
     } = useNotifications(socket)
+    const unreadNotifications = Array.isArray(rawUnread) ? rawUnread : []
     const prevUnreadCount = useRef(unreadCount)
 
     useEffect(() => {

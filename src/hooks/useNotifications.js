@@ -25,9 +25,13 @@ export function useNotifications(notificationSocket) {
 
     const loadInitialNotifications = useCallback(
         async (userId) => {
-            const { notifications, count } = await getUnreadNotificationsForUser(userId)
-            dispatch(setUnreadNotifications(notifications))
-            dispatch(setUnreadCount(count))
+            try {
+                const { notifications, count } = await getUnreadNotificationsForUser(userId)
+                dispatch(setUnreadNotifications(notifications))
+                dispatch(setUnreadCount(count))
+            } catch (err) {
+                console.warn('[useNotifications] Falha ao carregar notificações:', err?.message)
+            }
         },
         [dispatch, getUnreadNotificationsForUser]
     )
