@@ -22,6 +22,50 @@ import { createAsyncResponseClient } from "./asyncResponseFirebaseClient"
 import { createMoFirebaseClient } from "./moFirebaseClient"
 import { store } from "../store"
 
+const getEnv = (key) => {
+    if (typeof process !== "undefined" && process?.env) {
+        return process.env[key]
+    }
+    return undefined
+}
+
+const gatewayHostByPrefix = {
+    user: getEnv("REACT_APP_GATEWAY_HOST_USER") || "api-user.teraprox.com",
+    processo: getEnv("REACT_APP_GATEWAY_HOST_PROCESSO") || "api-processo.teraprox.com",
+    manutencao: getEnv("REACT_APP_GATEWAY_HOST_MANUTENCAO") || "api-manutencao.teraprox.com",
+    notification: getEnv("REACT_APP_GATEWAY_HOST_NOTIFICATION") || "notification-api.teraprox.com",
+}
+
+function resolveGatewayEndpoint(baseEndPoint) {
+    if (!baseEndPoint) {
+        return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null }
+    }
+
+    try {
+        const parsed = new URL(baseEndPoint)
+        const pathname = parsed.pathname || "/"
+        const cleanPathname = pathname.endsWith("/") && pathname.length > 1
+            ? pathname.slice(0, -1)
+            : pathname
+
+        const match = cleanPathname.match(/^\/(user|processo|manutencao|notification)(\/|$)/)
+        if (!match) {
+            return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null }
+        }
+
+        const prefix = match[1]
+        const suffix = cleanPathname.replace(new RegExp(`^/${prefix}`), "") || "/"
+        const normalizedBaseURL = `${parsed.origin}${suffix}${parsed.search || ""}`
+
+        return {
+            normalizedBaseURL,
+            gatewayHostHeader: gatewayHostByPrefix[prefix] || null,
+        }
+    } catch {
+        return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null }
+    }
+}
+
 const WebProvider = createContext(null)
 export { WebProvider }
 
@@ -156,7 +200,8 @@ export default function WebProviderComponent({ children }) {
             )
         }
 
-        const http = axios.create({ baseURL: endPointToConfig })
+        const { normalizedBaseURL, gatewayHostHeader } = resolveGatewayEndpoint(endPointToConfig)
+        const http = axios.create({ baseURL: normalizedBaseURL })
 
         http.interceptors.response.use(
             res => {
@@ -240,6 +285,12 @@ export default function WebProviderComponent({ children }) {
         http.interceptors.request.use(config => {
             const currentToken = store.getState().global.token
             if (currentToken) config.headers.Authorization = `${currentToken}`
+            if (context && !config.headers?.Contexto) {
+                config.headers.Contexto = context
+            }
+            if (gatewayHostHeader && !config.headers?.["x-teraprox-host"]) {
+                config.headers["x-teraprox-host"] = gatewayHostHeader
+            }
             return config
         })
 
@@ -264,7 +315,7 @@ export default function WebProviderComponent({ children }) {
             delete: (path, id, extraHeaders, query) => {
                 const p = path || context
                 const url = id ? `${p}/${id}` : p
-                return api.delete(`${url}${query ? "?" + query : ""}`)
+                return api.delete(`${url}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             patch: (path, data, extraHeaders, query) => {
                 const p = path || context
@@ -272,18 +323,18 @@ export default function WebProviderComponent({ children }) {
             },
             readAll: (path, extraHeaders, query) => {
                 const p = path || context
-                return api.get(`${p}${query ? "?" + query : ""}`)
+                return api.get(`${p}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             read: (path, id, extraHeaders, query) => {
                 const p = path || context
-                return api.get(`${p}/${id}${query ? "?" + query : ""}`)
+                return api.get(`${p}/${id}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             save: (path, data, extraHeaders, query) => {
                 const p = path || context
                 if (data.id || data._id) {
-                    return api.put(`${p}/${data.id || data._id}${query ? "?" + query : ""}`, data)
+                    return api.put(`${p}/${data.id || data._id}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
                 } else {
-                    return api.post(`${p}${query ? "?" + query : ""}`, data)
+                    return api.post(`${p}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
                 }
             },
             readAllwithPage: (path, page, size) => {
@@ -294,11 +345,11 @@ export default function WebProviderComponent({ children }) {
                 const p = path || context
                 const bulkParam = `ids=${ids.join(",")}`
                 const fullQuery = query ? `${query}&${bulkParam}` : bulkParam
-                return api.delete(`${p}?${fullQuery}`)
+                return api.delete(`${p}?${fullQuery}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             deleteSimple: (path, extraHeaders, query) => {
                 const p = path || context
-                return api.delete(`${p}${query ? "?" + query : ""}`)
+                return api.delete(`${p}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
         }
     }, [setRestApi])

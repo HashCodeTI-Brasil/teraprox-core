@@ -1,9 +1,9 @@
-export const endPointRabbit = "https://api-rabbit.teraprox.com"
-export const endPointNotification = "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/notification/"
-export const endPointCaderno = "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/processo/"
-export const endPointManutencao = "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/manutencao/"
-export const endPointUser = "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/user/"
-export const endPointTimer = "https://api-timer.teraprox.com/"
+export const endPointRabbit = process.env.REACT_APP_END_POINT_RABBIT || "https://api-rabbit.teraprox.com"
+export const endPointNotification = process.env.REACT_APP_END_POINT_NOTIFICATION || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/notification/"
+export const endPointCaderno = process.env.REACT_APP_END_POINT_CADERNO || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/processo/"
+export const endPointManutencao = process.env.REACT_APP_END_POINT_MANUTENCAO || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/manutencao/"
+export const endPointUser = process.env.REACT_APP_END_POINT_USER || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/user/"
+export const endPointTimer = process.env.REACT_APP_END_POINT_TIMER || "https://api-timer.teraprox.com/"
 
 export const paths = {
     // Login / User

@@ -4,11 +4,56 @@ import { useStore } from "react-redux";
 import { logOut, setToken } from "../../Reducers/default-reducers/globalConfigReducer";
 import { setGlobalError } from "../../Reducers/default-reducers/globalErrorReducer";
 
+const getEnv = (key) => {
+    if (typeof process !== "undefined" && process?.env) {
+        return process.env[key];
+    }
+    return undefined;
+};
+
+const gatewayHostByPrefix = {
+    user: getEnv("REACT_APP_GATEWAY_HOST_USER") || "api-user.teraprox.com",
+    processo: getEnv("REACT_APP_GATEWAY_HOST_PROCESSO") || "api-processo.teraprox.com",
+    manutencao: getEnv("REACT_APP_GATEWAY_HOST_MANUTENCAO") || "api-manutencao.teraprox.com",
+    notification: getEnv("REACT_APP_GATEWAY_HOST_NOTIFICATION") || "notification-api.teraprox.com",
+};
+
+const resolveGatewayEndpoint = (baseEndPoint) => {
+    if (!baseEndPoint) {
+        return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null };
+    }
+
+    try {
+        const parsed = new URL(baseEndPoint);
+        const pathname = parsed.pathname || "/";
+        const cleanPathname = pathname.endsWith("/") && pathname.length > 1
+            ? pathname.slice(0, -1)
+            : pathname;
+
+        const match = cleanPathname.match(/^\/(user|processo|manutencao|notification)(\/|$)/);
+        if (!match) {
+            return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null };
+        }
+
+        const prefix = match[1];
+        const suffix = cleanPathname.replace(new RegExp(`^/${prefix}`), "") || "/";
+        const normalizedBaseURL = `${parsed.origin}${suffix}${parsed.search || ""}`;
+
+        return {
+            normalizedBaseURL,
+            gatewayHostHeader: gatewayHostByPrefix[prefix] || null,
+        };
+    } catch {
+        return { normalizedBaseURL: baseEndPoint, gatewayHostHeader: null };
+    }
+};
+
 
 export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
     const store = useStore();
     const configureInterceptors = () => {
-        const http = axios.create();
+        const { normalizedBaseURL, gatewayHostHeader } = resolveGatewayEndpoint(baseEndPoint);
+        const http = axios.create({ baseURL: normalizedBaseURL });
 
         http.interceptors.response.use(
             res => {
@@ -89,6 +134,12 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
             if (token) {
                 config.headers.Authorization = `${token}`;
             }
+            if (context && !config.headers?.Contexto) {
+                config.headers.Contexto = context;
+            }
+            if (gatewayHostHeader && !config.headers?.["x-teraprox-host"]) {
+                config.headers["x-teraprox-host"] = gatewayHostHeader;
+            }
             return config;
         });
 
@@ -115,7 +166,6 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
 
     const api = useMemo(() => {
         const http = configureInterceptors();
-        http.defaults.baseURL = baseEndPoint;
 
         return {
             get: (path, query) => {
