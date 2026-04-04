@@ -176,10 +176,6 @@ export default function WebProviderComponent({ children }) {
             err => {
                 const status = err.response?.status
                 const data = err.response?.data
-                const requestUrl = err.config?.url || ""
-                const requestBaseUrl = err.config?.baseURL || ""
-                const requestFingerprint = `${requestBaseUrl}${requestUrl}`
-                const isNotificationRequest = typeof requestFingerprint === "string" && requestFingerprint.includes("/notification/")
 
                 if (status === 400 || status === 404) {
                     if (status === 400 && Array.isArray(data?.errors)) {
@@ -204,7 +200,7 @@ export default function WebProviderComponent({ children }) {
                         return http.request(err.config)
                     }
 
-                    if (isNotificationRequest) {
+                    if (context === "notification") {
                         return Promise.reject(err)
                     }
 
@@ -219,6 +215,11 @@ export default function WebProviderComponent({ children }) {
 
                     // Rejeita o request. O route guard (isAuth=false) redireciona para /Login.
                     // Após re-login os componentes remontam e fazem requests frescos com o novo token.
+                    return Promise.reject(err)
+                }
+
+                // Notification é secundário — nunca deve travar a UI com tela de erro
+                if (context === "notification") {
                     return Promise.reject(err)
                 }
 
