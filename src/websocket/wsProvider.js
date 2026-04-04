@@ -241,17 +241,12 @@ export default function WebProviderComponent({ children }) {
             const currentToken = store.getState().global.token
             if (currentToken) config.headers.Authorization = `${currentToken}`
             
-            // Prioridade 1: Injetar x-teraprox-host baseado no service de origem no routesConfig
+            // Injetar x-teraprox-host baseado no service de origem no routesConfig
             const routeCfg = routesConfig.find(svc => 
                 svc.routes.some(r => r.configuration.context === context)
             )
             if (routeCfg?.service) {
                 config.headers["x-teraprox-host"] = routeCfg.service
-            }
-
-            // Fallback: se for uma rota de notificação explícita
-            if (!config.headers["x-teraprox-host"] && config.url?.includes("/notification/")) {
-                config.headers["x-teraprox-host"] = "notification"
             }
 
             if (context && !config.headers?.Contexto) {

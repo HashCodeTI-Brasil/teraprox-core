@@ -1,8 +1,8 @@
 export const endPointRabbit = process.env.REACT_APP_END_POINT_RABBIT || "https://api-rabbit.teraprox.com"
-export const endPointNotification = process.env.REACT_APP_END_POINT_NOTIFICATION || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/notification/"
+export const endPointNotification = process.env.REACT_APP_END_POINT_NOTIFICATION || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/"
 export const endPointCaderno = process.env.REACT_APP_END_POINT_CADERNO || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/"
 export const endPointManutencao = process.env.REACT_APP_END_POINT_MANUTENCAO || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/"
-export const endPointUser = process.env.REACT_APP_END_POINT_USER || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/user/"
+export const endPointUser = process.env.REACT_APP_END_POINT_USER || "https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/"
 export const endPointTimer = process.env.REACT_APP_END_POINT_TIMER || "https://api-timer.teraprox.com/"
 
 export const paths = {
