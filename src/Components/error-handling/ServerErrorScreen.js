@@ -4,8 +4,7 @@ import { Button } from 'react-bootstrap';
 import { clearGlobalError } from '../../Reducers/default-reducers/globalErrorReducer';
 
 const containerStyle = {
-    minHeight: '100vh',
-    background: 'linear-gradient(160deg, #f0f6ff 0%, #ffffff 100%)',
+    minHeight: '80vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

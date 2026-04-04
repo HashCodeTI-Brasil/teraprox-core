@@ -25,7 +25,14 @@ const App = () => {
     );
 
     if (isServerError) {
-        return <ServerErrorScreen />;
+        return (
+            <div className="teraprox-shell">
+                {isAuth && <MenuBar />}
+                <div className={isAuth ? "container-fluid mt-4" : ""}>
+                    <ServerErrorScreen />
+                </div>
+            </div>
+        );
     }
 
     return (
