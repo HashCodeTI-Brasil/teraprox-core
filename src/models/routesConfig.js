@@ -67,4 +67,13 @@ export const routesConfig = [
             { configuration: { context: "dimensao", path: paths.dimensaoForm, endPoint: endPointManutencao } },
         ],
     },
+    {
+        service: "user",
+        routes: [
+            { configuration: { context: "user", path: paths.usuarios, endPoint: endPointUser } },
+            { configuration: { context: "setor", path: paths.setores, endPoint: endPointUser } },
+            { configuration: { context: "company", path: paths.empresas, endPoint: endPointUser } },
+            { configuration: { context: "permissao", path: paths.permissoes, endPoint: endPointUser } },
+        ],
+    },
 ]
