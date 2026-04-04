@@ -1,6 +1,12 @@
-import { endPointCaderno, endPointManutencao, endPointUser, paths } from "./constantes";
+import { endPointCaderno, endPointManutencao, endPointNotification, endPointUser, paths } from "./constantes";
 
 export const routesConfig = [
+    {
+        service: "notification",
+        routes: [
+            { configuration: { context: "notification", endPoint: endPointNotification } },
+        ],
+    },
     {
         service: "processo",
         routes: [
