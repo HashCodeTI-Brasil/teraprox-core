@@ -10,7 +10,7 @@ export const usePostData = () => {
         setLoading(true);
         try {
             const abstractController = endpoint
-                ? controller(null, endpoint)
+                ? controller(context, endpoint)
                 : controller(context);
             const response = await abstractController.post(url, payload);
             return response;

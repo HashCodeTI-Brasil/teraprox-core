@@ -9,7 +9,7 @@ export const useFetchData = () => {
 
     const fetchData = async (context, url, endpoint) => {
         const dynamicController = endpoint
-            ? controller(null, endpoint)
+            ? controller(context, endpoint)
             : controller(context);
         setLoading(true);
         setError(null);
