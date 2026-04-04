@@ -10,12 +10,12 @@ export const useNotificationService = () => {
 
     return useMemo(() => ({
         getUnreadNotificationsForUser: async (userId) => {
-            const result = await controllerRef.current.get(`user/${userId}/unread`)
+            const result = await controllerRef.current.get(`notification/user/${userId}/unread`)
             return result?.notifications ? { notifications: result.notifications, count: result.count } : { notifications: result || [], count: (result || []).length }
         },
-        getArchivedNotificationsForUser: async (userId) => controllerRef.current.get(`user/${userId}/archived`),
-        markAsRead: async (id) => controllerRef.current.post(`${id}/read`),
-        dismissNotification: async (id) => controllerRef.current.post(`${id}/dismiss`),
-        markAllAsRead: async (notificationIds) => controllerRef.current.post(`/mark-all-read`, notificationIds),
+        getArchivedNotificationsForUser: async (userId) => controllerRef.current.get(`notification/user/${userId}/archived`),
+        markAsRead: async (id) => controllerRef.current.patch(`notificationUser/${id}/read`),
+        dismissNotification: async (id) => controllerRef.current.patch(`notification/${id}/dismiss`),
+        markAllAsRead: async (notificationIds) => controllerRef.current.patch(`notificationUser/mark-all-read`, notificationIds),
     }), [])
 }
