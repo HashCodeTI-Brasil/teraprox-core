@@ -5,7 +5,7 @@ export function useUserService() {
     return useBasicService(
         endPointUser,
         ({ controller, endpoint }) => {
-            const userController = controller(null, endpoint)
+            const userController = controller("user", endpoint)
 
             return {
                 async authOnSGP(loginForm) {
