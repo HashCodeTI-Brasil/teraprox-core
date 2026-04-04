@@ -39,7 +39,9 @@ const useLogin = () => {
             if (companyId) {
                 try {
                     const setores = await controller("user", endPointUser).get(
-                        `findSetoresByCompanyId/${companyId}`
+                        `findSetoresByCompanyId/${companyId}`,
+                        undefined,
+                        { "x-teraprox-host": "user" }
                     )
                     dispatch(setCompanySetores(setores))
                 } catch (err) {
