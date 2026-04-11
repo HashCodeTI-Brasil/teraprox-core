@@ -1,0 +1,19 @@
+.expandable-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.expandable-card .card-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.expandable-card .chevron-icon {
+  transition: transform 0.2s ease;
+}
+
+.expandable-card .chevron-icon.rotated {
+  transform: rotate(180deg);
+}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { FaCheck, FaCheckSquare, FaSearch, FaChevronDown } from 'react-icons/fa'
 import { MdClose } from 'react-icons/md'
-import { pickTextColorBasedOnBgColorAdvanced } from '../../utils/colorUtils'
+import { pickTextColorBasedOnBgColorAdvanced } from 'teraprox-core-sdk'
 
 interface BranchNode {
   recurso: {
@@ -100,7 +100,7 @@ const BranchDropDisplay = ({
   const isLastBranchClicked = () =>
     branches.length > 0 && branches[branches.length - 1].id === branch.id
 
-  const visibleNodes = branch.branchNodes.filter((bn) =>
+  const visibleNodes = (branch.branchNodes || []).filter((bn) =>
     bn.recurso.nome.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -204,7 +204,7 @@ const BranchDropDisplay = ({
               }}
             >
               <FaCheckSquare style={{ marginRight: '0.5rem' }} />
-              Selecionar múltiplos
+              Selecionar multiplos
             </button>
           ) : (
             <div style={{ display: 'flex', gap: '0.5rem', margin: '0.5rem 0' }}>
@@ -225,7 +225,7 @@ const BranchDropDisplay = ({
                 }}
               >
                 <FaCheck style={{ marginRight: '0.5rem' }} />
-                Confirmar seleção
+                Confirmar selecao
               </button>
               <button
                 onClick={cancelMulti}

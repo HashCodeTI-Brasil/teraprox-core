@@ -5,9 +5,18 @@ export type { ToastService, ToastOptions } from './types/Toast'
 export type { MatchingObjectSubscription } from './types/MatchingObject'
 export type { Notification, NotificationState } from './types/Notification'
 export type { NavigateFn, NavigationConfig } from './types/Navigation'
+export type { SolicitacaoDeServico, StatusSolicitacao } from './types/SolicitacaoDeServico'
+export type { IObservabilityPort, VitalsPayload, BreadcrumbPayload, InteractionPayload } from './types/IObservabilityPort'
+export type { IAnexoPort, AnexoPersistido, AnexoLocal, UploadIntent } from './types/IAnexoPort'
 
 // Context
 export { CoreServiceContext } from './context/CoreServiceContext'
+
+// Factories & Adapters (Null Object Pattern)
+export { CoreServiceBuilder, FetchHttpAdapter } from './factories/CoreServiceBuilder'
+export { NullCoreService, NullToastService, NullHttpController } from './adapters/null/NullObjectAdapters'
+export { NullObservabilityAdapter } from './adapters/null/NullObservabilityAdapter'
+export { TracingHttpAdapter } from './adapters/TracingHttpAdapter'
 
 // Hooks (existentes)
 export { useCoreService } from './hooks/useCoreService'
@@ -16,6 +25,8 @@ export { useToast } from './hooks/useToast'
 export { useMatchingObject } from './hooks/useMatchingObject'
 export { useNotifications } from './hooks/useNotifications'
 export { useNavigator } from './hooks/useNavigator'
+export { useObservability } from './hooks/useObservability'
+export { useAnexoManager } from './hooks/useAnexoManager'
 
 // Hooks (novos v0.3.0)
 export { useFetchData } from './hooks/useFetchData'
@@ -25,8 +36,7 @@ export { useFormStorage } from './hooks/useFormStorage'
 export { useSmartSearch } from './hooks/useSmartSearch'
 export { useValidation } from './hooks/useValidation'
 
-// Components
-export { default as RecursoDisplayer } from './components/recurso/RecursoDisplayer'
+// Modules removed to ui-kit
 
 // Reducers (existentes)
 export {
@@ -53,6 +63,8 @@ export {
 
 // Utils (existentes)
 export { pickTextColorBasedOnBgColorAdvanced } from './utils/colorUtils'
+export { initWebVitals } from './utils/webVitals'
+export { generateTraceId, generateSpanId, buildTraceparent } from './utils/tracing'
 
 // Utils (novos v0.3.0)
 export {

@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { GrCheckmark } from "react-icons/gr"
+import { useHttpController } from "teraprox-core-sdk"
 import { AutoComplete } from "../forms/AutoComplete"
 import { QrCodeScanButton } from "../qr/QrCodeScanButton"
 
@@ -7,7 +8,7 @@ export interface FindRecursoByTagFieldProps {
 	/** Callback chamado quando um recurso é selecionado ou lido via QR. */
 	callback: (recurso: any, confirmed: boolean) => void
 	/** Controller de recurso injetado (deve implementar read, get e findByTagDescription) */
-	recursoController: {
+	recursoController?: {
 		read: (endpoint: string, data?: any) => Promise<any>
 		get: (endpoint: string) => Promise<any>
 	}
@@ -18,6 +19,12 @@ export interface FindRecursoByTagFieldProps {
  * Suporta busca via AutoComplete e leitura via QR Code.
  */
 export const FindRecursoByTagField: React.FC<FindRecursoByTagFieldProps> = ({ callback, recursoController }) => {
+	const recursoControllerPadrao = useHttpController("recurso")
+	const controladorAtivo = recursoController ?? {
+		read: recursoControllerPadrao.read.bind(recursoControllerPadrao),
+		get: recursoControllerPadrao.get.bind(recursoControllerPadrao),
+	}
+
 	const [selectedTag, setSelectedTag] = useState<any>("")
 	const [reachedRecurso, setReachedRecurso] = useState<any>(null)
 
@@ -26,7 +33,7 @@ export const FindRecursoByTagField: React.FC<FindRecursoByTagFieldProps> = ({ ca
 	 */
 	const findRecursoByTagIdHandler = async (tagId: string | number) => {
 		try {
-			const r = await recursoController.read("findRecursoByTagId", tagId)
+			const r = await controladorAtivo.read("findRecursoByTagId", tagId)
 			setReachedRecurso(r)
 		} catch (error) {
 			console.error("Erro ao buscar recurso por tag ID:", error)
@@ -39,7 +46,7 @@ export const FindRecursoByTagField: React.FC<FindRecursoByTagFieldProps> = ({ ca
 	const findRecursoByTagDescriptionHandler = async (description: string) => {
 		try {
 			const formattedDescription = description.replace(/\s/g, "")
-			const recurso = await recursoController.read(
+			const recurso = await controladorAtivo.read(
 				`recurso/findByTagDescription`,
 				formattedDescription
 			)
@@ -87,10 +94,9 @@ export const FindRecursoByTagField: React.FC<FindRecursoByTagFieldProps> = ({ ca
 			<AutoComplete
 				sortKey={"id"}
 				loadCondition={true}
-				loadFunc={() => recursoController.get("findActiveRecursosTags")}
+				loadFunc={() => controladorAtivo.get("findActiveRecursosTags")}
 				displayKey={"descricao"}
 				title={"Selecione ou Digite a TAG"}
-				isBold={true}
 				actionButton={confirmRecursoSelectionButton}
 				actionButton2={() => (
 					<QrCodeScanButton

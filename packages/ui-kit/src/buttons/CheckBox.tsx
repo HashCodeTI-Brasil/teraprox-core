@@ -43,7 +43,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
 		return (
 			<div className={className}>
 				{opcoes.map((opcao, index) => (
-					<InputGroup key={index} disabled={disabled} style={{ padding: 12, justifyItems: "center" }}>
+					<InputGroup key={index} style={{ padding: 12, justifyItems: "center", opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
 						<InputGroup.Checkbox />
 						<Form.Control
 							autoFocus={true}

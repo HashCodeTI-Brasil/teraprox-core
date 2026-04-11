@@ -1,54 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Spinner } from 'react-bootstrap';
-import { FindRecursoByTagField } from '../forms/FindRecursoByTagField';
-import '../styles/RecursoDisplayer.css';
-
-export type RecursoMode = 'manutencao' | 'processo';
+import { useEffect, useState } from 'react'
+import { Button } from 'react-bootstrap'
+import { useDispatch } from 'react-redux'
+import { useHttpController } from 'teraprox-core-sdk'
+import type { HttpController } from 'teraprox-core-sdk'
+import { setLevels } from 'teraprox-core-sdk'
+import BranchDropDisplay from './BranchDropDisplay'
+import { FindRecursoByTagField } from '../forms/FindRecursoByTagField'
+import '../styles/RecursoDisplayer.css'
 
 export interface RecursoDisplayerProps {
-  mode?: RecursoMode;
-  controller: any;
-  selectedList?: any[];
-  onSaveRecurso: (recursos: any[]) => void;
-  singleReturn?: boolean;
+  selectedList?: any[]
+  onSaveRecurso: (recursos: any[], checked?: boolean) => void
+  singleReturn?: boolean
+  arvoreEstruturalController?: HttpController
+  branchLevelController?: HttpController
+  recursoController?: HttpController
 }
 
-export const RecursoDisplayer: React.FC<RecursoDisplayerProps> = ({
-  mode = 'manutencao',
-  controller,
+export const RecursoDisplayer = ({
   selectedList = [],
   onSaveRecurso,
   singleReturn = false,
-}) => {
-  const [selectorDisplay, setSelectorDisplay] = useState<'branch' | 'TAG'>('branch');
-  const [loading, setLoading] = useState(false);
-  const [recursosProcesso, setRecursosProcesso] = useState<any[]>([]);
-  const [branchesManutencao, setBranchesManutencao] = useState<any[]>([]);
+  arvoreEstruturalController: injectedArvore,
+  branchLevelController: injectedBranchLevel,
+  recursoController: injectedRecurso,
+}: RecursoDisplayerProps) => {
+  void selectedList
 
-  // Carregamento inicial baseado no modo
+  const defaultArvore = useHttpController('')
+  const defaultBranchLevel = useHttpController('branchLevel')
+
+  const arvoreEstruturalController = injectedArvore || defaultArvore
+  const branchLevelController = injectedBranchLevel || defaultBranchLevel
+
+  const [branches, setBranches] = useState<any[]>([])
+  const dispatch = useDispatch()
+
+  const [selectorDisplay, setSelectorDisplay] = useState('')
+  const [multiMode, setMultiMode] = useState(false)
+
   useEffect(() => {
-    let mounted = true;
-    const loadInicial = async () => {
-      setLoading(true);
+    const init = async () => {
+      const b = await arvoreEstruturalController.get('branchByBranchLevel/1')
+      setBranches(b)
+      const lv = await branchLevelController.readAll()
+      dispatch(setLevels(lv))
+    }
+    init()
+  }, [])
+
+  const branchSetter = async (bn: any) => {
+    const parentBranch = branches.find((b) => b.id === bn.branchId)
+    const currentLevel = parentBranch?.branchLevel?.level ?? 1
+
+    const branchsToStay = branches
+      .filter((b) => b.branchLevel.level <= currentLevel)
+      .map((b) =>
+        b.branchLevel.level === currentLevel
+          ? { ...b, nomeRecurso: bn.recurso.nome }
+          : b
+      )
+
+    const nextBranchId = bn.recurso.branchId ?? bn.recurso.branch?.id
+    if (nextBranchId) {
       try {
-        if (mode === 'manutencao') {
-          // Loop infinito / API arvoreEstrutural
-          const b = await controller('arvoreEstrutural').get(`branchByBranchLevel/1`);
-          if (mounted) setBranchesManutencao(b);
-        } else if (mode === 'processo') {
-          // Flatten com agrupamento
-          const recs = await controller('recurso').readAll();
-          if (mounted) setRecursosProcesso(Array.isArray(recs) ? recs : []);
+        const nextBranch = await arvoreEstruturalController.read('branch', nextBranchId)
+        if (nextBranch && nextBranch.branchLevel) {
+          branchsToStay.push(nextBranch)
         }
-      } catch (err) {
-        console.error("Erro ao carregar estrutura do RecursoDisplayer", err);
-      } finally {
-        if (mounted) setLoading(false);
+      } catch (e) {
+        console.warn('[RecursoDisplayer] Failed to fetch child branch:', e)
       }
-    };
-    loadInicial();
-    return () => { mounted = false; };
-  }, [mode, controller]);
+    }
+
+    setBranches([...branchsToStay])
+  }
+
+  const backOnBranch = (branch: any) => {
+    const branchsToStay = branches.filter(
+      (bArray) => bArray.branchLevel.level <= branch.branchLevel.level
+    )
+    setBranches(branchsToStay)
+  }
 
   return (
     <div style={{ width: '100%', padding: 0 }} className="recurso-displayer-generic">
@@ -61,7 +94,7 @@ export const RecursoDisplayer: React.FC<RecursoDisplayerProps> = ({
             variant={selectorDisplay === 'branch' ? 'primary' : 'outline-primary'}
             className="me-1"
           >
-             {mode === 'processo' ? 'Agrupamentos' : 'Árvore'}
+            Arvore
           </Button>
           <Button
             size="sm"
@@ -73,31 +106,31 @@ export const RecursoDisplayer: React.FC<RecursoDisplayerProps> = ({
         </div>
       </div>
 
-      {loading && <Spinner animation="border" size="sm" />}
-
-      {!loading && selectorDisplay === 'branch' && mode === 'manutencao' && (
-         <div className="manutencao-tree-view">
-             {/* Renders BranchDropDisplays dynamically simulating the infinite loop */}
-             <div className="text-muted small italic">Árvore de Manutenção (Branches/Nodes em Cascata) - Implementação Genérica</div>
-         </div>
-      )}
-
-      {!loading && selectorDisplay === 'branch' && mode === 'processo' && (
-         <div className="processo-group-view">
-             {/* Renders grouped resources emulating a single root branch level */}
-             <div className="text-muted small italic">Lista de Agrupamentos de Processo (Raiz Única)</div>
-         </div>
-      )}
+      {selectorDisplay === 'branch' &&
+        branches.map((branch, i) => (
+          <BranchDropDisplay
+            key={branch.id || i}
+            branch={branch}
+            addBranch={branchSetter}
+            multiMode={multiMode}
+            setMultiMode={setMultiMode}
+            onSaveRecurso={onSaveRecurso}
+            backOnBranch={backOnBranch}
+            branches={branches}
+            singleReturn={singleReturn}
+          />
+        ))}
 
       {selectorDisplay === 'TAG' && (
         <FindRecursoByTagField
-          callback={(rec: any, checked: boolean) => {
-            onSaveRecurso([rec]);
+          recursoController={injectedRecurso}
+          callback={(rec, checked) => {
+            onSaveRecurso([rec], checked)
           }}
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default RecursoDisplayer;
+export default RecursoDisplayer

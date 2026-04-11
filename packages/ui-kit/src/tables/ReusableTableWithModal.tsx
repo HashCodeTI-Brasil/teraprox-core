@@ -60,7 +60,8 @@ export const ReusableTableWithModal: React.FC<ReusableTableWithModalProps> = ({
 	}
 
 	useEffect(() => {
-		if (fetchDataCallback) fetchData()
+		fetchData()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleRowClick = (td: ReusableTableColumnConfig) => {

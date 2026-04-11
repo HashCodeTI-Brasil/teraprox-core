@@ -1,7 +1,7 @@
 import React from "react"
 import { Form, FormCheckProps } from "react-bootstrap"
 
-export interface SwitchProps extends Omit<FormCheckProps, 'onChange'> {
+export interface SwitchProps extends Omit<FormCheckProps, 'onChange' | 'value'> {
   /** Rótulo do switch */
   label?: string
   /** Valor atual (checked) */

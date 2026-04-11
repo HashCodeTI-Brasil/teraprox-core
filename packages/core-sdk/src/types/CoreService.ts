@@ -1,6 +1,7 @@
 import type { HttpController } from './HttpController'
 import type { ToastService } from './Toast'
 import type { MatchingObjectSubscription } from './MatchingObject'
+import type { IObservabilityPort } from './IObservabilityPort'
 
 export interface CoreService {
   /** Cria um HttpController configurado para um contexto/endpoint */
@@ -26,4 +27,7 @@ export interface CoreService {
 
   /** Indica se o componente está hospedado pelo Core */
   hostedByCore: boolean
+
+  /** Porta de observabilidade — tracking, vitals e breadcrumbs */
+  observability: IObservabilityPort
 }

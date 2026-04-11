@@ -4,6 +4,7 @@ import type { CoreService } from '../types/CoreService'
 import type { HttpController } from '../types/HttpController'
 import type { ToastService } from '../types/Toast'
 import type { MatchingObjectSubscription } from '../types/MatchingObject'
+import { NullObservabilityAdapter } from '../adapters/null/NullObservabilityAdapter'
 
 interface EmulatorConfig {
   host: string
@@ -353,6 +354,7 @@ export function StandaloneProvider({ createController, addToast, firebaseConfig,
       unsubscribeEvent: () => {},
       handleLogout: () => {},
       hostedByCore: false,
+      observability: new NullObservabilityAdapter(),
     }),
     [createController, toast, subscribe, unsubscribe]
   )
