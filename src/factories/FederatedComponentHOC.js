@@ -1,8 +1,8 @@
-import React, { Suspense, useMemo, useContext } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { useWebProvider } from '../hooks/useWebProvider';
+import { useCoreService } from 'teraprox-core-sdk';
 import { useLocation } from 'react-router-dom';
 import { useStore } from 'react-redux';
-import { WebProvider as CoreWebProvider } from '../websocket/wsProvider';
 import FederatedErrorBoundary from '../Components/error-handling/FederatedErrorBoundary';
 import FederatedLoadingPlaceholder from '../Components/loading/FederatedLoadingPlaceholder';
 import FederatedUnavailableCard from '../Components/error-handling/FederatedUnavailableCard';
@@ -32,7 +32,7 @@ const isRenderableComponentType = (type) => {
  */
 export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => {
     const webProvider = useWebProvider();
-    const coreWebProviderRaw = useContext(CoreWebProvider);
+    const coreService = useCoreService();
     const store = useStore();
     const location = useLocation();
 
@@ -114,7 +114,7 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
         <div className="federated-container">
             <FederatedErrorBoundary>
                 {BridgeComponent ? (
-                    <BridgeComponent webProviderValue={coreWebProviderRaw}>
+                    <BridgeComponent coreService={coreService}>
                         {remoteContent}
                     </BridgeComponent>
                 ) : (

@@ -19,8 +19,7 @@ export const menuSections = [
         title: 'Controle de Processo',
         items: [
             { label: 'Cadernos', routePath: '/cadernos', modulePath: 'teraprox_app_sgp/Cadernos', context: 'cadernos' },
-            { label: 'CEP', routePath: '/CEP', modulePath: 'teraprox_app_sgp/C-E-P', context: 'cadernoDeVerificacaco' },
-            { label: 'Análise Performance', routePath: '/analisePerformanceCp', modulePath: 'teraprox_app_sgp/ReportScreen', context: 'registroDeCampo' },
+            { label: 'Análise de Performance', routePath: '/analisePerformanceCp', modulePath: 'teraprox_app_sgp/ProcessoDashboard', context: 'planoDeControle' },
             { label: 'Ordens de Correção', routePath: '/ordensDeCorrecao', modulePath: 'teraprox_app_sgp/OrdemDeCorrecaoList', context: 'ordemDeCorrecao' },
             { label: 'Dashboard de Consumo de Materiais', routePath: '/consumoDeMateriaPrima', modulePath: 'teraprox_app_sgp/MaterialConsumptionDashboard', context: 'material' },
         ],

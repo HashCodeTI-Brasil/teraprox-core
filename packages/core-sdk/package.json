@@ -1,6 +1,6 @@
 {
   "name": "teraprox-core-sdk",
-  "version": "0.2.0",
+  "version": "0.3.3",
   "description": "Contrato tipado Core ↔ Federados — interfaces, context, hooks e componentes compartilhados",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -15,14 +15,19 @@
       "types": "./dist/dev.d.ts",
       "import": "./dist/dev.mjs",
       "require": "./dist/dev.js"
+    },
+    "./federation": {
+      "types": "./dist/federation.d.ts",
+      "import": "./dist/federation.mjs",
+      "require": "./dist/federation.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/dev.ts --format esm,cjs --dts --clean",
-    "dev": "tsup src/index.ts src/dev.ts --format esm,cjs --dts --watch"
+    "build": "tsup src/index.ts src/dev.ts src/federation.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts src/dev.ts src/federation.ts --format esm,cjs --dts --watch"
   },
   "publishConfig": {
     "access": "public"
@@ -32,11 +37,18 @@
   },
   "peerDependencies": {
     "@reduxjs/toolkit": ">=1.9.0",
+    "dayjs": ">=1.11.0",
+    "firebase": ">=10.0.0",
     "react": ">=17.0.0",
     "react-bootstrap": ">=2.0.0",
     "react-icons": ">=4.0.0",
     "react-redux": ">=8.0.0",
     "react-router-dom": ">=6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "firebase": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@reduxjs/toolkit": "^2.0.0",

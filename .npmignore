@@ -1,0 +1,27 @@
+# Exclude all node_modules, including nested ones in packages/
+node_modules/
+packages/*/node_modules/
+
+# Exclude git and github metadata
+.git/
+.github/
+
+# Exclude firebase configuration and cache
+.firebase/
+firebase.json
+.firebaserc
+
+# Exclude dev-only files
+webpack.config.js
+Dockerfile.prod
+Dockerfile
+.DS_Store
+.env
+
+# Documentation
+documentation/
+
+# Exclude source code if only build is needed
+# (Commented out by default, uncomment if you want to publish only the 'dist' folder)
+# src/
+# packages/*/src/

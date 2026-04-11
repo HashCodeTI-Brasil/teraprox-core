@@ -30,7 +30,6 @@ export const paths = {
     ordenacaoDeFolhas: "/ordenacaoDeFolhas",
     formularios: "/formularios",
     formularioForm: "/formularioForm",
-    C_E_P: "/CEP",
     analisePerformanceCp: "/analisePerformanceCp",
     ordensDeCorrecao: "/ordensDeCorrecao",
     ordemDeCorrecaoForm: "/ordemDeCorrecaoForm",

@@ -1,0 +1,50 @@
+.timer-display-container {
+  border-radius: 8px;
+  border: 1px solid #d3d3d3;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  max-width: 260px;
+  margin: auto;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.timer-display-container:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.timer-display-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-icon {
+  color: #555;
+}
+
+.timer-icon-action {
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.timer-icon-action:hover {
+  transform: scale(1.2);
+  color: #007bff;
+}
+
+.timer-display-time {
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.timer-display-message {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+}

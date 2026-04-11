@@ -1,0 +1,28 @@
+.icon-label-list {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	padding: 1rem;
+}
+
+.icon-label-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	cursor: pointer;
+	transition: opacity 0.2s;
+}
+
+.icon-label-item:hover {
+	opacity: 0.8;
+}
+
+.icon-label-item .icon-label {
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	color: #495057;
+	text-align: center;
+}

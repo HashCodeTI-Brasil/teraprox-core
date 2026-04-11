@@ -116,6 +116,11 @@ module.exports = {
                     requiredVersion: false,
                     eager: true,
                 },
+                'teraprox-ui-kit': {
+                    singleton: true,
+                    requiredVersion: false,
+                    eager: true,
+                },
                 ...(() => {
                     const shared = {};
                     [
