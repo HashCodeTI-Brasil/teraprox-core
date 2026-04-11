@@ -1,0 +1,96 @@
+name: 🔄 Auto-Update Frontends on Core Change
+
+on:
+  push:
+    branches:
+      - gcp-migration
+    paths:
+      - 'packages/core-sdk/**'
+      - 'packages/ui-kit/**'
+      - 'package.json'
+
+jobs:
+  update-frontends:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        frontend:
+          - repo: teraprox-app-sgm
+            branch: gcp-migration
+          - repo: teraprox-app-sgp
+            branch: gcp-migration
+
+    steps:
+      - name: 📥 Checkout core repository
+        uses: actions/checkout@v4
+        with:
+          repository: HashCodeTI-Brasil/teraprox-api-manutencao
+          ref: gcp-migration
+
+      - name: 📥 Checkout frontend repository
+        uses: actions/checkout@v4
+        with:
+          repository: HashCodeTI-Brasil/${{ matrix.frontend.repo }}
+          ref: ${{ matrix.frontend.branch }}
+          path: frontend
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 🔨 Build core-sdk
+        run: |
+          npm install
+          npm run build --workspace=packages/core-sdk || true
+          npm run build --workspace=packages/ui-kit || true
+
+      - name: 📝 Extract core version
+        id: version
+        run: |
+          VERSION=$(grep '"version"' packages/core-sdk/package.json | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Core-SDK Version: $VERSION"
+
+      - name: 🔄 Update frontend dependencies
+        run: |
+          cd frontend
+          sed -i 's/"teraprox-core-sdk": "[^"]*"/"teraprox-core-sdk": "^${{ steps.version.outputs.version }}"/g' package.json
+          sed -i 's/"teraprox-ui-kit": "[^"]*"/"teraprox-ui-kit": "^${{ steps.version.outputs.version }}"/g' package.json
+          npm install --legacy-peer-deps
+
+      - name: 🧪 Type check
+        run: |
+          cd frontend
+          npx tsc --noEmit 2>/dev/null || true
+
+      - name: 📤 Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: update core-sdk to ${{ steps.version.outputs.version }}
+
+            Automated update triggered by changes in teraprox-core
+          title: "🔄 chore: update to core-sdk@${{ steps.version.outputs.version }} (${{ matrix.frontend.repo }})"
+          body: |
+            ## 🤖 Automated Update
+
+            This PR updates **${{ matrix.frontend.repo }}** dependencies:
+
+            - **teraprox-core-sdk**: ^${{ steps.version.outputs.version }}
+            - **teraprox-ui-kit**: ^${{ steps.version.outputs.version }}
+
+            Triggered by: commit to `teraprox-api-manutencao`
+
+            ### Checklist
+            - [ ] Review changes
+            - [ ] Run tests locally
+            - [ ] Verify no build errors
+            - [ ] Test features affected by core changes
+          branch: "deps/core-sdk-${{ steps.version.outputs.version }}"
+          delete-branch: true
+          base: ${{ matrix.frontend.branch }}
+          path: frontend
