@@ -31,14 +31,21 @@ export class FetchHttpAdapter implements HttpController {
   private async request(method: string, extraPath: string, data?: any, extraHeaders?: Record<string, string>) {
     const url = extraPath ? `${this.endpoint}/${extraPath}` : this.endpoint
     const isFormData = typeof FormData !== 'undefined' && data instanceof FormData
-    let headers = this.mergeHeaders(extraHeaders, data !== undefined && !isFormData)
     const body = data !== undefined ? (isFormData ? data : JSON.stringify(data)) : undefined
 
-    if (this.interceptors?.onBeforeRequest) {
-      headers = await this.interceptors.onBeforeRequest(headers)
+    const buildHeaders = async (): Promise<Record<string, string>> => {
+      let h = this.mergeHeaders(extraHeaders, data !== undefined && !isFormData)
+      if (this.interceptors?.onBeforeRequest) {
+        h = await this.interceptors.onBeforeRequest(h)
+      }
+      return h
     }
 
+    /** Same semantics as axios err.config._retry — at most one interceptor-driven retry per logical request. */
+    let interceptorRetryConsumed = false
+
     const doFetch = async (): Promise<any> => {
+      const headers = await buildHeaders()
       const res = await fetch(url, { method, headers, body })
 
       if (!res.ok) {
@@ -46,7 +53,16 @@ export class FetchHttpAdapter implements HttpController {
         if (this.interceptors?.onError) {
           return this.interceptors.onError(
             { status: res.status, headers: res.headers, data: errorData, message: `HTTP ${res.status}` },
-            () => this.request(method, extraPath, data, extraHeaders),
+            async () => {
+              if (interceptorRetryConsumed) {
+                const e = new Error(`HTTP ${res.status} (retry limit)`)
+                ;(e as any).status = res.status
+                ;(e as any).data = errorData
+                throw e
+              }
+              interceptorRetryConsumed = true
+              return doFetch()
+            },
           )
         }
         throw new Error(`HTTP ${res.status}`)

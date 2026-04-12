@@ -32,6 +32,14 @@ function resolveService(context) {
     return undefined
 }
 
+/** Mesmo padrão de `webInterface.js`: Bearer + JWT (gateway aceita com ou sem prefixo). */
+function authorizationFromToken(raw) {
+    if (!raw) return undefined
+    const t = String(raw).trim()
+    if (!t) return undefined
+    return /^bearer\s+/i.test(t) ? t : `Bearer ${t}`
+}
+
 export default function CoreServiceProvider({ children }) {
     const wp = useContext(WebProvider)
     const toast = useToasts()
@@ -69,8 +77,8 @@ export default function CoreServiceProvider({ children }) {
 
         const interceptors = {
             onBeforeRequest(headers) {
-                const currentToken = store.getState().global.token
-                if (currentToken) headers.Authorization = `${currentToken}`
+                const auth = authorizationFromToken(store.getState().global.token)
+                if (auth) headers.Authorization = auth
                 if (service) headers['x-teraprox-host'] = service
                 if (context && !headers.Contexto) headers.Contexto = context
                 return headers
@@ -109,8 +117,16 @@ export default function CoreServiceProvider({ children }) {
                 if (status === 401) {
                     if (isNotification) return Promise.reject(error)
 
+                    // Igual ao basicController (axios): no máximo 1 retry com token atual;
+                    // se continuar 401, sessão expirada → logout (evita loop infinito).
                     const currentToken = store.getState().global.token
-                    if (currentToken) return retry()
+                    if (currentToken) {
+                        try {
+                            return await retry()
+                        } catch {
+                            /* retry esgotado ou segundo erro — segue para fluxo de expiração */
+                        }
+                    }
 
                     const alreadyWaiting = store.getState().global.needUserLogin
                     if (!alreadyWaiting) {
