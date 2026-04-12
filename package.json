@@ -32,7 +32,7 @@
         "react-toast-notifications": "^2.5.1",
         "redux": "^5.0.1",
         "redux-persist": "^6.0.0",
-        "teraprox-core-sdk": "^0.2.0",
+        "teraprox-core-sdk": "file:packages/core-sdk",
         "teraprox-ui-kit": "file:packages/ui-kit"
     },
     "devDependencies": {

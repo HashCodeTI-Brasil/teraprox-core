@@ -63,6 +63,7 @@ const App = () => {
                                                     modulePath={screen.modulePath}
                                                     LazyComponent={componentRegistry[screen.modulePath]}
                                                     context={screen.context}
+                                                    reducerKeys={screen.reducerKeys}
                                                     hideFooter
                                                 />
                                             }

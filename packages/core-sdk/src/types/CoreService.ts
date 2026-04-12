@@ -3,6 +3,13 @@ import type { ToastService } from './Toast'
 import type { MatchingObjectSubscription } from './MatchingObject'
 import type { IObservabilityPort } from './IObservabilityPort'
 
+export interface RateLimitEntry {
+  used: number
+  limit: number
+  exceeded: boolean
+  windowReset: string  // ISO 8601
+}
+
 export interface CoreService {
   /** Cria um HttpController configurado para um contexto/endpoint */
   createController(context: string, baseEndPoint?: string): HttpController
@@ -30,4 +37,7 @@ export interface CoreService {
 
   /** Porta de observabilidade — tracking, vitals e breadcrumbs */
   observability: IObservabilityPort
+
+  /** Estado de rate limit em tempo real via RTDB. pathGroup → uso atual. */
+  rateLimits: Record<string, RateLimitEntry>
 }

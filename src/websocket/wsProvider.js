@@ -20,6 +20,7 @@ import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
 import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
 import { createAsyncResponseClient } from "./asyncResponseFirebaseClient"
 import { createMoFirebaseClient } from "./moFirebaseClient"
+import { createRateLimitFirebaseClient } from "./rateLimitFirebaseClient"
 import { store } from "../store"
 
 const WebProvider = createContext(null)
@@ -38,6 +39,7 @@ export default function WebProviderComponent({ children }) {
 
     const [socket, setSocket] = useState(null)
     const [notificationSocket, setNotificationSocket] = useState(null)
+    const [rateLimits, setRateLimits] = useState({})
 
     const enqueueSuccessToast = useCallback((message, options = {}, delay = 1000) => {
         if (successToastTimerRef.current) {
@@ -81,6 +83,18 @@ export default function WebProviderComponent({ children }) {
             }
         }
     }, [token, userId, company])
+
+    useEffect(() => {
+        if (token && company) {
+            console.log(`[Core][RateLimit] Conectando listener: company=${company}`)
+            const rlClient = createRateLimitFirebaseClient(company, (state) => {
+                setRateLimits(state)
+            })
+            return () => {
+                rlClient.disconnect()
+            }
+        }
+    }, [token, company])
 
     const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {
         if (typeof incomingMatchingObject !== "object") return
@@ -356,6 +370,7 @@ export default function WebProviderComponent({ children }) {
         wsEvent,
         socket,
         notificationSocket,
+        rateLimits,
         handleLogout,
         setRestApi,
         basicController,
@@ -371,6 +386,7 @@ export default function WebProviderComponent({ children }) {
         wsEvent,
         socket,
         notificationSocket,
+        rateLimits,
         handleLogout,
         setRestApi,
         basicController,

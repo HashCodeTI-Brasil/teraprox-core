@@ -149,6 +149,7 @@ export async function loadRemoteManifests() {
                     label: item.label,
                     icon: item.icon,
                     menuSection: section.label,
+                    reducerKeys: item.reducers || [],
                 };
                 allRoutes.push(route);
                 menuItems.push(route);
@@ -172,6 +173,7 @@ export async function loadRemoteManifests() {
                 routePath: form.path,
                 modulePath,
                 context: form.context,
+                reducerKeys: form.reducers || [],
             });
 
             componentRegistry[modulePath] = loadRemoteComponent(remoteName, moduleName);

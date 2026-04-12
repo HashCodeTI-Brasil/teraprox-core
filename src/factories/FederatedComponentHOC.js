@@ -31,7 +31,7 @@ const isRenderableComponentType = (type) => {
  * O modo manifest-driven é preferido. O legacy será removido quando todos os remotes
  * exportarem manifests completos com formRoutes.
  */
-export const FederatedComponentHost = ({ modulePath, LazyComponent, hideFooter, ...props }) => {
+export const FederatedComponentHost = ({ modulePath, LazyComponent, hideFooter, reducerKeys, ...props }) => {
     const webProvider = useWebProvider();
     const coreService = useCoreService();
     const store = useStore();
@@ -46,7 +46,7 @@ export const FederatedComponentHost = ({ modulePath, LazyComponent, hideFooter, 
 
     const expectedRemote = useMemo(() => resolveRemoteName(modulePath), [modulePath]);
 
-    const { ready, loadError, BridgeComponent, bridgeRemote, retry } = useRemoteInfra(store, modulePath, context);
+    const { ready, loadError, BridgeComponent, bridgeRemote, retry } = useRemoteInfra(store, modulePath, context, reducerKeys);
 
     if (!ResolvedComponent) {
         return (

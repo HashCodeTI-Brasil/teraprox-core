@@ -33,7 +33,7 @@ const resolveBridgeExport = (bridgeModule) => {
  * Sem if/else por remote. Para adicionar um novo remote, basta adicioná-lo
  * em REMOTE_CONFIGS no remoteLoader.js — este hook não muda.
  */
-export const useRemoteInfra = (store, modulePath, context) => {
+export const useRemoteInfra = (store, modulePath, context, reducerKeys) => {
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(null);
     const [BridgeComponent, setBridgeComponent] = useState(null);
@@ -64,7 +64,7 @@ export const useRemoteInfra = (store, modulePath, context) => {
                 let remoteReducers = {};
                 if (typeof remoteModule?.getReducersForModule === 'function') {
                     try {
-                        remoteReducers = await remoteModule.getReducersForModule({ modulePath, context });
+                        remoteReducers = await remoteModule.getReducersForModule({ modulePath, context, reducerKeys });
                     } catch (error) {
                         console.warn('Falha ao carregar reducers granulares; aplicando fallback completo.', error);
                         if (typeof remoteModule?.loadAllReducers === 'function') {
