@@ -20,8 +20,8 @@ jobs:
 
       - name: Build local packages
         run: |
-          npm run build --prefix packages/core-sdk
-          npm run build --prefix packages/ui-kit
+          cd packages/core-sdk && npx tsup src/index.ts src/dev.ts src/federation.ts --format esm,cjs --clean && cd ../..
+          cd packages/ui-kit && npx tsup src/index.ts --format esm,cjs --clean && cd ../..
 
       - name: Build
         env:

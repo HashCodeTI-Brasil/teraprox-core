@@ -429,6 +429,7 @@ export function StandaloneProvider({
       handleLogout: () => {},
       hostedByCore: false,
       observability: new NullObservabilityAdapter(),
+      rateLimits: {},
     }),
     [createController, toast, subscribe, unsubscribe]
   )

@@ -52,5 +52,6 @@ export const NullCoreService: CoreService = {
   unsubscribeEvent: (evt) => console.log(`[CoreService Fallback] Desinscrição Evento: ${evt}`),
   handleLogout: () => console.log(`[CoreService Fallback] Realizando logout...`),
   hostedByCore: false,
+  rateLimits: {},
   observability: new NullObservabilityAdapter(),
 }

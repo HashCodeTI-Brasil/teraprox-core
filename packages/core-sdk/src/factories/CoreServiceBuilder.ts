@@ -155,6 +155,7 @@ export class CoreServiceBuilder {
       handleLogout: () => console.log('[CoreServiceBuilder] Logout invocado no Standalone mode'),
       hostedByCore: this._hostedByCore,
       observability: this._observability,
+      rateLimits: {},
     }
   }
 }
