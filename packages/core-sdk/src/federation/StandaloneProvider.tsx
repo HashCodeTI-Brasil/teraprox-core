@@ -14,8 +14,11 @@ interface EmulatorConfig {
 
 interface StandaloneConfig {
   /**
-   * Factory for creating an HttpController. The remote provides its
-   * local implementation (using basicController + axios).
+   * Implementação de `CoreService.createController` **somente para modo standalone**
+   * (npm start do remote sem o shell). É a mesma *assinatura* que o core expõe
+   * em `CoreServiceProvider`, mas o host injeta a dele via `FederatedBridge`;
+   * telas devem sempre usar `useCoreService().createController` — nunca chamar
+   * esta factory diretamente.
    */
   createController: (context: string, baseEndPoint?: string) => HttpController
 

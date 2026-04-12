@@ -83,6 +83,7 @@ export { capitalize, truncate, removeAccents, slugify, isBlank } from './utils/s
 
 // Federation Runtime (v0.3.0 + v0.4.0 manifest-driven reducers)
 export { FederatedBridge } from './federation/FederatedBridge'
+export { isHostedByCore } from './federation/isHostedByCore'
 export { createReducersBundle, createReducersFromManifest } from './federation/createReducersBundle'
 export { StandaloneProvider } from './federation/StandaloneProvider'
 export { DevAutoLogin } from './federation/DevAutoLogin'
