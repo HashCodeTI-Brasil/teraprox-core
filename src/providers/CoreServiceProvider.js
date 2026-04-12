@@ -32,12 +32,20 @@ function resolveService(context) {
     return undefined
 }
 
-/** Mesmo padrão de `webInterface.js`: Bearer + JWT (gateway aceita com ou sem prefixo). */
+/**
+ * Mesmo padrão do `basicController` em wsProvider.js: enviar só o JWT no Authorization.
+ * O gateway (`parseTokenFromHeader`) aceita `Bearer <jwt>` ou `<jwt>`; evitamos prefixar
+ * com "Bearer " aqui para ficar idêntico ao axios e evitar headers com mais de 2 tokens
+ * após split por espaço (ex.: "Bearer  jwt" → 401).
+ */
 function authorizationFromToken(raw) {
     if (!raw) return undefined
-    const t = String(raw).trim()
+    let t = String(raw).trim()
     if (!t) return undefined
-    return /^bearer\s+/i.test(t) ? t : `Bearer ${t}`
+    if (/^bearer\s+/i.test(t)) {
+        t = t.replace(/^bearer\s+/i, '').trim()
+    }
+    return t || undefined
 }
 
 export default function CoreServiceProvider({ children }) {
