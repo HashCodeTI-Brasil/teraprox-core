@@ -8,12 +8,9 @@ import Login from './Screens/Login';
 import Home from './Screens/Home';
 import ServerErrorScreen from './Components/error-handling/ServerErrorScreen';
 import { clearGlobalError } from './Reducers/default-reducers/globalErrorReducer';
-import { allFederatedRoutes as sgpRoutes } from './models/federatedProcessoScreens';
-import { allFederatedRoutes as sgmRoutes } from './models/federatedManutencaoScreens';
-import { allFederatedRoutes as cadastroRoutes } from './models/federatedCadastroScreens';
-import { allFederatedRoutes as solicitacaoRoutes } from './models/federatedSolicitacaoScreens';
+import FederatedLoadingPlaceholder from './Components/loading/FederatedLoadingPlaceholder';
+import { useFederatedRoutes } from './hooks/useFederatedRoutes';
 
-const allFederatedRoutes = [...sgpRoutes, ...sgmRoutes, ...cadastroRoutes, ...solicitacaoRoutes];
 const homeRoute = '/home';
 
 const App = () => {
@@ -23,6 +20,8 @@ const App = () => {
     const globalError = useSelector(state => state.errors);
     const isAuth = global?.isAuth;
 
+    const { routes, componentRegistry, menuSections, loading } = useFederatedRoutes();
+
     React.useEffect(() => {
         if (globalError) {
             dispatch(clearGlobalError());
@@ -30,13 +29,13 @@ const App = () => {
     }, [location.pathname]);
 
     const isServerError = globalError && (
-        globalError.status === undefined ||   // network error (sem resposta do servidor)
-        (globalError.status >= 500 && globalError.status < 600)  // 5xx
+        globalError.status === undefined ||
+        (globalError.status >= 500 && globalError.status < 600)
     );
 
     return (
         <div className="teraprox-shell">
-            {isAuth && <MenuBar />}
+            {isAuth && <MenuBar menuSections={menuSections} />}
             <div className={isAuth ? "container-fluid mt-4" : ""}>
                 <main>
                     {isServerError ? (
@@ -47,12 +46,14 @@ const App = () => {
 
                             {!isAuth ? (
                                 <Route path="*" element={<Navigate to="/Login" replace />} />
+                            ) : loading ? (
+                                <Route path="*" element={<FederatedLoadingPlaceholder />} />
                             ) : (
                                 <>
                                     <Route path="/" element={<Navigate to={homeRoute} replace />} />
                                     <Route path={homeRoute} element={<Home />} />
 
-                                    {allFederatedRoutes.map((screen) => (
+                                    {routes.map((screen) => (
                                         <Route
                                             key={screen.routePath}
                                             path={screen.routePath}
@@ -60,6 +61,7 @@ const App = () => {
                                                 <FederatedComponentHost
                                                     key={screen.routePath}
                                                     modulePath={screen.modulePath}
+                                                    LazyComponent={componentRegistry[screen.modulePath]}
                                                     context={screen.context}
                                                     hideFooter
                                                 />

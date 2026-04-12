@@ -190,6 +190,11 @@ export default function WebProviderComponent({ children }) {
                 }
 
                 if (status === 401) {
+                    // Serviços secundários nunca devem causar logout nem retry
+                    if (context === "notification") {
+                        return Promise.reject(err)
+                    }
+
                     const currentToken = store.getState().global.token
                     const canRetry = !!currentToken && !err.config?._retry
 
@@ -198,10 +203,6 @@ export default function WebProviderComponent({ children }) {
                         err.config.headers = err.config.headers || {}
                         err.config.headers.Authorization = `${currentToken}`
                         return http.request(err.config)
-                    }
-
-                    if (context === "notification") {
-                        return Promise.reject(err)
                     }
 
                     // Evita toast/logOut duplicado quando vários requests expiram simultaneamente.
@@ -264,36 +265,36 @@ export default function WebProviderComponent({ children }) {
         const api = setRestApi(context, baseEndPoint)
         return {
             get: (path, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.get(`${p}${query ? "?" + query : ""}`)
             },
             post: (path, data, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.post(`${p}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             put: (path, data, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.put(`${p}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             delete: (path, id, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 const url = id ? `${p}/${id}` : p
                 return api.delete(`${url}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             patch: (path, data, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.patch(`${p}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             readAll: (path, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.get(`${p}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             read: (path, id, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.get(`${p}/${id}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             save: (path, data, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 if (data.id || data._id) {
                     return api.put(`${p}/${data.id || data._id}${query ? "?" + query : ""}`, data, extraHeaders ? { headers: extraHeaders } : undefined)
                 } else {
@@ -301,17 +302,17 @@ export default function WebProviderComponent({ children }) {
                 }
             },
             readAllwithPage: (path, page, size) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.get(`${p}?page=${page}&size=${size}`)
             },
             bulkDelete: (path, ids, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 const bulkParam = `ids=${ids.join(",")}`
                 const fullQuery = query ? `${query}&${bulkParam}` : bulkParam
                 return api.delete(`${p}?${fullQuery}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
             deleteSimple: (path, extraHeaders, query) => {
-                const p = path || context
+                const p = (path !== null && path !== undefined) ? path : context
                 return api.delete(`${p}${query ? "?" + query : ""}`, extraHeaders ? { headers: extraHeaders } : undefined)
             },
         }

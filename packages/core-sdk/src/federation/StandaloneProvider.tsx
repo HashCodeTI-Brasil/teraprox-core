@@ -19,8 +19,24 @@ interface StandaloneConfig {
    */
   createController: (context: string, baseEndPoint?: string) => HttpController
 
-  /** Toast function from react-toast-notifications */
-  addToast: (message: string, options?: any) => void
+  /**
+   * Pass a ToastService implementation directly (preferred).
+   * Eliminates the need for an addToast bridge in every remote.
+   *
+   * Example:
+   * ```
+   * const myToast: ToastService = { success: ..., warning: ..., error: ..., info: ... }
+   * <StandaloneProvider toast={myToast} ...>
+   * ```
+   */
+  toast?: ToastService
+
+  /**
+   * react-toast-notifications style callback — kept for backward compatibility
+   * with remotes that already use ToastProvider + useToasts().
+   * When `toast` prop is provided, `addToast` is ignored.
+   */
+  addToast?: (message: string, options?: any) => void
 
   /**
    * Firebase client config object (from REACT_APP_FIREBASE_CONFIG).
@@ -47,6 +63,13 @@ interface StandaloneConfig {
   /**
    * Tenant / company ID used to build the RTDB path:
    * `{tenant}/matchingObjects`
+   *
+   * Resolution order (first non-empty value wins):
+   *   1. This prop (dynamic — typically from Redux state after login)
+   *   2. `REACT_APP_RTDB_TENANT` env var (static — set in the app's .env)
+   *   3. `'dev-local'` as last resort in NODE_ENV=development
+   *
+   * In production the prop MUST be provided; env-var fallback is for dev only.
    */
   tenant?: string
 
@@ -213,22 +236,57 @@ function RtdbConfigWarning({ onDismiss }: { onDismiss: () => void }) {
  * }
  * ```
  */
-export function StandaloneProvider({ createController, addToast, firebaseConfig, emulator, tenant, children }: StandaloneConfig) {
+export function StandaloneProvider({
+  createController,
+  toast: toastProp,
+  addToast,
+  firebaseConfig,
+  emulator,
+  tenant,
+  children,
+}: StandaloneConfig) {
   const [subscriptions] = useState<MatchingObjectSubscription[]>([])
   const subscriptionsRef = useRef(subscriptions)
   subscriptionsRef.current = subscriptions
 
   const [rtdbWarning, setRtdbWarning] = useState(false)
 
-  const toast: ToastService = useMemo(
-    () => ({
-      success: (msg, opts) => addToast(msg, { appearance: 'success', autoDismiss: true, ...opts }),
-      warning: (msg, opts) => addToast(msg, { appearance: 'warning', autoDismiss: true, ...opts }),
-      error: (msg, opts) => addToast(msg, { appearance: 'error', autoDismiss: true, ...opts }),
-      info: (msg, opts) => addToast(msg, { appearance: 'info', autoDismiss: true, ...opts }),
-    }),
-    [addToast]
-  )
+  // Tenant resolution order:
+  //   1. explicit prop (e.g. from Redux after login)
+  //   2. REACT_APP_RTDB_TENANT env var (set in the app's .env — read at build time by webpack DefinePlugin)
+  //   3. 'dev-local' fallback so RTDB always works in development without any config
+  // Note: process.env.REACT_APP_* may not be replaced inside node_modules depending on the
+  // bundler config, so the explicit prop or emulator prop remains the most reliable path.
+  const _envTenant =
+    typeof process !== 'undefined'
+      ? (process.env as Record<string, string | undefined>).REACT_APP_RTDB_TENANT
+      : undefined
+
+  const resolvedTenant: string | undefined =
+    tenant ||
+    _envTenant ||
+    (process.env.NODE_ENV !== 'production' ? 'dev-local' : undefined)
+
+  // Prefer direct ToastService prop; fall back to addToast bridge for
+  // backward compat with react-toast-notifications style providers.
+  const toast: ToastService = useMemo(() => {
+    if (toastProp) return toastProp
+    if (addToast) {
+      return {
+        success: (msg, opts) => addToast(msg, { appearance: 'success', autoDismiss: true, ...opts }),
+        warning: (msg, opts) => addToast(msg, { appearance: 'warning', autoDismiss: true, ...opts }),
+        error:   (msg, opts) => addToast(msg, { appearance: 'error',   autoDismiss: true, ...opts }),
+        info:    (msg, opts) => addToast(msg, { appearance: 'info',    autoDismiss: true, ...opts }),
+      }
+    }
+    // Neither provided — no-op toast (logs to console in dev)
+    const noop = (msg: string) => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[StandaloneProvider] Toast called but no toast/addToast prop provided:', msg)
+      }
+    }
+    return { success: noop, warning: noop, error: noop, info: noop }
+  }, [toastProp, addToast])
 
   const subscribe = useCallback(
     (mo: MatchingObjectSubscription) => {
@@ -247,9 +305,25 @@ export function StandaloneProvider({ createController, addToast, firebaseConfig,
     [subscriptions]
   )
 
+  // Warn in dev when even the resolved tenant is still absent — means no prop,
+  // no REACT_APP_RTDB_TENANT and somehow NODE_ENV is not 'development'.
+  useEffect(() => {
+    if (resolvedTenant || process.env.NODE_ENV === 'production') return
+    const timer = setTimeout(() => {
+      console.warn(
+        '[StandaloneProvider] RTDB listener deferred: tenant could not be resolved after 5 s.\n' +
+        'Fix with any of:\n' +
+        '  • Pass `tenant` prop (e.g. from Redux state.global.companyId)\n' +
+        '  • Set REACT_APP_RTDB_TENANT=<companyId> in your .env\n' +
+        '  • Run in NODE_ENV=development (auto-falls back to "dev-local")'
+      )
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [resolvedTenant])
+
   // --- Firebase RTDB listener with auto-detect emulator ---
   useEffect(() => {
-    if (!tenant) return
+    if (!resolvedTenant) return
 
     let cleanup: (() => void) | undefined
     let cancelled = false
@@ -305,7 +379,7 @@ export function StandaloneProvider({ createController, addToast, firebaseConfig,
           db = getDatabase(cloudApp)
         }
 
-        const moRef = ref(db, `${tenant}/matchingObjects`)
+        const moRef = ref(db, `${resolvedTenant}/matchingObjects`)
 
         const unsub = onChildAdded(moRef, (snapshot: any) => {
           const data = snapshot.val()
@@ -342,7 +416,7 @@ export function StandaloneProvider({ createController, addToast, firebaseConfig,
       cancelled = true
       cleanup?.()
     }
-  }, [firebaseConfig, emulator, tenant])
+  }, [firebaseConfig, emulator, resolvedTenant])
 
   const value: CoreService = useMemo(
     () => ({

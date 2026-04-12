@@ -131,26 +131,20 @@ const sgmFormScreens = {
     'teraprox_app_sgm/ModoDeFalhaForm': lazyWithChunkReload(() => import('teraprox_app_sgm/ModoDeFalhaForm')),
     'teraprox_app_sgm/RegistroDeTarefaForm': lazyWithChunkReload(() => import('teraprox_app_sgm/RegistroDeTarefaForm')),
     'teraprox_app_sgm/DimensaoPicker': lazyWithChunkReload(() => import('teraprox_app_sgm/DimensaoPicker')),
-    'teraprox_app_sgm/AprovacaoStatus': lazyWithChunkReload(() => import('teraprox_app_sgm/AprovacaoStatus')),
+    // AprovacaoStatus migrado para teraprox_app_solicitacao
     'teraprox_app_sgm/OrdemDeServico': lazyWithChunkReload(() => import('teraprox_app_sgm/OrdemDeServico')),
     'teraprox_app_sgm/SetorForm': lazyWithChunkReload(() => import('teraprox_app_sgm/SetorForm')),
     'teraprox_app_sgm/TurnoForm': lazyWithChunkReload(() => import('teraprox_app_sgm/TurnoForm')),
 };
 
 // =====================================================================
-// Solicitações de Serviço — remote independente
+// Solicitações de Serviço — migrado para manifest-driven (remoteLoader.js)
+// Entradas removidas: o remoteLoader carrega via container.get() dinâmico
 // =====================================================================
 
-const solicitacaoListScreens = {
-    'teraprox_app_solicitacao/SolicitacoesDeServico': lazyWithChunkReload(() => import('teraprox_app_solicitacao/SolicitacoesDeServico')),
-};
-
-const solicitacaoFormScreens = {
-    'teraprox_app_solicitacao/SolicitacaoDeServicoForm': lazyWithChunkReload(() => import('teraprox_app_solicitacao/SolicitacaoDeServicoForm')),
-};
-
 // =====================================================================
-// Registry unificado — lookup por modulePath
+// Registry unificado — lookup por modulePath (LEGACY: SGP + SGM apenas)
+// Novos remotes devem usar manifest + remoteLoader.js
 // =====================================================================
 
 export const componentRegistry = {
@@ -159,17 +153,4 @@ export const componentRegistry = {
     ...sgpFormScreens,
     ...sgmListScreens,
     ...sgmFormScreens,
-    ...solicitacaoListScreens,
-    ...solicitacaoFormScreens,
-};
-
-/**
- * Resolve o remote name (sgp | sgm | solicitacao) a partir do modulePath.
- */
-export const resolveRemoteName = (modulePath) => {
-    if (!modulePath) return null;
-    if (modulePath.startsWith('teraprox_app_sgm/')) return 'sgm';
-    if (modulePath.startsWith('teraprox_app_sgp/')) return 'sgp';
-    if (modulePath.startsWith('teraprox_app_solicitacao/')) return 'solicitacao';
-    return null;
 };

@@ -31,8 +31,15 @@ export interface AnexoLocal {
  * Resultado da intent de upload (signed URL da nuvem).
  */
 export interface UploadIntent {
-  signedUrl: string
-  anexoId: string | number
+  /** URL for signed upload — API may return as `uploadUrl` or `signedUrl`. */
+  signedUrl?: string
+  uploadUrl?: string
+  key?: string
+  anexoId?: string | number
+  fileName?: string
+  contentType?: string
+  dataId?: string
+  dataContext?: string
   fields?: Record<string, string>
 }
 

@@ -14,6 +14,7 @@ import CoreServiceProvider from './providers/CoreServiceProvider';
 import WebProviderComponent from './websocket/wsProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'teraprox-ui-kit/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

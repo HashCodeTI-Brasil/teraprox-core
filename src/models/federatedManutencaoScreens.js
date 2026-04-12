@@ -54,7 +54,7 @@ export const formRoutes = [
     { routePath: '/modoDeFalhaForm', modulePath: 'teraprox_app_sgm/ModoDeFalhaForm', context: 'modoDeFalha' },
     { routePath: '/registroDeTarefaForm', modulePath: 'teraprox_app_sgm/RegistroDeTarefaForm', context: 'registroDeTarefa' },
     { routePath: '/dimensaoForm', modulePath: 'teraprox_app_sgm/DimensaoPicker', context: 'dimensao' },
-    { routePath: '/aprovacaoStatus', modulePath: 'teraprox_app_sgm/AprovacaoStatus', context: 'solicitacaoDeServico' },
+    // /aprovacaoStatus migrado para teraprox_app_solicitacao (federatedSolicitacaoScreens.js)
     { routePath: '/ordemDeServico/:id', modulePath: 'teraprox_app_sgm/OrdemDeServico', context: 'tarefa' },
 ];
 

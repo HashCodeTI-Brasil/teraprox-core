@@ -6,7 +6,7 @@ import { useStore } from 'react-redux';
 import FederatedErrorBoundary from '../Components/error-handling/FederatedErrorBoundary';
 import FederatedLoadingPlaceholder from '../Components/loading/FederatedLoadingPlaceholder';
 import FederatedUnavailableCard from '../Components/error-handling/FederatedUnavailableCard';
-import { componentRegistry, resolveRemoteName } from '../federation/remoteRegistry';
+import { resolveRemoteName } from '../federation/remoteLoader';
 import { useRemoteInfra } from '../hooks/useRemoteInfra';
 
 const FORWARD_REF_TYPE = Symbol.for('react.forward_ref');
@@ -24,13 +24,14 @@ const isRenderableComponentType = (type) => {
 /**
  * Host component que orquestra o carregamento de componentes federados.
  *
- * Responsabilidades:
- *  1. Resolver o componente React.lazy do registry
- *  2. Delegar ao useRemoteInfra a carga de ReducersBundle + Bridge + injeção de reducers
- *  3. Envolver o componente remoto no FederatedBridge para contexto WebProvider
- *  4. Passar webProvider como prop (padrão DI — host injeta no remote)
+ * Suporta dois modos:
+ *  - Manifest-driven: recebe `LazyComponent` diretamente (auto-gerado pelo remoteLoader)
+ *  - Legacy: recebe `modulePath` e faz lookup no componentRegistry legado
+ *
+ * O modo manifest-driven é preferido. O legacy será removido quando todos os remotes
+ * exportarem manifests completos com formRoutes.
  */
-export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => {
+export const FederatedComponentHost = ({ modulePath, LazyComponent, hideFooter, ...props }) => {
     const webProvider = useWebProvider();
     const coreService = useCoreService();
     const store = useStore();
@@ -38,10 +39,8 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
 
     const context = props?.context;
 
-    const RemoteComponent = useMemo(() => {
-        if (!modulePath) return null;
-        return componentRegistry[modulePath];
-    }, [modulePath]);
+    // LazyComponent pode vir do manifest (novo) ou do legado
+    const ResolvedComponent = LazyComponent || null;
 
     const initialData = useMemo(() => location.state?.initialData || {}, [location.state?.initialData]);
 
@@ -49,21 +48,21 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
 
     const { ready, loadError, BridgeComponent, bridgeRemote, retry } = useRemoteInfra(store, modulePath, context);
 
-    if (!RemoteComponent) {
+    if (!ResolvedComponent) {
         return (
             <FederatedUnavailableCard
                 modulePath={modulePath}
-                errorMessage="Componente nao registrado no catalogo federado do Core."
+                errorMessage="Componente não registrado no catálogo federado do Core."
                 onRetry={retry}
             />
         );
     }
 
-    if (!isRenderableComponentType(RemoteComponent)) {
+    if (!isRenderableComponentType(ResolvedComponent)) {
         return (
             <FederatedUnavailableCard
                 modulePath={modulePath}
-                errorMessage="Componente remoto recebido em formato invalido."
+                errorMessage="Componente remoto recebido em formato inválido."
                 onRetry={retry}
             />
         );
@@ -85,7 +84,6 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
         return <FederatedLoadingPlaceholder />;
     }
 
-    // Guard: bridge stale — aguarda recarga quando navega entre SGP ↔ SGM
     if (expectedRemote && bridgeRemote && bridgeRemote !== expectedRemote) {
         return <FederatedLoadingPlaceholder />;
     }
@@ -94,7 +92,7 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
         return (
             <FederatedUnavailableCard
                 modulePath={modulePath}
-                errorMessage="Bridge federado recebido em formato invalido."
+                errorMessage="Bridge federado recebido em formato inválido."
                 onRetry={retry}
             />
         );
@@ -102,7 +100,7 @@ export const FederatedComponentHost = ({ modulePath, hideFooter, ...props }) => 
 
     const remoteContent = (
         <Suspense fallback={<FederatedLoadingPlaceholder />}>
-            <RemoteComponent
+            <ResolvedComponent
                 initialData={initialData}
                 webProvider={webProvider}
                 {...props}

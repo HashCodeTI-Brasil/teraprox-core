@@ -25,6 +25,19 @@ export interface RemoteMenuSection {
   items: RemoteMenuItem[]
 }
 
+/**
+ * Rota de formulário / tela interna que não aparece no menu,
+ * mas precisa ser registrada como <Route> no host.
+ */
+export interface RemoteFormRoute {
+  /** Rota no react-router (ex: '/solicitacaoDeServicoForm') */
+  path: string
+  /** Nome do módulo no exposes do webpack (ex: './SolicitacaoDeServicoForm') */
+  module: string
+  /** Contexto para ReducersBundle e HTTP (ex: 'solicitacaoDeServico') */
+  context: string
+}
+
 export interface RemoteManifest {
   /** Nome do remote (deve corresponder ao name do ModuleFederationPlugin) */
   name: string
@@ -32,4 +45,6 @@ export interface RemoteManifest {
   version: string
   /** Seções de menu que este remote contribui */
   menuSections: RemoteMenuSection[]
+  /** Rotas internas (formulários, detalhe) que não aparecem no menu */
+  formRoutes?: RemoteFormRoute[]
 }

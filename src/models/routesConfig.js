@@ -42,8 +42,10 @@ export const routesConfig = [
             { configuration: { context: "ordemDeServico", path: paths.modelosDeOrdemDeServico, endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeServico", path: paths.visaoGeralDeMateriaPrima, endPoint: endPointManutencao } },
             { configuration: { context: "visaoGeral", path: paths.visaoGeralManutencao } },
-            { configuration: { context: "solicitacaoDeServico", path: paths.solicitacoesDeServico, endPoint: endPointManutencao } },
-            { configuration: { context: "solicitacaoDeServico", path: paths.solicitacaoDeServicoForm, endPoint: endPointManutencao } },
+            // Hexagonal remote (SGM-SS): context já está na base URL — paths são relativos ao contexto
+            { configuration: { context: "solicitacaoDeServico", path: paths.solicitacoesDeServico, endPoint: `${endPointManutencao}solicitacaoDeServico` } },
+            { configuration: { context: "solicitacaoDeServico", path: paths.solicitacaoDeServicoForm, endPoint: `${endPointManutencao}solicitacaoDeServico` } },
+            { configuration: { context: "solicitacaoDeServico", path: paths.aprovaStatus, endPoint: `${endPointManutencao}solicitacaoDeServico` } },
             { configuration: { context: "ordemDeManutencao", path: paths.ordensDeManutencao, endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeManutencao", path: paths.ordemDeManutencaoForm, endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeManutencao", path: paths.executarOrdemDeManutencao, endPoint: endPointManutencao } },

@@ -19,8 +19,8 @@ interface UseAnexoManagerReturn {
   addFiles: (files: File[]) => void
   /** Remove um arquivo local da fila. */
   removeLocal: (localId: string) => void
-  /** Envia todos os arquivos pendentes. */
-  uploadAll: () => Promise<AnexoPersistido[]>
+  /** Envia todos os arquivos pendentes. Se `overrideEntityId` for fornecido, usa-o em vez do entityId do hook. */
+  uploadAll: (overrideEntityId?: string | number) => Promise<AnexoPersistido[]>
   /** Remove um anexo persistido (do servidor). */
   removePersistido: (anexoId: string | number) => Promise<void>
   /** Obtém signed URL para preview/download. */
@@ -56,6 +56,7 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
       confirm: (params) => ctrl.post('confirm', {
         key: (params as any).key,
         fileName: (params as any).fileName ?? '',
+        contentType: (params as any).contentType ?? '',
         dataId: String(params.entityId),
         dataContext: params.context,
       }),
@@ -100,10 +101,11 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
     setLocais((prev) => prev.filter((a) => a.localId !== localId))
   }, [])
 
-  const uploadAll = useCallback(async (): Promise<AnexoPersistido[]> => {
+  const uploadAll = useCallback(async (overrideEntityId?: string | number): Promise<AnexoPersistido[]> => {
     const pending = locais.filter((a) => a.status === 'pending' || a.status === 'error')
     if (!pending.length) return []
 
+    const eid = overrideEntityId ?? entityId
     const results: AnexoPersistido[] = []
     const p = getPort()
 
@@ -120,7 +122,7 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
             tipo: anexo.tipo,
             tamanho: anexo.tamanho,
             context,
-            entityId,
+            entityId: eid,
           })
         } catch {
           // intent not available, fallback to direct
@@ -131,8 +133,9 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
         )
 
         let result: AnexoPersistido
-        if (intent?.signedUrl) {
-          await fetch(intent.signedUrl, {
+        const intentUrl = intent?.uploadUrl || intent?.signedUrl
+        if (intentUrl) {
+          await fetch(intentUrl, {
             method: 'PUT',
             body: anexo.file,
             headers: { 'Content-Type': anexo.tipo },
@@ -141,14 +144,15 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
             prev.map((a) => a.localId === anexo.localId ? { ...a, progress: 80 } : a)
           )
           result = await p.confirm({
-            anexoId: intent.anexoId,
+            anexoId: intent!.anexoId,
             context,
-            entityId,
-            key: (intent as any).key,
-            fileName: anexo.nome,
+            entityId: eid,
+            key: intent!.key,
+            fileName: intent!.fileName ?? anexo.nome,
+            contentType: intent!.contentType ?? anexo.tipo,
           } as any)
         } else {
-          result = await p.uploadDirect({ file: anexo.file, context, entityId })
+          result = await p.uploadDirect({ file: anexo.file, context, entityId: eid })
         }
 
         setLocais((prev) =>

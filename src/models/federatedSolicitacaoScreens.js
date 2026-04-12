@@ -23,6 +23,11 @@ export const formRoutes = [
         modulePath: 'teraprox_app_solicitacao/SolicitacaoDeServicoForm',
         context: 'solicitacaoDeServico',
     },
+    {
+        routePath: '/aprovacaoStatus',
+        modulePath: 'teraprox_app_solicitacao/AprovacaoStatus',
+        context: 'solicitacaoDeServico',
+    },
 ];
 
 export const menuScreens = menuSections.flatMap((s) => s.items);

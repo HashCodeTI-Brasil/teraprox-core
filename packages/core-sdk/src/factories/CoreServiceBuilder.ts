@@ -2,6 +2,7 @@ import type { CoreService } from '../types/CoreService'
 import type { ToastService } from '../types/Toast'
 import type { HttpController } from '../types/HttpController'
 import type { IObservabilityPort } from '../types/IObservabilityPort'
+import type { MatchingObjectSubscription } from '../types/MatchingObject'
 import { NullCoreService, NullToastService, NullHttpController } from '../adapters/null/NullObjectAdapters'
 import { NullObservabilityAdapter } from '../adapters/null/NullObservabilityAdapter'
 import { TracingHttpAdapter } from '../adapters/TracingHttpAdapter'
@@ -101,6 +102,10 @@ export class CoreServiceBuilder {
   }
 
   build(): CoreService {
+    // Subscriptions are stored here so they survive re-renders and can be
+    // tapped by a companion RtdbBridge component or tested directly.
+    const subscriptions: MatchingObjectSubscription[] = []
+
     return {
       toast: this._toast,
       createController: (context: string, baseEndPoint?: string) => {
@@ -130,16 +135,24 @@ export class CoreServiceBuilder {
           ? new TracingHttpAdapter(endpoint, extraHeaders)
           : new FetchHttpAdapter(endpoint, extraHeaders)
       },
+
+      // Subscriptions are properly managed so that:
+      // 1. Components using useMatchingObject() have their registrations tracked.
+      // 2. An external RtdbBridge / StandaloneProvider can dispatch to them.
+      // 3. Tests can inspect which subscriptions are active.
       subscribe: (mo) => {
-         // Futuro: se rtdbConfig existir, plugar no firebase/realtime nativo 
-         console.log(`[CoreServiceBuilder RTDB] Subscribe > ${mo.context}`)
+        subscriptions.push(mo)
       },
       unsubscribe: (mo) => {
-         console.log(`[CoreServiceBuilder RTDB] Unsubscribe > ${mo.context}`)
+        const idx = subscriptions.findIndex(
+          (s) => s.context === mo.context && s.location === mo.location
+        )
+        if (idx >= 0) subscriptions.splice(idx, 1)
       },
-      subscribeEvent: (evt) => {},
-      unsubscribeEvent: (evt) => {},
-      handleLogout: () => console.log('Logout invocado no Standalone mode'),
+
+      subscribeEvent: (_evt) => {},
+      unsubscribeEvent: (_evt) => {},
+      handleLogout: () => console.log('[CoreServiceBuilder] Logout invocado no Standalone mode'),
       hostedByCore: this._hostedByCore,
       observability: this._observability,
     }

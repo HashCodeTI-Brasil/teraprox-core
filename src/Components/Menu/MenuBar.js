@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Image, Nav, Navbar, NavDropdown, NavItem } from 'react-bootstrap';
 import { BiUserCircle } from 'react-icons/bi';
 import { FiChevronDown, FiLogOut, FiMenu } from 'react-icons/fi';
@@ -8,16 +8,21 @@ import PermissionContainer from '../Hocs/withPermission';
 import { useWebProvider } from '../../hooks/useWebProvider';
 import scqlogo from '../../assets/img/teraprox-logo.png';
 import { ids, paths } from '../../models/constantes';
-import { setPageLocation, logOut } from '../../Reducers/default-reducers/globalConfigReducer';
+import { setPageLocation } from '../../Reducers/default-reducers/globalConfigReducer';
 import { isAuthenticated } from '../../Services/auth';
 import "../../assets/styles/menuBarLogo.css";
 import NotificationBell from '../Notifications/NotificationBell';
-import { menuSections as sgpMenuSections } from '../../models/federatedProcessoScreens';
-import { menuSections as sgmMenuSections } from '../../models/federatedManutencaoScreens';
-import { menuSections as cadastroMenuSections } from '../../models/federatedCadastroScreens';
-import { menuSections as solicitacaoMenuSections } from '../../models/federatedSolicitacaoScreens';
 
-const MenuBar = () => {
+/**
+ * MenuBar 100% manifest-driven.
+ *
+ * Recebe `menuSections` do App (gerado pelo remoteLoader a partir dos manifests dos remotes).
+ * Cada seção tem { title, icon, items[] } onde items têm { routePath, label }.
+ *
+ * Os dropdowns são agrupados por título da seção. Se dois remotes declaram
+ * a mesma seção (ex: "Cadastros"), os itens são mesclados automaticamente.
+ */
+const MenuBar = ({ menuSections = [] }) => {
     const { handleLogout, notificationSocket } = useWebProvider()
     const global = useSelector(state => state.global) || {}
     const socket = global.socketConnection
@@ -28,6 +33,19 @@ const MenuBar = () => {
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [expandedMenu, setExpandedMenu] = useState(null)
     const drawerRef = useRef(null)
+
+    // Agrupa seções com mesmo título (ex: "Cadastros" do SGP + SGM → um dropdown só)
+    const groupedMenus = useMemo(() => {
+        const map = new Map();
+        for (const section of menuSections) {
+            const key = section.title;
+            if (!map.has(key)) {
+                map.set(key, { title: key, icon: section.icon, subsections: [] });
+            }
+            map.get(key).subsections.push(section);
+        }
+        return Array.from(map.values());
+    }, [menuSections]);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -46,7 +64,6 @@ const MenuBar = () => {
 
     useEffect(() => {
         if (!drawerOpen) return
-        const drawer = drawerRef.current
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') setDrawerOpen(false)
         }
@@ -64,27 +81,29 @@ const MenuBar = () => {
 
     const toggleDrawer = () => setDrawerOpen(!drawerOpen)
     const toggleMenu = (menuKey) => setExpandedMenu(prev => prev === menuKey ? null : menuKey)
-    const manutencaoSections = (() => {
-        const solicitacaoItems = solicitacaoMenuSections.flatMap(section => section.items || [])
-        const operacaoIndex = sgmMenuSections.findIndex(section => section.title === 'Operação')
 
-        if (operacaoIndex === -1) {
-            return [...sgmMenuSections, ...solicitacaoMenuSections]
-        }
-
-        return sgmMenuSections.map((section, index) => {
-            if (index !== operacaoIndex) return section
-            return {
-                ...section,
-                items: [...section.items, ...solicitacaoItems],
-            }
-        })
-    })()
+    const renderMenuLink = (item, extraProps = {}) => (
+        <PermissionContainer
+            key={item.routePath}
+            menubar={true}
+            component={(componenteRef) => (
+                <Link
+                    className={extraProps.className || "dropdown-item"}
+                    id={item.routePath}
+                    ref={componenteRef}
+                    to={item.routePath}
+                    {...(extraProps.onClick ? { onClick: extraProps.onClick } : {})}
+                >
+                    {item.label}
+                </Link>
+            )}
+        />
+    )
 
     if (isAuthenticated(global.token)) {
         return (
             <div className='App tc f3 menu-bar'>
-                <Navbar className="menu-bar" expand="lg" onClick={navClickHandler} >
+                <Navbar className="menu-bar" expand="lg" onClick={navClickHandler}>
                     <div className="navbar-logo">
                         <Image
                             style={{ cursor: "pointer" }}
@@ -105,91 +124,30 @@ const MenuBar = () => {
                     ) : (
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="mr-auto">
-                                <PermissionContainer menubar component={cRef => (
-                                    <NavDropdown ref={cRef} className="teraprox-dropdown" title="Processo" id={ids.menuBar.processoDropdownMenu}>
-                                        {sgpMenuSections.map((section, sIdx) => (
-                                            <React.Fragment key={section.title}>
-                                                {sIdx > 0 && <NavDropdown.Divider />}
-                                                <NavDropdown.Header>{section.title}</NavDropdown.Header>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="dropdown-item"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
-                                                ))}
-                                            </React.Fragment>
-                                        ))}
-                                    </NavDropdown>
-                                )} />
-
-                                <PermissionContainer menubar component={cRef => (
-                                    <NavDropdown ref={cRef} className="teraprox-dropdown" title="Manutenção" id={ids.menuBar.manutencaoDropdownMenu}>
-                                        {manutencaoSections.map((section, sIdx) => (
-                                            <React.Fragment key={`${section.title}-${sIdx}`}>
-                                                {sIdx > 0 && <NavDropdown.Divider />}
-                                                <NavDropdown.Header>{section.title}</NavDropdown.Header>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="dropdown-item"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
-                                                ))}
-                                            </React.Fragment>
-                                        ))}
-                                    </NavDropdown>
-                                )} />
-
-                                <PermissionContainer menubar component={cRef => (
-                                    <NavDropdown ref={cRef} className="teraprox-dropdown" title="Cadastros" id={ids.menuBar.cadastrosDropdownMenu}>
-                                        {cadastroMenuSections.map((section, sIdx) => (
-                                            <React.Fragment key={section.title}>
-                                                {sIdx > 0 && <NavDropdown.Divider />}
-                                                <NavDropdown.Header>{section.title}</NavDropdown.Header>
-                                                {section.items.map((item) => (
-                                                    <PermissionContainer
-                                                        key={item.routePath}
-                                                        menubar={true}
-                                                        component={(componenteRef) => (
-                                                            <Link
-                                                                className="dropdown-item"
-                                                                id={item.routePath}
-                                                                ref={componenteRef}
-                                                                to={item.routePath}
-                                                            >
-                                                                {item.label}
-                                                            </Link>
-                                                        )}
-                                                    />
-                                                ))}
-                                            </React.Fragment>
-                                        ))}
-                                    </NavDropdown>
-                                )} />
+                                {groupedMenus.map((group) => (
+                                    <PermissionContainer key={group.title} menubar component={cRef => (
+                                        <NavDropdown
+                                            ref={cRef}
+                                            className="teraprox-dropdown"
+                                            title={group.title}
+                                            id={`menu-${group.title.toLowerCase().replace(/\s+/g, '-')}`}
+                                        >
+                                            {group.subsections.map((section, sIdx) => (
+                                                <React.Fragment key={`${section.title}-${sIdx}`}>
+                                                    {sIdx > 0 && <NavDropdown.Divider />}
+                                                    {group.subsections.length > 1 && (
+                                                        <NavDropdown.Header>{section.title}</NavDropdown.Header>
+                                                    )}
+                                                    {section.items.map((item) => renderMenuLink(item))}
+                                                </React.Fragment>
+                                            ))}
+                                        </NavDropdown>
+                                    )} />
+                                ))}
                             </Nav>
                         </Navbar.Collapse>
                     )}
 
-                    {/* Mobile drawer */}
                     {isMobile && (
                         <>
                             <div className={`mobile-drawer ${drawerOpen ? 'open' : ''}`} ref={drawerRef} role="dialog" aria-hidden={!drawerOpen} aria-label="Menu de navegação">
@@ -218,42 +176,28 @@ const MenuBar = () => {
                                     </div>
                                 </div>
                                 <nav className="mobile-drawer-nav">
-                                    {[{ key: 'processo', title: 'Processo', sections: sgpMenuSections },
-                                                                            { key: 'manutencao', title: 'Manutenção', sections: manutencaoSections },
-                                      { key: 'cadastros', title: 'Cadastros', sections: cadastroMenuSections },
-                                    ].map((group) => (
-                                        <div className="drawer-accordion" key={group.key}>
+                                    {groupedMenus.map((group) => (
+                                        <div className="drawer-accordion" key={group.title}>
                                             <button
-                                                className={`drawer-accordion-toggle ${expandedMenu === group.key ? 'active' : ''}`}
-                                                onClick={() => toggleMenu(group.key)}
-                                                aria-expanded={expandedMenu === group.key}
+                                                className={`drawer-accordion-toggle ${expandedMenu === group.title ? 'active' : ''}`}
+                                                onClick={() => toggleMenu(group.title)}
+                                                aria-expanded={expandedMenu === group.title}
                                             >
                                                 <span>{group.title}</span>
-                                                <FiChevronDown className={`drawer-accordion-icon ${expandedMenu === group.key ? 'rotated' : ''}`} size={18} />
+                                                <FiChevronDown className={`drawer-accordion-icon ${expandedMenu === group.title ? 'rotated' : ''}`} size={18} />
                                             </button>
-                                            <div className={`drawer-accordion-content ${expandedMenu === group.key ? 'expanded' : ''}`}>
-                                                {group.sections.map((section, sIdx) => (
-                                                    <React.Fragment key={`${group.key}-${section.title}-${sIdx}`}>
+                                            <div className={`drawer-accordion-content ${expandedMenu === group.title ? 'expanded' : ''}`}>
+                                                {group.subsections.map((section, sIdx) => (
+                                                    <React.Fragment key={`${group.title}-${section.title}-${sIdx}`}>
                                                         {sIdx > 0 && <div className="drawer-divider" />}
                                                         <div className="drawer-section">
-                                                            <div className="drawer-subsection-title">{section.title}</div>
-                                                            {section.items.map((item) => (
-                                                                <PermissionContainer
-                                                                    key={item.routePath}
-                                                                    menubar={true}
-                                                                    component={(componenteRef) => (
-                                                                        <Link
-                                                                            className="drawer-link"
-                                                                            id={item.routePath}
-                                                                            ref={componenteRef}
-                                                                            to={item.routePath}
-                                                                            onClick={() => setDrawerOpen(false)}
-                                                                        >
-                                                                            {item.label}
-                                                                        </Link>
-                                                                    )}
-                                                                />
-                                                            ))}
+                                                            {group.subsections.length > 1 && (
+                                                                <div className="drawer-subsection-title">{section.title}</div>
+                                                            )}
+                                                            {section.items.map((item) => renderMenuLink(item, {
+                                                                className: 'drawer-link',
+                                                                onClick: () => setDrawerOpen(false),
+                                                            }))}
                                                         </div>
                                                     </React.Fragment>
                                                 ))}
