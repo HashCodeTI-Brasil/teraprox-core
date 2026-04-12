@@ -1,54 +1,148 @@
 import React, { useMemo, useContext, useCallback } from 'react'
-import { CoreServiceContext } from 'teraprox-core-sdk'
+import { CoreServiceContext, FetchHttpAdapter } from 'teraprox-core-sdk'
 import { WebProvider } from '../websocket/wsProvider'
 import { useToasts } from 'react-toast-notifications'
+import { useDispatch } from 'react-redux'
+import {
+    logOut,
+    setNeedUserLogin,
+    setToken,
+} from '../Reducers/default-reducers/globalConfigReducer'
+import { setGlobalError } from '../Reducers/default-reducers/globalErrorReducer'
+import { routesConfig } from '../models/routesConfig'
+import { store } from '../store'
 
-/**
- * Normalizes custom paths so they are always relative to the context —
- * matching FetchHttpAdapter behavior used by standalone federated modules.
- *
- * Rules:
- *  - null/undefined  → undefined  (triggers auto-CRUD fallback to context)
- *  - ''              → ''         (keep empty — some callers use it with baseURL that already includes context)
- *  - path === ctx    → as-is      (caller already provided the full context)
- *  - path starts with ctx/ → as-is
- *  - otherwise       → ctx/path   (prepend context)
- *  - empty context   → as-is      (no prefix to add)
- */
-function normalizePath(context, path) {
-    if (path == null) return undefined
-    if (path === '' || !context) return path
-    if (path === context || path.startsWith(`${context}/`)) return path
-    return `${context}/${path}`
+function resolveEndpoint(context) {
+    for (const svc of routesConfig) {
+        for (const route of svc.routes) {
+            if (route.configuration.context === context) {
+                return route.configuration.endPoint
+            }
+        }
+    }
+    return undefined
 }
 
-function wrapController(ctrl, context) {
-    return {
-        get:             (path, query)                  => ctrl.get(normalizePath(context, path), query),
-        post:            (path, data, eh, q)            => ctrl.post(normalizePath(context, path), data, eh, q),
-        put:             (path, data, eh, q)            => ctrl.put(normalizePath(context, path), data, eh, q),
-        delete:          (path, id, eh, q)              => ctrl.delete(normalizePath(context, path), id, eh, q),
-        patch:           (path, data, eh, q)            => ctrl.patch(normalizePath(context, path), data, eh, q),
-        readAll:         (path, eh, q)                  => ctrl.readAll(normalizePath(context, path), eh, q),
-        read:            (path, id, eh, q)              => ctrl.read(normalizePath(context, path), id, eh, q),
-        save:            (path, data, eh, q)            => ctrl.save(normalizePath(context, path), data, eh, q),
-        readAllwithPage: (path, page, size)             => ctrl.readAllwithPage(normalizePath(context, path), page, size),
-        bulkDelete:      (path, ids, eh, q)             => ctrl.bulkDelete(normalizePath(context, path), ids, eh, q),
-        deleteSimple:    (path, eh, q)                  => ctrl.deleteSimple(normalizePath(context, path), eh, q),
+function resolveService(context) {
+    for (const svc of routesConfig) {
+        if (svc.routes.some(r => r.configuration.context === context)) {
+            return svc.service
+        }
     }
+    return undefined
 }
 
 export default function CoreServiceProvider({ children }) {
     const wp = useContext(WebProvider)
     const toast = useToasts()
+    const dispatch = useDispatch()
 
-    const wrappedCreateController = useCallback((context, baseEndPoint) => {
-        const ctrl = wp.basicController(context, baseEndPoint)
-        return wrapController(ctrl, context)
+    const successToastTimerRef = React.useRef(null)
+
+    const enqueueSuccessToast = useCallback((message, options = {}, delay = 1000) => {
+        if (successToastTimerRef.current) clearTimeout(successToastTimerRef.current)
+        successToastTimerRef.current = setTimeout(() => {
+            if (toast?.addToast) toast.addToast(message, options)
+            successToastTimerRef.current = null
+        }, delay)
+    }, [toast])
+
+    const processResponseMatchingObjects = useCallback((matchingObjects) => {
+        if (!matchingObjects) return
+        const mos = Array.isArray(matchingObjects) ? matchingObjects : [matchingObjects]
+        for (const mo of mos) {
+            if (wp?.wsEvent) {
+                wp.wsEvent.dispatchEvent(
+                    new CustomEvent(mo.context + (mo.location || ''), { detail: mo.payload })
+                )
+            }
+        }
     }, [wp])
 
+    const createController = useCallback((context, baseEndPoint) => {
+        const gatewayBase = baseEndPoint || resolveEndpoint(context) || ''
+        const endpoint = context
+            ? `${gatewayBase.replace(/\/$/, '')}/${context}`
+            : gatewayBase.replace(/\/$/, '')
+        const service = resolveService(context)
+        const isNotification = context === 'notification'
+
+        const interceptors = {
+            onBeforeRequest(headers) {
+                const currentToken = store.getState().global.token
+                if (currentToken) headers.Authorization = `${currentToken}`
+                if (service) headers['x-teraprox-host'] = service
+                if (context && !headers.Contexto) headers.Contexto = context
+                return headers
+            },
+
+            onResponse(response, method) {
+                if (method !== 'GET' && method !== 'PATCH') {
+                    enqueueSuccessToast('Dados processados com sucesso', {
+                        appearance: 'success',
+                        autoDismiss: true,
+                        autoDismissTimeout: 2000,
+                    })
+                }
+                if (response.data?.newToken) dispatch(setToken(response.data.newToken))
+                const gatewayNewToken = response.headers?.get?.('x-new-token')
+                if (gatewayNewToken) dispatch(setToken(gatewayNewToken))
+                processResponseMatchingObjects(response.data?.matchingObjects)
+                return response.data?.content || response.data
+            },
+
+            onError(error, retry) {
+                const { status, data } = error
+
+                if (status === 400 || status === 404) {
+                    if (status === 400 && Array.isArray(data?.errors)) {
+                        data.errors.forEach((msg) =>
+                            toast.addToast(msg, { appearance: 'warning', autoDismiss: true })
+                        )
+                    }
+                    if (status === 404) {
+                        toast.addToast('Recurso não encontrado.', { appearance: 'info', autoDismiss: true })
+                    }
+                    return data
+                }
+
+                if (status === 401) {
+                    if (isNotification) return Promise.reject(error)
+
+                    const currentToken = store.getState().global.token
+                    if (currentToken) return retry()
+
+                    const alreadyWaiting = store.getState().global.needUserLogin
+                    if (!alreadyWaiting) {
+                        dispatch(setNeedUserLogin(true))
+                        toast.addToast('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
+                        dispatch(logOut())
+                    }
+                    return Promise.reject(error)
+                }
+
+                if (isNotification) return Promise.reject(error)
+
+                if (status === 403) {
+                    toast.addToast('Você não tem permissão para acessar este recurso.', { autoDismiss: true })
+                }
+                if (status === 500 && Array.isArray(data?.errors)) {
+                    data.errors.forEach((errMsg) =>
+                        toast.addToast(errMsg, { autoDismiss: true, autoDismissTimeout: 2000 })
+                    )
+                }
+
+                const customError = { message: error.message, status, data }
+                dispatch(setGlobalError(customError))
+                return Promise.reject(customError)
+            },
+        }
+
+        return new FetchHttpAdapter(endpoint, {}, interceptors)
+    }, [dispatch, enqueueSuccessToast, processResponseMatchingObjects, toast])
+
     const value = useMemo(() => ({
-        createController: wrappedCreateController,
+        createController,
 
         toast: {
             success: (msg, opts) => toast.addToast(msg, { appearance: 'success', autoDismiss: true, ...opts }),
@@ -63,11 +157,8 @@ export default function CoreServiceProvider({ children }) {
         unsubscribeEvent: wp.unsubscribeEvent,
         handleLogout: wp.handleLogout,
         hostedByCore: true,
-
-        // Rate limit state — updated in real-time via RTDB.
-        // pathGroup → { used, limit, exceeded, windowReset }
         rateLimits: wp.rateLimits ?? {},
-    }), [wrappedCreateController, wp, toast])
+    }), [createController, wp, toast])
 
     return (
         <CoreServiceContext.Provider value={value}>

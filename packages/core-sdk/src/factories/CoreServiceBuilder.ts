@@ -3,12 +3,17 @@ import type { ToastService } from '../types/Toast'
 import type { HttpController } from '../types/HttpController'
 import type { IObservabilityPort } from '../types/IObservabilityPort'
 import type { MatchingObjectSubscription } from '../types/MatchingObject'
+import type { HttpInterceptors } from '../types/HttpInterceptors'
 import { NullCoreService, NullToastService, NullHttpController } from '../adapters/null/NullObjectAdapters'
 import { NullObservabilityAdapter } from '../adapters/null/NullObservabilityAdapter'
 import { TracingHttpAdapter } from '../adapters/TracingHttpAdapter'
 
 export class FetchHttpAdapter implements HttpController {
-  constructor(private endpoint: string, private extraHeaders?: Record<string, string>) {}
+  constructor(
+    private endpoint: string,
+    private extraHeaders?: Record<string, string>,
+    private interceptors?: HttpInterceptors,
+  ) {}
 
   private mergeHeaders(extraReqHeaders?: Record<string, string>, hasJsonBody?: boolean): Record<string, string> {
     return {
@@ -18,32 +23,98 @@ export class FetchHttpAdapter implements HttpController {
     }
   }
 
+  /** Join non-empty path segments, avoiding double slashes. */
+  private joinPath(...parts: (string | number | null | undefined)[]): string {
+    return parts.filter(p => p != null && p !== '').map(String).join('/')
+  }
+
   private async request(method: string, extraPath: string, data?: any, extraHeaders?: Record<string, string>) {
     const url = extraPath ? `${this.endpoint}/${extraPath}` : this.endpoint
     const isFormData = typeof FormData !== 'undefined' && data instanceof FormData
-    const headers = this.mergeHeaders(extraHeaders, data !== undefined && !isFormData)
+    let headers = this.mergeHeaders(extraHeaders, data !== undefined && !isFormData)
     const body = data !== undefined ? (isFormData ? data : JSON.stringify(data)) : undefined
-    try {
+
+    if (this.interceptors?.onBeforeRequest) {
+      headers = await this.interceptors.onBeforeRequest(headers)
+    }
+
+    const doFetch = async (): Promise<any> => {
       const res = await fetch(url, { method, headers, body })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      return await res.json()
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        if (this.interceptors?.onError) {
+          return this.interceptors.onError(
+            { status: res.status, headers: res.headers, data: errorData, message: `HTTP ${res.status}` },
+            () => this.request(method, extraPath, data, extraHeaders),
+          )
+        }
+        throw new Error(`HTTP ${res.status}`)
+      }
+
+      const responseData = await res.json().catch(() => ({}))
+
+      if (this.interceptors?.onResponse) {
+        return this.interceptors.onResponse(
+          { status: res.status, headers: res.headers, data: responseData },
+          method,
+        )
+      }
+      return responseData
+    }
+
+    if (this.interceptors) {
+      return await doFetch()
+    }
+    try {
+      return await doFetch()
     } catch (e) {
       console.warn(`[FetchHttpAdapter] ${method} ${url}:`, e)
       return []
     }
   }
 
-  get(path?: string) { return this.request('GET', path || '') }
-  post(path?: string, data?: any, extraHeaders?: Record<string, string>) { return this.request('POST', path || '', data, extraHeaders) }
-  put(path?: string, data?: any) { return this.request('PUT', path || '', data) }
-  patch(path?: string, data?: any) { return this.request('PATCH', path || '', data) }
-  delete(path?: string, id?: string | number) { return this.request('DELETE', `${path || ''}/${id}`) }
-  deleteSimple(path?: string) { return this.request('DELETE', path || '') }
-  save(path?: string, data?: any) { return this.request('POST', path || '', data) }
-  read(path?: string, id?: string | number) { return this.request('GET', `${path || ''}/${id}`) }
-  readAll(path?: string) { return this.request('GET', path || '') }
-  readAllwithPage(path?: string) { return this.request('GET', path || '') }
-  bulkDelete(path?: string) { return this.request('DELETE', path || '') }
+  private qs(query?: string): string { return query ? `?${query}` : '' }
+
+  get(path?: string, query?: string) {
+    return this.request('GET', `${this.joinPath(path)}${this.qs(query)}`)
+  }
+  post(path?: string, data?: any, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('POST', `${this.joinPath(path)}${this.qs(query)}`, data, extraHeaders)
+  }
+  put(path?: string, data?: any, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('PUT', `${this.joinPath(path)}${this.qs(query)}`, data, extraHeaders)
+  }
+  patch(path?: string, data?: any, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('PATCH', `${this.joinPath(path)}${this.qs(query)}`, data, extraHeaders)
+  }
+  delete(path?: string, id?: string | number, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('DELETE', `${this.joinPath(path, id)}${this.qs(query)}`, undefined, extraHeaders)
+  }
+  deleteSimple(path?: string, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('DELETE', `${this.joinPath(path)}${this.qs(query)}`, undefined, extraHeaders)
+  }
+  save(path?: string, data?: any, extraHeaders?: Record<string, string>, query?: string) {
+    if (data && (data.id || data._id)) {
+      const id = data.id || data._id
+      return this.request('PUT', `${this.joinPath(path, id)}${this.qs(query)}`, data, extraHeaders)
+    }
+    return this.request('POST', `${this.joinPath(path)}${this.qs(query)}`, data, extraHeaders)
+  }
+  read(path?: string, id?: string | number, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('GET', `${this.joinPath(path, id)}${this.qs(query)}`, undefined, extraHeaders)
+  }
+  readAll(path?: string, extraHeaders?: Record<string, string>, query?: string) {
+    return this.request('GET', `${this.joinPath(path)}${this.qs(query)}`, undefined, extraHeaders)
+  }
+  readAllwithPage(path?: string, page?: number, size?: number) {
+    return this.request('GET', `${this.joinPath(path)}?page=${page}&size=${size}`)
+  }
+  bulkDelete(path?: string, ids?: (string | number)[], extraHeaders?: Record<string, string>, query?: string) {
+    const bulkParam = ids ? `ids=${ids.join(',')}` : ''
+    const fullQuery = query ? `${query}&${bulkParam}` : bulkParam
+    return this.request('DELETE', `${this.joinPath(path)}?${fullQuery}`, undefined, extraHeaders)
+  }
 }
 
 export class CoreServiceBuilder {

@@ -10,6 +10,7 @@ export type { OrdemDeCorrecao, OrdemDeCorrecaoFormState, StatusOrdemDeCorrecao, 
 export type { RegraDeCorrecao, RegraDeCorrecaoFormState, CalculoDeCorrecao } from './types/RegraDeCorrecao'
 export type { IObservabilityPort, VitalsPayload, BreadcrumbPayload, InteractionPayload } from './types/IObservabilityPort'
 export type { IAnexoPort, AnexoPersistido, AnexoLocal, UploadIntent } from './types/IAnexoPort'
+export type { HttpInterceptors, HttpResponseMeta, HttpErrorMeta } from './types/HttpInterceptors'
 
 // Context
 export { CoreServiceContext } from './context/CoreServiceContext'
