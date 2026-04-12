@@ -86,7 +86,7 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
         http.interceptors.request.use(async (config) => {
             const token = store.getState().global.token;
             if (token) {
-                config.headers.Authorization = `${token}`;
+                config.headers.Authorization = `Bearer ${token}`;
             }
             if (context && !config.headers?.Contexto) {
                 config.headers.Contexto = context;
