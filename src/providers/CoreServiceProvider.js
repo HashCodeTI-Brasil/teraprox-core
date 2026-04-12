@@ -102,6 +102,16 @@ export default function CoreServiceProvider({ children }) {
             onError(error, retry) {
                 const { status, data } = error
 
+                const sessionExpiredFlow = () => {
+                    const alreadyWaiting = store.getState().global.needUserLogin
+                    if (!alreadyWaiting) {
+                        dispatch(setNeedUserLogin(true))
+                        toast.addToast('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
+                        dispatch(logOut())
+                    }
+                    return Promise.reject(error)
+                }
+
                 if (status === 400 || status === 404) {
                     if (status === 400 && Array.isArray(data?.errors)) {
                         data.errors.forEach((msg) =>
@@ -117,24 +127,13 @@ export default function CoreServiceProvider({ children }) {
                 if (status === 401) {
                     if (isNotification) return Promise.reject(error)
 
-                    // Igual ao basicController (axios): no máximo 1 retry com token atual;
-                    // se continuar 401, sessão expirada → logout (evita loop infinito).
+                    // Igual ao basicController (axios): no máximo 1 retry (limitado no FetchHttpAdapter);
+                    // sem async/await aqui — Babel do core não trata onError como async.
                     const currentToken = store.getState().global.token
                     if (currentToken) {
-                        try {
-                            return await retry()
-                        } catch {
-                            /* retry esgotado ou segundo erro — segue para fluxo de expiração */
-                        }
+                        return retry().catch(() => sessionExpiredFlow())
                     }
-
-                    const alreadyWaiting = store.getState().global.needUserLogin
-                    if (!alreadyWaiting) {
-                        dispatch(setNeedUserLogin(true))
-                        toast.addToast('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
-                        dispatch(logOut())
-                    }
-                    return Promise.reject(error)
+                    return sessionExpiredFlow()
                 }
 
                 if (isNotification) return Promise.reject(error)
