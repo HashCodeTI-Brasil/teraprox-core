@@ -36,18 +36,11 @@ const useLogin = () => {
             dispatch(setToken(authResponse.token))
             dispatch(setNeedUserLogin(false))
 
-            const companyId = authResponse.companyId
-            if (companyId) {
-                try {
-                    const setores = await controller("user", endPointUser).get(
-                        `findSetoresByCompanyId/${companyId}`,
-                        undefined,
-                        { "x-teraprox-host": "user" }
-                    )
-                    dispatch(setCompanySetores(setores))
-                } catch (err) {
-                    console.error("Erro ao carregar setores:", err)
-                }
+            try {
+                const setores = await controller("setor", endPointUser).get("all")
+                dispatch(setCompanySetores(setores))
+            } catch (err) {
+                console.error("Erro ao carregar setores:", err)
             }
 
             connect(authResponse.userName, authResponse.identifier, authResponse.id)
