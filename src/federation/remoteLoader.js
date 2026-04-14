@@ -60,6 +60,12 @@ const REMOTE_CONFIGS = [
         importBridge:         () => import('teraprox_app_ordem_de_correcao/FederatedBridge'),
         importReducersBundle: () => import('teraprox_app_ordem_de_correcao/ReducersBundle'),
     },
+    {
+        name: 'teraprox_app_plano_de_controle',
+        importManifest:       () => import('teraprox_app_plano_de_controle/Manifest'),
+        importBridge:         () => import('teraprox_app_plano_de_controle/FederatedBridge'),
+        importReducersBundle: () => import('teraprox_app_plano_de_controle/ReducersBundle'),
+    },
 ];
 
 // Lookup rápido por nome do remote
