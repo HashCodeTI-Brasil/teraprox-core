@@ -71,8 +71,14 @@ const useLogin = () => {
 
         try {
             const tenant = getTenantFromHostname()
-            const loginBody = { email, password }
-            if (tenant) loginBody.company = tenant
+            if (!tenant) {
+                toastManager.addToast("Tenant não identificado. Em produção, acesse via subdomínio (ex: cationbrasil.teraprox.com). Em dev, preencha o campo Tenant.", {
+                    appearance: "warning",
+                    autoDismiss: true,
+                })
+                return
+            }
+            const loginBody = { email, password, company: tenant }
 
             const finalAuth = await authOnSGP(loginBody)
 
