@@ -1,13 +1,20 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Button, Container, Form, Card, Row, Col } from "react-bootstrap"
 import { useSelector } from "react-redux"
 import { Navigate } from "react-router-dom"
 import ToogablePasswordField from "../Components/User/ToogablePasswordField"
 import useLogin from "../hooks/useLogin"
+import { isLocalDev, getDevTenant, setDevTenant } from "../utils/tenantResolver.js"
 
 const Login = () => {
     const global = useSelector((state) => state.global)
     const { setUsuario, setSenha, authPlataform } = useLogin()
+    const showTenantField = isLocalDev()
+    const [devTenant, setDevTenantState] = useState(getDevTenant())
+
+    useEffect(() => {
+        setDevTenant(devTenant)
+    }, [devTenant])
 
     if (global.isAuth) {
         return <Navigate to="/" />
@@ -25,6 +32,22 @@ const Login = () => {
                             </div>
 
                             <Form>
+                                {showTenantField && (
+                                    <Form.Group className="mb-3" controlId="formTenant">
+                                        <Form.Label className="text-muted small">
+                                            Tenant (dev local)
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="ex: cationbrasil"
+                                            value={devTenant}
+                                            onChange={(e) => setDevTenantState(e.target.value)}
+                                            className="py-2"
+                                            style={{ borderColor: '#ffc107', backgroundColor: '#fffdf0' }}
+                                        />
+                                    </Form.Group>
+                                )}
+
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>E-mail ou Usuário</Form.Label>
                                     <Form.Control
