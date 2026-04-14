@@ -17,6 +17,7 @@ export interface AnexoPersistedItem {
   url?: string
   signedUrl?: string
   createdAt?: string
+  unavailable?: boolean
 }
 
 export interface AnexoLocalItem {
@@ -123,6 +124,24 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
   dropzoneLabel,
 }) => {
   const [thumbUrls, setThumbUrls] = useState<Record<string, string>>({})
+  const [unavailableIds, setUnavailableIds] = useState<Set<string | number>>(new Set())
+
+  const handleDownload = useCallback(async (anexo: AnexoPersistedItem) => {
+    if (!onDownload) return
+    const url = anexo.url || anexo.signedUrl
+    if (url) {
+      try {
+        const res = await fetch(url, { method: 'HEAD', mode: 'cors' })
+        if (res.ok) {
+          onDownload(anexo)
+          return
+        }
+      } catch { /* network error — fall through */ }
+      setUnavailableIds(prev => new Set(prev).add(anexo.id))
+      return
+    }
+    onDownload(anexo)
+  }, [onDownload])
 
   // Generate object URLs for local image thumbnails
   useEffect(() => {
@@ -197,25 +216,27 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
           {/* Persistidos */}
           {persistidos.map((anexo) => {
             const cat = getFileCategory(anexo.tipo || '', anexo.nome)
+            const isUnavailable = anexo.unavailable || unavailableIds.has(anexo.id)
             return (
-              <div key={`p-${anexo.id}`} className="anexo-file-item">
+              <div key={`p-${anexo.id}`} className={`anexo-file-item ${isUnavailable ? 'anexo-file-unavailable' : ''}`}>
                 <div className={`anexo-file-icon anexo-icon-${cat}`}>
                   <FileIcon category={cat} />
                 </div>
                 <div className="anexo-file-info">
                   <div className="anexo-file-name" title={anexo.nome}>{anexo.nome}</div>
                   <div className="anexo-file-meta">
-                    {anexo.tamanho ? <span>{formatFileSize(anexo.tamanho)}</span> : null}
+                    {isUnavailable && <span className="anexo-status-error">Anexo indisponivel</span>}
+                    {!isUnavailable && anexo.tamanho ? <span>{formatFileSize(anexo.tamanho)}</span> : null}
                     {anexo.createdAt && <span>{new Date(anexo.createdAt).toLocaleDateString('pt-BR')}</span>}
                   </div>
                 </div>
                 <div className="anexo-file-actions">
-                  {onDownload && (
+                  {onDownload && !isUnavailable && (
                     <button
                       type="button"
                       className="anexo-btn-action anexo-btn-download"
                       title="Download"
-                      onClick={() => onDownload(anexo)}
+                      onClick={() => handleDownload(anexo)}
                     >
                       <FiDownload />
                     </button>

@@ -3280,6 +3280,24 @@ var AnexoManager = ({
   dropzoneLabel
 }) => {
   const [thumbUrls, setThumbUrls] = (0, import_react24.useState)({});
+  const [unavailableIds, setUnavailableIds] = (0, import_react24.useState)(/* @__PURE__ */ new Set());
+  const handleDownload = (0, import_react24.useCallback)(async (anexo) => {
+    if (!onDownload) return;
+    const url = anexo.url || anexo.signedUrl;
+    if (url) {
+      try {
+        const res = await fetch(url, { method: "HEAD", mode: "cors" });
+        if (res.ok) {
+          onDownload(anexo);
+          return;
+        }
+      } catch (e) {
+      }
+      setUnavailableIds((prev) => new Set(prev).add(anexo.id));
+      return;
+    }
+    onDownload(anexo);
+  }, [onDownload]);
   (0, import_react24.useEffect)(() => {
     const newUrls = {};
     locais.forEach((a) => {
@@ -3341,23 +3359,25 @@ var AnexoManager = ({
       loading && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "anexo-empty", children: "Carregando anexos..." }),
       persistidos.map((anexo) => {
         const cat = getFileCategory(anexo.tipo || "", anexo.nome);
-        return /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "anexo-file-item", children: [
+        const isUnavailable = anexo.unavailable || unavailableIds.has(anexo.id);
+        return /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: `anexo-file-item ${isUnavailable ? "anexo-file-unavailable" : ""}`, children: [
           /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(FileIcon, { category: cat }) }),
           /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "anexo-file-info", children: [
             /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
             /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "anexo-file-meta", children: [
-              anexo.tamanho ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { children: formatFileSize(anexo.tamanho) }) : null,
+              isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "anexo-status-error", children: "Anexo indisponivel" }),
+              !isUnavailable && anexo.tamanho ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { children: formatFileSize(anexo.tamanho) }) : null,
               anexo.createdAt && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { children: new Date(anexo.createdAt).toLocaleDateString("pt-BR") })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "anexo-file-actions", children: [
-            onDownload && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
+            onDownload && !isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
               "button",
               {
                 type: "button",
                 className: "anexo-btn-action anexo-btn-download",
                 title: "Download",
-                onClick: () => onDownload(anexo),
+                onClick: () => handleDownload(anexo),
                 children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiDownload, {})
               }
             ),
