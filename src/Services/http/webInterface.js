@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useStore } from "react-redux";
 import { logOut, setToken } from "../../Reducers/default-reducers/globalConfigReducer";
 import { setGlobalError } from "../../Reducers/default-reducers/globalErrorReducer";
+import { getTenantFromHostname } from "../../utils/tenantResolver.js";
 
 export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
     const store = useStore();
@@ -90,6 +91,10 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
             }
             if (context && !config.headers?.Contexto) {
                 config.headers.Contexto = context;
+            }
+            const tenant = getTenantFromHostname();
+            if (tenant) {
+                config.headers['x-tenant'] = tenant;
             }
             return config;
         });

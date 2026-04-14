@@ -12,6 +12,7 @@ import {
     setCompanySetores,
 } from "../Reducers/default-reducers/globalConfigReducer"
 import { endPointUser } from "../models/constantes"
+import { getTenantFromHostname } from "../utils/tenantResolver.js"
 
 const useLogin = () => {
     const [email, setUsuario] = useState("")
@@ -69,10 +70,11 @@ const useLogin = () => {
         }
 
         try {
-            const finalAuth = await authOnSGP({
-                email,
-                password,
-            })
+            const tenant = getTenantFromHostname()
+            const loginBody = { email, password }
+            if (tenant) loginBody.company = tenant
+
+            const finalAuth = await authOnSGP(loginBody)
 
             authHandler(finalAuth)
         } catch (error) {

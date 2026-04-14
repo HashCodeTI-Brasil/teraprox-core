@@ -1,5 +1,6 @@
 import React, { useMemo, useContext, useCallback } from 'react'
 import { CoreServiceContext, FetchHttpAdapter } from 'teraprox-core-sdk'
+import { getTenantFromHostname } from '../utils/tenantResolver.js'
 import { WebProvider } from '../websocket/wsProvider'
 import { useToasts } from 'react-toast-notifications'
 import { useDispatch } from 'react-redux'
@@ -83,12 +84,15 @@ export default function CoreServiceProvider({ children }) {
         const service = resolveService(context)
         const isNotification = context === 'notification'
 
+        const tenant = getTenantFromHostname()
+
         const interceptors = {
             onBeforeRequest(headers) {
                 const auth = authorizationFromToken(store.getState().global.token)
                 if (auth) headers.Authorization = auth
                 if (service) headers['x-teraprox-host'] = service
                 if (context && !headers.Contexto) headers.Contexto = context
+                if (tenant) headers['x-tenant'] = tenant
                 return headers
             },
 
