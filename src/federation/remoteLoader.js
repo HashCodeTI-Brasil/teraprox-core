@@ -36,6 +36,30 @@ const REMOTE_CONFIGS = [
         importBridge:         () => import('teraprox_app_solicitacao/FederatedBridge'),
         importReducersBundle: () => import('teraprox_app_solicitacao/ReducersBundle'),
     },
+    {
+        name: 'sgm_os',
+        importManifest:       () => import('sgm_os/Manifest'),
+        importBridge:         () => import('sgm_os/FederatedBridge'),
+        importReducersBundle: () => import('sgm_os/ReducersBundle'),
+    },
+    {
+        name: 'sgm_om',
+        importManifest:       () => import('sgm_om/Manifest'),
+        importBridge:         () => import('sgm_om/FederatedBridge'),
+        importReducersBundle: () => import('sgm_om/ReducersBundle'),
+    },
+    {
+        name: 'teraprox_app_caderno',
+        importManifest:       () => import('teraprox_app_caderno/Manifest'),
+        importBridge:         () => import('teraprox_app_caderno/FederatedBridge'),
+        importReducersBundle: () => import('teraprox_app_caderno/ReducersBundle'),
+    },
+    {
+        name: 'teraprox_app_ordem_de_correcao',
+        importManifest:       () => import('teraprox_app_ordem_de_correcao/Manifest'),
+        importBridge:         () => import('teraprox_app_ordem_de_correcao/FederatedBridge'),
+        importReducersBundle: () => import('teraprox_app_ordem_de_correcao/ReducersBundle'),
+    },
 ];
 
 // Lookup rápido por nome do remote

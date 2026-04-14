@@ -11,6 +11,10 @@ const isProd = process.env.NODE_ENV === 'production';
 const REMOTE_SGP_URL = process.env.REMOTE_SGP_URL || (isProd ? 'https://teraprox-sgp.web.app' : 'http://localhost:3002');
 const REMOTE_SGM_URL = process.env.REMOTE_SGM_URL || (isProd ? 'https://teraprox-sgm.web.app' : 'http://localhost:3003');
 const REMOTE_SOLICITACAO_URL = process.env.REMOTE_SOLICITACAO_URL || (isProd ? 'https://teraprox-solicitacoes.web.app' : 'http://localhost:3004');
+const REMOTE_SGM_OS_URL = process.env.REMOTE_SGM_OS_URL || (isProd ? 'https://teraprox-sgm-os.web.app' : 'http://localhost:4021');
+const REMOTE_SGM_OM_URL = process.env.REMOTE_SGM_OM_URL || (isProd ? 'https://teraprox-sgm-om.web.app' : 'http://localhost:4022');
+const REMOTE_CADERNO_URL = process.env.REMOTE_CADERNO_URL || (isProd ? 'https://teraprox-caderno.web.app' : 'http://localhost:3006');
+const REMOTE_ORDEM_CORRECAO_URL = process.env.REMOTE_ORDEM_CORRECAO_URL || (isProd ? 'https://teraprox-ordem-correcao.web.app' : 'http://localhost:3007');
 
 // Collect all REACT_APP_* env vars for DefinePlugin
 // Define the entire process.env object so any process.env.* access (static or dynamic)
@@ -109,6 +113,10 @@ module.exports = {
                 teraprox_app_sgp: promiseRemote('teraprox_app_sgp', REMOTE_SGP_URL),
                 teraprox_app_sgm: promiseRemote('teraprox_app_sgm', REMOTE_SGM_URL),
                 teraprox_app_solicitacao: promiseRemote('teraprox_app_solicitacao', REMOTE_SOLICITACAO_URL),
+                sgm_os: promiseRemote('sgm_os', REMOTE_SGM_OS_URL),
+                sgm_om: promiseRemote('sgm_om', REMOTE_SGM_OM_URL),
+                teraprox_app_caderno: promiseRemote('teraprox_app_caderno', REMOTE_CADERNO_URL),
+                teraprox_app_ordem_de_correcao: promiseRemote('teraprox_app_ordem_de_correcao', REMOTE_ORDEM_CORRECAO_URL),
             },
             shared: {
                 'teraprox-core-sdk': {
