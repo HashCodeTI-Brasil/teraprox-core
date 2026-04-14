@@ -1,0 +1,40 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro ao processar solicitação",
+    "success": "Operação realizada com sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Deletar",
+    "edit": "Editar",
+    "back": "Voltar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "search": "Buscar",
+    "validationError": "Por favor, corrija os erros abaixo",
+    "requiredField": "Campo obrigatório"
+  },
+  "menu": {
+    "manutencao": "Manutenção",
+    "processo": "Processo",
+    "usuarios": "Usuários",
+    "solicitacoes": "Solicitações",
+    "relatorios": "Relatórios",
+    "configuracoes": "Configurações",
+    "sair": "Sair"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "E-mail",
+    "password": "Senha",
+    "loginError": "Falha ao fazer login",
+    "sessionExpired": "Sua sessão expirou"
+  },
+  "toast": {
+    "saved": "Salvo com sucesso!",
+    "deleted": "Deletado com sucesso!",
+    "updated": "Atualizado com sucesso!",
+    "error": "Algo deu errado, tente novamente"
+  }
+}

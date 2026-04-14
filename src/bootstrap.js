@@ -6,9 +6,14 @@ import { ToastProvider } from 'react-toast-notifications';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BrowserRouter } from 'react-router-dom';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 
 import App from './App';
 import { store, persistor } from './store';
+
+// 🌐 Configure dayjs to use Portuguese (Brazil) locale
+dayjs.locale('pt-br');
 import { ValidateProvider } from './providers/ValidateProvider';
 import CoreServiceProvider from './providers/CoreServiceProvider';
 import WebProviderComponent from './websocket/wsProvider';

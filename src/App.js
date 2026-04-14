@@ -7,6 +7,7 @@ import MenuBar from './Components/Menu/MenuBar';
 import Login from './Screens/Login';
 import Home from './Screens/Home';
 import ServerErrorScreen from './Components/error-handling/ServerErrorScreen';
+import LGPDConsentBanner from './Components/LGPDConsentBanner.jsx';
 import { clearGlobalError } from './Reducers/default-reducers/globalErrorReducer';
 import FederatedLoadingPlaceholder from './Components/loading/FederatedLoadingPlaceholder';
 import { useFederatedRoutes } from './hooks/useFederatedRoutes';
@@ -36,6 +37,10 @@ const App = () => {
     return (
         <div className="teraprox-shell">
             {isAuth && <MenuBar menuSections={menuSections} />}
+            
+            {/* 🔒 LGPD Consent Banner — shown on first visit and annually */}
+            <LGPDConsentBanner />
+            
             <div className={isAuth ? "container-fluid mt-4" : ""}>
                 <main>
                     {isServerError ? (

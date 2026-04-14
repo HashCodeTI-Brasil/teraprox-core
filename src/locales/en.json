@@ -1,0 +1,40 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error processing request",
+    "success": "Operation completed successfully",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "validationError": "Please fix the errors below",
+    "requiredField": "This field is required"
+  },
+  "menu": {
+    "manutencao": "Maintenance",
+    "processo": "Process",
+    "usuarios": "Users",
+    "solicitacoes": "Requests",
+    "relatorios": "Reports",
+    "configuracoes": "Settings",
+    "sair": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "loginError": "Login failed",
+    "sessionExpired": "Your session has expired"
+  },
+  "toast": {
+    "saved": "Saved successfully!",
+    "deleted": "Deleted successfully!",
+    "updated": "Updated successfully!",
+    "error": "Something went wrong, please try again"
+  }
+}
