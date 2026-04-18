@@ -1,14 +1,17 @@
 import React from 'react';
 import FederatedUnavailableCard from './FederatedUnavailableCard';
 
-const isChunkLoadError = (error) => {
+const isRemoteOffline = (error) =>
+    error?.name === 'ScriptExternalLoadError';
+
+const isStaleChunkError = (error) => {
+    if (isRemoteOffline(error)) return false;
     const msg = error?.message || '';
     return (
         msg.includes('Loading chunk') ||
         msg.includes('Loading CSS chunk') ||
         msg.includes('Failed to fetch dynamically imported module') ||
-        msg.includes('ChunkLoadError') ||
-        error?.name === 'ScriptExternalLoadError'
+        msg.includes('ChunkLoadError')
     );
 };
 
@@ -27,10 +30,14 @@ class FederatedErrorBoundary extends React.Component {
     }
 
     componentDidCatch(error, errorInfo) {
+        if (isRemoteOffline(error)) {
+            console.warn('[Federation] Remote offline — exibindo fallback sem reload', error.message);
+            return;
+        }
+
         console.error("Erro detectado no Federated Component:", error, errorInfo);
 
-        // Auto-reload para erros de chunk stale (deploy novo invalidou bundles)
-        if (isChunkLoadError(error)) {
+        if (isStaleChunkError(error)) {
             const reloadKey = 'federated_chunk_reload_ts';
             const lastReload = sessionStorage.getItem(reloadKey);
             const now = Date.now();

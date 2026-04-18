@@ -13,6 +13,7 @@ const REMOTE_SGM_URL = process.env.REMOTE_SGM_URL || (isProd ? 'https://teraprox
 const REMOTE_SOLICITACAO_URL = process.env.REMOTE_SOLICITACAO_URL || (isProd ? 'https://teraprox-solicitacoes.web.app' : 'http://localhost:3004');
 const REMOTE_SGM_OS_URL = process.env.REMOTE_SGM_OS_URL || (isProd ? 'https://teraprox-sgm-os.web.app' : 'http://localhost:4021');
 const REMOTE_SGM_OM_URL = process.env.REMOTE_SGM_OM_URL || (isProd ? 'https://teraprox-sgm-om.web.app' : 'http://localhost:4022');
+const REMOTE_SGM_UTILS_URL = process.env.REMOTE_SGM_UTILS_URL || (isProd ? 'https://teraprox-sgm-utils.web.app' : 'http://localhost:4023');
 const REMOTE_CADERNO_URL = process.env.REMOTE_CADERNO_URL || (isProd ? 'https://teraprox-caderno.web.app' : 'http://localhost:3006');
 const REMOTE_ORDEM_CORRECAO_URL = process.env.REMOTE_ORDEM_CORRECAO_URL || (isProd ? 'https://teraprox-ordem-correcao.web.app' : 'http://localhost:3005');
 const REMOTE_PLANO_CONTROLE_URL = process.env.REMOTE_PLANO_CONTROLE_URL || (isProd ? 'https://teraprox-plano-controle.web.app' : 'http://localhost:3009');
@@ -35,28 +36,34 @@ const envKeys = {
     }),
 };
 
-// Promise-based remote loader — remotes offline não crasham o Core
+// Promise-based remote loader — remotes offline não crasham o Core nem poluem o console.
+// Offline: resolvemos com um stub cujo init é no-op (sharing não loga erro) e cujo get
+// rejeita com ScriptExternalLoadError somente quando alguém realmente tenta importar
+// um módulo — acionando o FederatedErrorBoundary / FederatedUnavailableCard.
 function promiseRemote(remoteName, remoteUrl) {
-    return `promise new Promise((resolve, reject) => {
+    return `promise new Promise((resolve) => {
         const url = '${remoteUrl}/remoteEntry.js?v=' + Date.now();
         const script = document.createElement('script');
         script.src = url;
         script.onload = () => {
-            const proxy = {
+            resolve({
                 get: (request) => window['${remoteName}'].get(request),
                 init: (arg) => {
                     try { return window['${remoteName}'].init(arg); }
-                    catch(e) { console.warn('${remoteName} already initialized'); }
+                    catch(e) { /* already initialized */ }
                 }
-            };
-            resolve(proxy);
+            });
         };
         script.onerror = () => {
-            const error = new Error('Loading script failed.\\n(error: ' + url + ')');
-            error.name = 'ScriptExternalLoadError';
-            error.request = url;
             console.warn('[Federation] Remote ${remoteName} offline (${remoteUrl})');
-            reject(error);
+            resolve({
+                __offline: true,
+                init: () => {},
+                get: () => Promise.reject(Object.assign(
+                    new Error('Remote ${remoteName} offline (' + url + ')'),
+                    { name: 'ScriptExternalLoadError', request: url }
+                ))
+            });
         };
         document.head.appendChild(script);
     })`;
@@ -116,6 +123,7 @@ module.exports = {
                 teraprox_app_solicitacao: promiseRemote('teraprox_app_solicitacao', REMOTE_SOLICITACAO_URL),
                 sgm_os: promiseRemote('sgm_os', REMOTE_SGM_OS_URL),
                 sgm_om: promiseRemote('sgm_om', REMOTE_SGM_OM_URL),
+                sgm_utils: promiseRemote('sgm_utils', REMOTE_SGM_UTILS_URL),
                 teraprox_app_caderno: promiseRemote('teraprox_app_caderno', REMOTE_CADERNO_URL),
                 teraprox_app_ordem_de_correcao: promiseRemote('teraprox_app_ordem_de_correcao', REMOTE_ORDEM_CORRECAO_URL),
                 teraprox_app_plano_de_controle: promiseRemote('teraprox_app_plano_de_controle', REMOTE_PLANO_CONTROLE_URL),
