@@ -11,6 +11,7 @@ import LGPDConsentBanner from './Components/LGPDConsentBanner.jsx';
 import { clearGlobalError } from './Reducers/default-reducers/globalErrorReducer';
 import FederatedLoadingPlaceholder from './Components/loading/FederatedLoadingPlaceholder';
 import { useFederatedRoutes } from './hooks/useFederatedRoutes';
+import { useSessionRevalidation } from './hooks/useSessionRevalidation';
 
 const homeRoute = '/home';
 
@@ -20,6 +21,7 @@ const App = () => {
     const global = useSelector(state => state.global);
     const globalError = useSelector(state => state.errors);
     const isAuth = global?.isAuth;
+    const { validating } = useSessionRevalidation();
 
     const { routes, componentRegistry, menuSections, loading } = useFederatedRoutes();
 
@@ -36,14 +38,16 @@ const App = () => {
 
     return (
         <div className="teraprox-shell">
-            {isAuth && <MenuBar menuSections={menuSections} />}
+            {isAuth && !validating && <MenuBar menuSections={menuSections} />}
             
             {/* 🔒 LGPD Consent Banner — shown on first visit and annually */}
             <LGPDConsentBanner />
             
             <div className={isAuth ? "container-fluid mt-4" : ""}>
                 <main>
-                    {isServerError ? (
+                    {validating ? (
+                        <FederatedLoadingPlaceholder />
+                    ) : isServerError ? (
                         <ServerErrorScreen />
                     ) : (
                         <Routes>

@@ -36,6 +36,7 @@ export * from './displays/RecursoDisplayer'
 export * from './filters/StatusPills'
 export * from './filters/PeriodSelector'
 export * from './filters/AdvancedFilterBar'
+export * from './filters/UnifiedPeriodSelector'
 
 // ─── Forms ───────────────────────────────────────────────────────────────────
 export * from './forms/MailSender'
