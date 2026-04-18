@@ -77,10 +77,17 @@ export default function CoreServiceProvider({ children }) {
     }, [wp])
 
     const createController = useCallback((context, baseEndPoint) => {
-        const gatewayBase = baseEndPoint || resolveEndpoint(context) || ''
-        const endpoint = context
-            ? `${gatewayBase.replace(/\/$/, '')}/${context}`
-            : gatewayBase.replace(/\/$/, '')
+        // Match SDK contract: when baseEndPoint is explicitly provided, use it as-is
+        // (no context prefix). When absent, resolve from routesConfig + add context.
+        let endpoint
+        if (baseEndPoint != null) {
+            endpoint = baseEndPoint.replace(/\/$/, '')
+        } else {
+            const resolved = resolveEndpoint(context) || ''
+            endpoint = context
+                ? `${resolved.replace(/\/$/, '')}/${context}`
+                : resolved.replace(/\/$/, '')
+        }
         const service = resolveService(context)
         const isNotification = context === 'notification'
 

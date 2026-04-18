@@ -49,6 +49,12 @@ const REMOTE_CONFIGS = [
         importReducersBundle: () => import('sgm_om/ReducersBundle'),
     },
     {
+        name: 'sgm_utils',
+        importManifest:       () => import('sgm_utils/Manifest'),
+        importBridge:         () => import('sgm_utils/FederatedBridge'),
+        importReducersBundle: () => import('sgm_utils/ReducersBundle'),
+    },
+    {
         name: 'teraprox_app_caderno',
         importManifest:       () => import('teraprox_app_caderno/Manifest'),
         importBridge:         () => import('teraprox_app_caderno/FederatedBridge'),

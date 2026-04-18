@@ -66,6 +66,8 @@ export const routesConfig = [
             { configuration: { context: "inspecao", path: paths.inspecoesDashboard } },
             { configuration: { context: "monitoramentoRecursos", path: paths.monitoramentoRecursos } },
             { configuration: { context: "componente", path: paths.componenteForm, endPoint: endPointManutencao } },
+            { configuration: { context: "branch", endPoint: endPointManutencao } },
+            { configuration: { context: "branchNode", endPoint: endPointManutencao } },
             { configuration: { context: "branchLevel", path: paths.branchLevelForm, endPoint: endPointManutencao } },
             { configuration: { context: "classeDeComponente", path: paths.classeDeComponenteForm, endPoint: endPointManutencao } },
             { configuration: { context: "classeDeRecurso", path: paths.classeDeRecursoForm, endPoint: endPointManutencao } },
