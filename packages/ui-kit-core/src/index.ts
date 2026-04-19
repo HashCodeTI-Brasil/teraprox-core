@@ -1,4 +1,4 @@
-// @teraprox/ui-kit-core — skeleton (Wave 0).
-// Será populado com primitivos cross-cutting (buttons, forms, displays, containers)
-// extraídos de teraprox-ui-kit nas Waves 1-3 da sprint ui-kit-domain-split.
-export {}
+// @teraprox/ui-kit-core — primitivos cross-cutting.
+// Populado em Waves 1-3 da sprint ui-kit-domain-split a partir de teraprox-ui-kit.
+
+export { FormModal, type FormModalProps } from './containers/FormModal'
