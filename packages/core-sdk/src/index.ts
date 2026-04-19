@@ -41,6 +41,43 @@ export { useValidation } from './hooks/useValidation'
 
 // Modules removed to ui-kit
 
+// ViewModels (Ports & Adapters — hexagonal-viewmodel pattern)
+export type {
+  IUnidadeMaterialViewModel,
+  UnidadeMaterialValue,
+  UnidadeMaterialRef,
+  UnidadeMaterialSliceState,
+  ValidationResult,
+  IInspecaoModalViewModel,
+  InspecaoValue,
+  LimiteDeControle,
+  InspecaoValidationResult,
+  InspecaoModalSliceState,
+} from './viewmodels'
+export {
+  useUnidadeMaterialViewModel,
+  unidadeMaterialReducer,
+  setUnidadeMaterialMaterial,
+  setUnidadeMaterialQuantidade,
+  setUnidadeMaterialUnidade,
+  populateUnidadeMaterial,
+  clearUnidadeMaterial,
+  selectUnidadeMaterial,
+  UNIDADE_MATERIAL_DEFAULT_KEY,
+  useInspecaoModalViewModel,
+  inspecaoModalReducer,
+  setInspecaoTipo,
+  setInspecaoNomeParametro,
+  setInspecaoUnidadeParametro,
+  setInspecaoParametro,
+  setInspecaoLimites,
+  removeInspecaoLimiteAt,
+  populateInspecaoModal,
+  clearInspecaoModal,
+  selectInspecaoModal,
+  INSPECAO_MODAL_DEFAULT_KEY,
+} from './viewmodels'
+
 // Reducers (existentes)
 export {
   default as branchLevelReducer,
