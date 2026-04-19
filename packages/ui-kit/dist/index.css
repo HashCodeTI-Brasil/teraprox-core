@@ -187,31 +187,6 @@
   font-style: italic;
 }
 
-/* src/styles/RecursoDisplayer.css */
-.recurso-displayer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.recurso-displayer .recurso-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 0.85rem;
-  background-color: #e9ecef;
-  color: #495057;
-}
-.recurso-displayer .recurso-badge .remove-btn {
-  cursor: pointer;
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
-.recurso-displayer .recurso-badge .remove-btn:hover {
-  opacity: 1;
-}
-
 /* src/styles/StatusPills.css */
 .status-pills-container {
   display: flex;

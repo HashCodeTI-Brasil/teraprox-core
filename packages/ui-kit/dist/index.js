@@ -38,6 +38,7 @@ __export(index_exports, {
   AsyncButton: () => AsyncButton,
   AutoComplete: () => AutoComplete,
   BonusButton: () => BonusButton,
+  BranchDropDisplay: () => import_ui_kit_sgm.BranchDropDisplay,
   ButtonWithDropdown: () => ButtonWithDropdown,
   CheckBox: () => CheckBox,
   ClickToWriteField: () => ClickToWriteField,
@@ -46,7 +47,7 @@ __export(index_exports, {
   DeleteButton: () => DeleteButton_default,
   DeleteConfirm: () => DeleteConfirm,
   ExpandableCard: () => ExpandableCard,
-  FindRecursoByTagField: () => FindRecursoByTagField,
+  FindRecursoByTagField: () => import_ui_kit_sgm3.FindRecursoByTagField,
   FormField: () => FormField,
   Generic3DotMenu: () => Generic3DotMenu,
   GenericChart: () => GenericChart,
@@ -71,7 +72,7 @@ __export(index_exports, {
   QrCodeScanButton: () => QrCodeScanButton,
   QrReader: () => QrReader,
   RateLimitBar: () => RateLimitBar,
-  RecursoDisplayer: () => RecursoDisplayer,
+  RecursoDisplayer: () => import_ui_kit_sgm2.RecursoDisplayer,
   ResponsiveContainer: () => ResponsiveContainer_default,
   ReusableTableWithModal: () => ReusableTableWithModal,
   SectorSelector: () => SectorSelector,
@@ -1094,272 +1095,11 @@ var GenericDisplay = ({
 var GenericDisplay_default = GenericDisplay;
 
 // src/displays/BranchDropDisplay.tsx
-var import_react10 = require("react");
-var import_fa3 = require("react-icons/fa");
-var import_md = require("react-icons/md");
-var import_teraprox_core_sdk = require("teraprox-core-sdk");
-var import_jsx_runtime22 = require("react/jsx-runtime");
-var BranchDropDisplay = ({
-  branch,
-  addBranch,
-  multiMode,
-  setMultiMode,
-  onSaveRecurso,
-  backOnBranch,
-  branches,
-  singleReturn
-}) => {
-  const [fontColor, setFontColor] = (0, import_react10.useState)("#000");
-  const [searchTerm, setSearchTerm] = (0, import_react10.useState)("");
-  const [show, setShow] = (0, import_react10.useState)(false);
-  const [multiSelected, setMultiSelected] = (0, import_react10.useState)([]);
-  const dropdownRef = (0, import_react10.useRef)(null);
-  (0, import_react10.useEffect)(() => {
-    setFontColor(
-      (0, import_teraprox_core_sdk.pickTextColorBasedOnBgColorAdvanced)(branch.branchLevel.color, "#FFFFFF", "#000000")
-    );
-  }, [branch.branchLevel.color]);
-  (0, import_react10.useEffect)(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShow(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [backOnBranch, branch]);
-  const handleItemClick = (bn) => {
-    const rec = bn.recurso;
-    if (multiMode) {
-      setMultiSelected(
-        (prev) => prev.some((r) => r.id === rec.id) ? prev.filter((r) => r.id !== rec.id) : [...prev, rec]
-      );
-    } else {
-      onSaveRecurso([rec]);
-      addBranch(bn);
-      setShow(false);
-    }
-  };
-  const startMulti = () => {
-    setMultiSelected([]);
-    setMultiMode(true);
-    setShow(true);
-  };
-  const handleConfirm = () => {
-    setMultiMode(false);
-    onSaveRecurso(multiSelected);
-    setMultiSelected([]);
-    setShow(false);
-  };
-  const cancelMulti = () => {
-    setMultiMode(false);
-    setMultiSelected([]);
-  };
-  const isLastBranchClicked = () => branches.length > 0 && branches[branches.length - 1].id === branch.id;
-  const visibleNodes = (branch.branchNodes || []).filter(
-    (bn) => bn.recurso.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-    "div",
-    {
-      ref: dropdownRef,
-      style: {
-        position: "relative",
-        marginBottom: "0.5rem",
-        width: "100%",
-        fontFamily: "Arial, sans-serif"
-      },
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-          "button",
-          {
-            onClick: () => setShow((s) => !s),
-            style: {
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0.5rem 1rem",
-              borderRadius: "9999px",
-              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              border: `1px solid ${branch.branchLevel.color}`,
-              background: branch.branchLevel.color,
-              color: fontColor,
-              cursor: "pointer",
-              outline: "none",
-              textAlign: "left",
-              fontSize: "1rem"
-            },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, children: [
-                branch.nomeRecurso || branch.branchLevel.nome,
-                branch.nomeRecurso && !multiMode && isLastBranchClicked() && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("em", { style: { fontStyle: "italic", opacity: 0.8, marginLeft: "0.5rem" }, children: "(Selecionado)" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_fa3.FaChevronDown, {})
-            ]
-          }
-        ),
-        show && /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-          "div",
-          {
-            style: {
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              width: "100%",
-              background: "#f0f0f0",
-              borderRadius: "8px",
-              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
-              marginTop: "0.25rem",
-              zIndex: 100,
-              maxHeight: "300px",
-              overflow: "auto"
-            },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-                "div",
-                {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0.5rem",
-                    borderBottom: "1px solid #ddd"
-                  },
-                  children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_fa3.FaSearch, { style: { marginRight: "0.5rem", color: "#555" } }),
-                    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
-                      "input",
-                      {
-                        type: "text",
-                        placeholder: "Pesquisar recurso...",
-                        value: searchTerm,
-                        onChange: (e) => setSearchTerm(e.target.value),
-                        style: {
-                          flex: 1,
-                          padding: "0.5rem",
-                          border: "1px solid #ccc",
-                          borderRadius: "9999px",
-                          outline: "none",
-                          fontSize: "0.95rem"
-                        }
-                      }
-                    )
-                  ]
-                }
-              ),
-              !multiMode && !singleReturn ? /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-                "button",
-                {
-                  onClick: startMulti,
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "100%",
-                    padding: "0.5rem",
-                    borderRadius: "9999px",
-                    border: "none",
-                    background: "#ffc107",
-                    color: "#000",
-                    fontSize: "0.95rem",
-                    cursor: "pointer",
-                    margin: "0.5rem 0"
-                  },
-                  children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_fa3.FaCheckSquare, { style: { marginRight: "0.5rem" } }),
-                    "Selecionar multiplos"
-                  ]
-                }
-              ) : /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { style: { display: "flex", gap: "0.5rem", margin: "0.5rem 0" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-                  "button",
-                  {
-                    onClick: handleConfirm,
-                    style: {
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0.5rem",
-                      borderRadius: "9999px",
-                      border: "none",
-                      background: "#28a745",
-                      color: "#fff",
-                      fontSize: "0.95rem",
-                      cursor: "pointer"
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_fa3.FaCheck, { style: { marginRight: "0.5rem" } }),
-                      "Confirmar selecao"
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-                  "button",
-                  {
-                    onClick: cancelMulti,
-                    style: {
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0.5rem",
-                      borderRadius: "9999px",
-                      border: "none",
-                      background: "#6c757d",
-                      color: "#fff",
-                      fontSize: "0.95rem",
-                      cursor: "pointer"
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_md.MdClose, { style: { marginRight: "0.5rem" } }),
-                      "Cancelar"
-                    ]
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { style: { padding: "0.5rem" }, children: visibleNodes.map((bn) => {
-                const selected = multiMode ? multiSelected.some((r) => r.id === bn.recurso.id) : false;
-                return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
-                  "div",
-                  {
-                    onClick: () => handleItemClick(bn),
-                    style: {
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "0.5rem",
-                      borderBottom: "1px solid #ddd",
-                      background: selected ? "#e9ecef" : "transparent",
-                      cursor: "pointer",
-                      transition: "background 0.1s"
-                    },
-                    onMouseEnter: (e) => {
-                      if (!selected) e.currentTarget.style.background = "#e2e6ea";
-                    },
-                    onMouseLeave: (e) => {
-                      e.currentTarget.style.background = selected ? "#e9ecef" : "transparent";
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("span", { children: bn.recurso.nome }),
-                      selected && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(import_fa3.FaCheck, {})
-                    ]
-                  },
-                  bn.recurso.id
-                );
-              }) })
-            ]
-          }
-        )
-      ]
-    }
-  );
-};
-var BranchDropDisplay_default = BranchDropDisplay;
+var import_ui_kit_sgm = require("@teraprox/ui-kit-sgm");
 
 // src/displays/RateLimitBar.tsx
-var import_react11 = require("react");
-var import_jsx_runtime23 = require("react/jsx-runtime");
+var import_react10 = require("react");
+var import_jsx_runtime22 = require("react/jsx-runtime");
 function formatResetIn(windowReset) {
   const resetAt = new Date(windowReset).getTime();
   const remaining = Math.max(0, Math.round((resetAt - Date.now()) / 1e3));
@@ -1368,7 +1108,7 @@ function formatResetIn(windowReset) {
   return `${Math.round(remaining / 60)}min`;
 }
 var RateLimitBar = ({ entry, label, className }) => {
-  const pct = (0, import_react11.useMemo)(() => {
+  const pct = (0, import_react10.useMemo)(() => {
     if (!entry || entry.limit <= 0) return 0;
     return Math.min(100, Math.round(entry.used / entry.limit * 100));
   }, [entry]);
@@ -1399,10 +1139,10 @@ var RateLimitBar = ({ entry, label, className }) => {
     justifyContent: "space-between",
     marginBottom: "2px"
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { style: containerStyle, className, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { style: textStyle, children: [
-      label && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("span", { children: label }),
-      /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("span", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { style: containerStyle, className, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { style: textStyle, children: [
+      label && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("span", { children: label }),
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("span", { children: [
         entry.used,
         "/",
         entry.limit,
@@ -1410,12 +1150,12 @@ var RateLimitBar = ({ entry, label, className }) => {
         entry.exceeded ? " \u2014 limite atingido" : ` (reset em ${formatResetIn(entry.windowReset)})`
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { style: barTrackStyle, children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { style: barFillStyle }) })
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { style: barTrackStyle, children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { style: barFillStyle }) })
   ] });
 };
 
 // src/displays/StatusIndicator.tsx
-var import_jsx_runtime24 = require("react/jsx-runtime");
+var import_jsx_runtime23 = require("react/jsx-runtime");
 var StatusIndicator = ({
   status,
   count,
@@ -1430,14 +1170,14 @@ var StatusIndicator = ({
     naoAtribuida: "N\xC3O ATRIBUIDA"
   };
   const label = statusLabels[status] || status.toUpperCase();
-  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: `status-flag ${status} ${containerClassName}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "status-label", children: label }),
-    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "status-count", children: count })
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: `status-flag ${status} ${containerClassName}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "status-label", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "status-count", children: count })
   ] });
 };
 
 // src/displays/VerticalItemsDisplay.tsx
-var import_jsx_runtime25 = require("react/jsx-runtime");
+var import_jsx_runtime24 = require("react/jsx-runtime");
 var VerticalItemsDisplay = ({
   item1 = "",
   item2 = "",
@@ -1445,15 +1185,15 @@ var VerticalItemsDisplay = ({
   className = "",
   style
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime25.jsxs)("div", { className, style, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime25.jsx)("div", { children: item1 }),
-    /* @__PURE__ */ (0, import_jsx_runtime25.jsx)("div", { children: item2 }),
-    /* @__PURE__ */ (0, import_jsx_runtime25.jsx)("div", { children: item3 })
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className, style, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { children: item1 }),
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { children: item2 }),
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { children: item3 })
   ] });
 };
 
 // src/displays/StatusLight.tsx
-var import_jsx_runtime26 = require("react/jsx-runtime");
+var import_jsx_runtime25 = require("react/jsx-runtime");
 var StatusLight = ({
   active = false,
   activeLightColor = "green",
@@ -1463,7 +1203,7 @@ var StatusLight = ({
   style
 }) => {
   const color = active ? activeLightColor : inactiveLightColor;
-  return /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
     "div",
     {
       className,
@@ -1485,7 +1225,7 @@ var import_dayjs2 = __toESM(require("dayjs"));
 var import_duration = __toESM(require("dayjs/plugin/duration"));
 var import_bi = require("react-icons/bi");
 var import_bs = require("react-icons/bs");
-var import_jsx_runtime27 = require("react/jsx-runtime");
+var import_jsx_runtime26 = require("react/jsx-runtime");
 import_dayjs2.default.extend(import_duration.default);
 var TimerDisplay = ({
   id,
@@ -1515,8 +1255,8 @@ var TimerDisplay = ({
     const secondsRemaining = time.seconds().toString().padStart(2, "0");
     return days > 0 ? `${days}d ${hours}:${minutes}:${secondsRemaining}` : `${hours}:${minutes}:${secondsRemaining}`;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "timer-display-container", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "timer-display-content", children: id ? /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(import_jsx_runtime27.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("div", { className: "timer-display-container", children: /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("div", { className: "timer-display-content", children: id ? /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)(import_jsx_runtime26.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
       import_bi.BiTimer,
       {
         size: 24,
@@ -1524,7 +1264,7 @@ var TimerDisplay = ({
         title: "Timer"
       }
     ),
-    pausable && !isStopped && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+    pausable && !isStopped && /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
       import_bs.BsPause,
       {
         size: 20,
@@ -1533,7 +1273,7 @@ var TimerDisplay = ({
         title: "Pausar"
       }
     ),
-    playable && !isStopped && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+    playable && !isStopped && /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
       import_bs.BsPlay,
       {
         size: 20,
@@ -1542,594 +1282,15 @@ var TimerDisplay = ({
         title: "Iniciar"
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "timer-display-time", children: formatDuration(tempo) })
-  ] }) : /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "timer-display-message", children: emptyMessage }) }) });
+    /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("span", { className: "timer-display-time", children: formatDuration(tempo) })
+  ] }) : /* @__PURE__ */ (0, import_jsx_runtime26.jsx)("span", { className: "timer-display-message", children: emptyMessage }) }) });
 };
 
 // src/displays/RecursoDisplayer.tsx
-var import_react16 = require("react");
-var import_react_bootstrap19 = require("react-bootstrap");
-var import_react_redux = require("react-redux");
-var import_teraprox_core_sdk3 = require("teraprox-core-sdk");
-var import_teraprox_core_sdk4 = require("teraprox-core-sdk");
-
-// src/forms/FindRecursoByTagField.tsx
-var import_react15 = require("react");
-var import_gr4 = require("react-icons/gr");
-var import_teraprox_core_sdk2 = require("teraprox-core-sdk");
-
-// src/forms/AutoComplete.tsx
-var import_react12 = require("react");
-var import_react_bootstrap18 = require("react-bootstrap");
-var import_jsx_runtime28 = require("react/jsx-runtime");
-var AutoComplete = ({
-  className,
-  ops = [],
-  sortKey,
-  displayKey,
-  displayKeys,
-  onValueChanged,
-  onSelectedClick,
-  value,
-  actionButton,
-  actionButton2,
-  placeH,
-  title,
-  filter,
-  filterField,
-  loadFunc,
-  loadCondition,
-  onBlurEvent,
-  formatationFunc,
-  onEscKeyDown,
-  onEnterKeyDown,
-  margT,
-  margB,
-  hideComponent,
-  disableComponent = false,
-  disableSelect = false,
-  autoFocusConfig,
-  onLoad,
-  cacheKey,
-  minChars = 0,
-  maxItems,
-  showListOnFocus = true,
-  lazyLoad = false
-}) => {
-  const [liItem, setListItem] = (0, import_react12.useState)([]);
-  const [options, setOptions] = (0, import_react12.useState)([]);
-  const [input, setInput] = (0, import_react12.useState)("");
-  const [hide, setHide] = (0, import_react12.useState)(true);
-  const [onLoaded, setOnLoaded] = (0, import_react12.useState)(false);
-  const [loading, setLoading] = (0, import_react12.useState)(false);
-  const cacheStore = (0, import_react12.useMemo)(() => {
-    const win = window;
-    if (!win.__AUTO_COMPLETE_CACHE__) {
-      win.__AUTO_COMPLETE_CACHE__ = /* @__PURE__ */ new Map();
-    }
-    return win.__AUTO_COMPLETE_CACHE__;
-  }, []);
-  const sortOptions = (data, key) => {
-    if (!key || !Array.isArray(data)) return data;
-    return [...data].sort((a, b) => String(a[key]).localeCompare(String(b[key])));
-  };
-  (0, import_react12.useEffect)(() => {
-    setInput(value || "");
-  }, [value]);
-  (0, import_react12.useEffect)(() => {
-    if (!Array.isArray(ops) || ops.length === 0) return;
-    const sortedOptions = sortOptions(ops, sortKey);
-    setListItem(sortedOptions);
-    setOptions(sortedOptions);
-  }, [ops, sortKey]);
-  (0, import_react12.useEffect)(() => {
-    const loadData = async () => {
-      if (!(loadCondition && loadFunc)) return;
-      if (lazyLoad && minChars > 0 && !showListOnFocus && (!value || String(value).length < minChars)) {
-        return;
-      }
-      const key = cacheKey ? `${cacheKey}${filter ? `:${filterField}:${filter}` : ""}` : null;
-      if (key && cacheStore.has(key)) {
-        const cacheEntry = cacheStore.get(key);
-        const data = cacheEntry.promise ? await cacheEntry.promise : cacheEntry.data || cacheEntry;
-        setListItem(data);
-        setOptions(data);
-        triggerOnLoad(data);
-        return;
-      }
-      setLoading(true);
-      try {
-        const requestPromise = loadFunc().then((res) => {
-          let newOps = (res == null ? void 0 : res.content) || res;
-          newOps = Array.isArray(newOps) ? newOps.filter((op) => op != null) : [];
-          if (filter && filterField) {
-            newOps = newOps.filter((op) => op[filterField] === filter);
-          }
-          return sortOptions(newOps, sortKey);
-        });
-        if (key) cacheStore.set(key, { promise: requestPromise });
-        const sortedOptions = await requestPromise;
-        setListItem(sortedOptions);
-        setOptions(sortedOptions);
-        if (key) cacheStore.set(key, { data: sortedOptions });
-        triggerOnLoad(sortedOptions);
-      } catch (error) {
-        if (key) cacheStore.delete(key);
-        setListItem([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [loadCondition, filter, filterField, sortKey, cacheKey, lazyLoad, minChars, showListOnFocus]);
-  const triggerOnLoad = (data) => {
-    if (onLoad && !onLoaded) {
-      setOnLoaded(true);
-      onLoad(data);
-    }
-  };
-  const keysJoinner = (li) => {
-    if (!displayKeys || !Array.isArray(displayKeys)) return "";
-    return displayKeys.map((key) => `${li[key]} `).join("").trim();
-  };
-  const getDisplayText = (item) => {
-    if (formatationFunc) return formatationFunc(item);
-    if (displayKey) return item[displayKey];
-    if (displayKeys) return keysJoinner(item);
-    return String(item);
-  };
-  const onFieldUpdate = (val) => {
-    const search = val.toLowerCase();
-    const canSearch = search.length >= minChars;
-    if (canSearch && Array.isArray(options)) {
-      const filtered = options.filter((item) => {
-        const text = getDisplayText(item);
-        return String(text).toLowerCase().includes(search);
-      });
-      setListItem(filtered);
-    } else {
-      setListItem(options || []);
-    }
-    onValueChanged == null ? void 0 : onValueChanged(val);
-    setInput(val);
-    setHide(!canSearch && options.length === 0);
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(
-    "div",
-    {
-      className,
-      style: { marginTop: margT != null ? margT : 4, marginBottom: margB != null ? margB : 4, position: "relative" },
-      onBlur: (e) => {
-        setTimeout(() => {
-          onBlurEvent == null ? void 0 : onBlurEvent(e, input);
-          setHide(true);
-        }, 200);
-      },
-      onKeyDown: (e) => {
-        if (e.key === "Escape") {
-          setHide(true);
-          onEscKeyDown == null ? void 0 : onEscKeyDown();
-        }
-        if (e.key === "Enter" && onEnterKeyDown) {
-          onEnterKeyDown(input);
-        }
-      },
-      onMouseLeave: () => setHide(true),
-      children: [
-        !hideComponent && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_react_bootstrap18.InputGroup, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_react_bootstrap18.FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
-            import_react_bootstrap18.Form.Control,
-            {
-              autoFocus: autoFocusConfig,
-              disabled: disableComponent || disableSelect,
-              placeholder: placeH,
-              autoComplete: "off",
-              value: input,
-              onClickCapture: () => {
-                const canOpen = showListOnFocus && input.length >= minChars;
-                setHide(!canOpen);
-              },
-              onChange: (e) => onFieldUpdate(e.currentTarget.value),
-              type: "text"
-            }
-          ) }),
-          loading && /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_react_bootstrap18.InputGroup.Text, { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_react_bootstrap18.Spinner, { animation: "border", size: "sm" }) }),
-          !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
-          !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
-          import_react_bootstrap18.ListGroup,
-          {
-            className: "listgroup-autocomplete shadow-sm",
-            hidden: hide || liItem.length === 0,
-            style: {
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              width: "100%",
-              maxHeight: "250px",
-              overflowY: "auto",
-              zIndex: 1050,
-              backgroundColor: "#fff"
-            },
-            children: (maxItems ? liItem.slice(0, maxItems) : liItem).map((li, index) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
-              import_react_bootstrap18.ListGroup.Item,
-              {
-                action: true,
-                onClick: () => {
-                  const text = getDisplayText(li);
-                  setInput(text);
-                  onSelectedClick(li, index, liItem);
-                  setHide(true);
-                },
-                children: getDisplayText(li)
-              },
-              index
-            ))
-          }
-        )
-      ]
-    }
-  );
-};
-
-// src/qr/QrCodeScanButton.tsx
-var import_react14 = require("react");
-var import_bs2 = require("react-icons/bs");
-
-// src/qr/QrReader.tsx
-var import_qr_scanner = __toESM(require("qr-scanner"));
-var import_react13 = require("react");
-var import_jsx_runtime29 = require("react/jsx-runtime");
-var QrReader = ({ callback }) => {
-  const scanner = (0, import_react13.useRef)(null);
-  const videoEl = (0, import_react13.useRef)(null);
-  const qrBoxEl = (0, import_react13.useRef)(null);
-  const [qrOn, setQrOn] = (0, import_react13.useState)(true);
-  const [scannedResult, setScannedResult] = (0, import_react13.useState)("");
-  const onScanSuccess = (result) => {
-    setScannedResult(result.data);
-    callback(result.data);
-  };
-  const onScanFail = (err) => {
-    if (typeof err === "string" && !err.includes("No QR code found")) {
-      console.error("QR Scanner Error:", err);
-    }
-  };
-  (0, import_react13.useEffect)(() => {
-    if (videoEl.current && !scanner.current) {
-      scanner.current = new import_qr_scanner.default(videoEl.current, onScanSuccess, {
-        onDecodeError: onScanFail,
-        preferredCamera: "environment",
-        highlightScanRegion: true,
-        highlightCodeOutline: true,
-        overlay: qrBoxEl.current || void 0
-      });
-      scanner.current.start().then(() => setQrOn(true)).catch((err) => {
-        console.error("Failed to start QR Scanner:", err);
-        setQrOn(false);
-      });
-    }
-    return () => {
-      if (scanner.current) {
-        scanner.current.stop();
-        scanner.current.destroy();
-        scanner.current = null;
-      }
-    };
-  }, []);
-  (0, import_react13.useEffect)(() => {
-    if (!qrOn) {
-      alert(
-        "C\xE2mera est\xE1 bloqueada ou inacess\xEDvel. Por favor, habilite a c\xE2mera nas permiss\xF5es do seu navegador e recarregue a p\xE1gina."
-      );
-    }
-  }, [qrOn]);
-  return /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
-    /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { ref: qrBoxEl, className: "qr-box" }),
-    scannedResult && /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)(
-      "div",
-      {
-        style: {
-          position: "absolute",
-          top: 10,
-          left: 10,
-          zIndex: 10,
-          background: "rgba(0,0,0,0.6)",
-          color: "white",
-          padding: "4px 8px",
-          borderRadius: "4px",
-          fontSize: "0.8rem"
-        },
-        children: [
-          "Lido: ",
-          scannedResult
-        ]
-      }
-    )
-  ] });
-};
-
-// src/qr/QrCodeScanButton.tsx
-var import_jsx_runtime30 = require("react/jsx-runtime");
-var QrCodeScanButton = ({ callback, size = 25 }) => {
-  const [showQr, setShowQr] = (0, import_react14.useState)(false);
-  const toggleQr = () => {
-    setShowQr((prev) => !prev);
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
-    "div",
-    {
-      className: "hoverable-div",
-      style: {
-        border: "solid",
-        borderTopRightRadius: "3px",
-        borderBottomRightRadius: "3px",
-        padding: "8px",
-        borderLeft: "none",
-        borderColor: "#ccc",
-        borderWidth: "1px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center"
-      },
-      onClick: toggleQr,
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_bs2.BsQrCode, { size }),
-        showQr && /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
-          "div",
-          {
-            style: {
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.8)",
-              zIndex: 9999,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "20px"
-            },
-            onClick: (e) => e.stopPropagation(),
-            children: /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
-                "div",
-                {
-                  onClick: toggleQr,
-                  style: { position: "absolute", top: "10px", right: "15px", fontSize: "1.5rem", cursor: "pointer", zIndex: 10001 },
-                  children: "\xD7"
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
-              /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
-                QrReader,
-                {
-                  callback: (v) => {
-                    toggleQr();
-                    callback(v);
-                  }
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
-            ] })
-          }
-        )
-      ]
-    }
-  );
-};
-
-// src/forms/FindRecursoByTagField.tsx
-var import_jsx_runtime31 = require("react/jsx-runtime");
-var FindRecursoByTagField = ({ callback, recursoController }) => {
-  const recursoControllerPadrao = (0, import_teraprox_core_sdk2.useHttpController)("recurso");
-  const controladorAtivo = recursoController != null ? recursoController : {
-    read: recursoControllerPadrao.read.bind(recursoControllerPadrao),
-    get: recursoControllerPadrao.get.bind(recursoControllerPadrao)
-  };
-  const [selectedTag, setSelectedTag] = (0, import_react15.useState)("");
-  const [reachedRecurso, setReachedRecurso] = (0, import_react15.useState)(null);
-  const findRecursoByTagIdHandler = async (tagId) => {
-    try {
-      const r = await controladorAtivo.read("findRecursoByTagId", tagId);
-      setReachedRecurso(r);
-    } catch (error) {
-      console.error("Erro ao buscar recurso por tag ID:", error);
-    }
-  };
-  const findRecursoByTagDescriptionHandler = async (description) => {
-    try {
-      const formattedDescription = description.replace(/\s/g, "");
-      const recurso = await controladorAtivo.read(
-        `recurso/findByTagDescription`,
-        formattedDescription
-      );
-      if (!callback) {
-        console.log("Recurso encontrado (sem callback):", recurso);
-      } else {
-        callback(recurso, true);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar recurso por descri\xE7\xE3o de tag:", error);
-    }
-  };
-  const confirmRecursoSelectionButton = () => {
-    return /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
-      "div",
-      {
-        className: "hoverable-div",
-        style: {
-          border: "solid",
-          borderTopRightRadius: "3px",
-          borderBottomRightRadius: "3px",
-          padding: "8px",
-          borderLeft: "none",
-          borderColor: "#ccc",
-          borderWidth: "1px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center"
-        },
-        children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
-          import_gr4.GrCheckmark,
-          {
-            size: 25,
-            onClick: () => reachedRecurso && callback(reachedRecurso, true)
-          }
-        )
-      }
-    );
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
-    AutoComplete,
-    {
-      sortKey: "id",
-      loadCondition: true,
-      loadFunc: () => controladorAtivo.get("findActiveRecursosTags"),
-      displayKey: "descricao",
-      title: "Selecione ou Digite a TAG",
-      actionButton: confirmRecursoSelectionButton,
-      actionButton2: () => /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
-        QrCodeScanButton,
-        {
-          callback: (description) => findRecursoByTagDescriptionHandler(description)
-        }
-      ),
-      onSelectedClick: (v) => {
-        setSelectedTag(v);
-        findRecursoByTagIdHandler(v.id);
-      },
-      value: (selectedTag == null ? void 0 : selectedTag.descricao) || ""
-    }
-  ) });
-};
-
-// src/displays/RecursoDisplayer.tsx
-var import_jsx_runtime32 = require("react/jsx-runtime");
-var RecursoDisplayer = ({
-  selectedList = [],
-  onSaveRecurso,
-  singleReturn = false,
-  arvoreEstruturalController: injectedArvore,
-  branchLevelController: injectedBranchLevel,
-  recursoController: injectedRecurso
-}) => {
-  void selectedList;
-  const defaultArvore = (0, import_teraprox_core_sdk3.useHttpController)("");
-  const defaultBranchLevel = (0, import_teraprox_core_sdk3.useHttpController)("branchLevel");
-  const arvoreEstruturalController = injectedArvore || defaultArvore;
-  const branchLevelController = injectedBranchLevel || defaultBranchLevel;
-  const [branches, setBranches] = (0, import_react16.useState)([]);
-  const dispatch = (0, import_react_redux.useDispatch)();
-  const [selectorDisplay, setSelectorDisplay] = (0, import_react16.useState)("");
-  const [multiMode, setMultiMode] = (0, import_react16.useState)(false);
-  (0, import_react16.useEffect)(() => {
-    let cancelled = false;
-    const init = async () => {
-      try {
-        const b = await arvoreEstruturalController.get("branchByBranchLevel/1");
-        if (cancelled) return;
-        setBranches(Array.isArray(b) ? b : []);
-      } catch (err) {
-        if (!cancelled) {
-          console.warn("[RecursoDisplayer] branchByBranchLevel/1 failed:", err);
-          setBranches([]);
-        }
-      }
-      try {
-        const lv = await branchLevelController.readAll();
-        if (cancelled) return;
-        dispatch((0, import_teraprox_core_sdk4.setLevels)(Array.isArray(lv) ? lv : []));
-      } catch (err) {
-        if (!cancelled) console.warn("[RecursoDisplayer] branchLevel.readAll failed:", err);
-      }
-    };
-    init().catch((err) => console.warn("[RecursoDisplayer] init failed:", err));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-  const branchSetter = async (bn) => {
-    var _a, _b, _c, _d;
-    const parentBranch = branches.find((b) => b.id === bn.branchId);
-    const currentLevel = (_b = (_a = parentBranch == null ? void 0 : parentBranch.branchLevel) == null ? void 0 : _a.level) != null ? _b : 1;
-    const branchsToStay = branches.filter((b) => b.branchLevel.level <= currentLevel).map(
-      (b) => b.branchLevel.level === currentLevel ? { ...b, nomeRecurso: bn.recurso.nome } : b
-    );
-    const nextBranchId = (_d = bn.recurso.branchId) != null ? _d : (_c = bn.recurso.branch) == null ? void 0 : _c.id;
-    if (nextBranchId) {
-      try {
-        const nextBranch = await arvoreEstruturalController.read("branch", nextBranchId);
-        if (nextBranch && nextBranch.branchLevel) {
-          branchsToStay.push(nextBranch);
-        }
-      } catch (e) {
-        console.warn("[RecursoDisplayer] Failed to fetch child branch:", e);
-      }
-    }
-    setBranches([...branchsToStay]);
-  };
-  const backOnBranch = (branch) => {
-    const branchsToStay = branches.filter(
-      (bArray) => bArray.branchLevel.level <= branch.branchLevel.level
-    );
-    setBranches(branchsToStay);
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { style: { width: "100%", padding: 0 }, className: "recurso-displayer-generic", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("div", { className: "d-flex justify-content-between align-items-center mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)("label", { className: "me-2", children: "Selecionar Recurso Por:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
-        import_react_bootstrap19.Button,
-        {
-          size: "sm",
-          onClick: () => setSelectorDisplay("branch"),
-          variant: selectorDisplay === "branch" ? "primary" : "outline-primary",
-          className: "me-1",
-          children: "Arvore"
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
-        import_react_bootstrap19.Button,
-        {
-          size: "sm",
-          onClick: () => setSelectorDisplay("TAG"),
-          variant: selectorDisplay === "TAG" ? "primary" : "outline-primary",
-          children: "TAG"
-        }
-      )
-    ] }) }),
-    selectorDisplay === "branch" && branches.map((branch, i) => /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
-      BranchDropDisplay_default,
-      {
-        branch,
-        addBranch: branchSetter,
-        multiMode,
-        setMultiMode,
-        onSaveRecurso,
-        backOnBranch,
-        branches,
-        singleReturn
-      },
-      branch.id || i
-    )),
-    selectorDisplay === "TAG" && /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
-      FindRecursoByTagField,
-      {
-        recursoController: injectedRecurso,
-        callback: (rec, checked) => {
-          onSaveRecurso([rec], checked);
-        }
-      }
-    )
-  ] });
-};
+var import_ui_kit_sgm2 = require("@teraprox/ui-kit-sgm");
 
 // src/filters/StatusPills.tsx
-var import_jsx_runtime33 = require("react/jsx-runtime");
+var import_jsx_runtime27 = require("react/jsx-runtime");
 var StatusPills = ({
   statuses,
   activeKeys,
@@ -2149,9 +1310,9 @@ var StatusPills = ({
       onSelectionChange(isActive ? [] : [key]);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("div", { className: `status-pills-container ${className}`, children: Object.entries(statuses).map(([key, meta]) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: `status-pills-container ${className}`, children: Object.entries(statuses).map(([key, meta]) => {
     const isActive = activeKeys.includes(key);
-    return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(
       "button",
       {
         type: "button",
@@ -2160,9 +1321,9 @@ var StatusPills = ({
         onClick: () => toggleKey(key),
         "aria-pressed": isActive,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("span", { className: "status-pill__swatch" }),
-          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("span", { className: "status-pill__label", children: meta.label }),
-          meta.count !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("span", { className: "status-pill__count", children: meta.count })
+          /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "status-pill__swatch" }),
+          /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "status-pill__label", children: meta.label }),
+          meta.count !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "status-pill__count", children: meta.count })
         ]
       },
       key
@@ -2171,11 +1332,11 @@ var StatusPills = ({
 };
 
 // src/filters/PeriodSelector.tsx
-var import_react17 = require("react");
-var import_react_bootstrap20 = require("react-bootstrap");
-var import_fa4 = require("react-icons/fa");
+var import_react11 = require("react");
+var import_react_bootstrap18 = require("react-bootstrap");
+var import_fa3 = require("react-icons/fa");
 var import_dayjs3 = __toESM(require("dayjs"));
-var import_jsx_runtime34 = require("react/jsx-runtime");
+var import_jsx_runtime28 = require("react/jsx-runtime");
 var PeriodSelector = ({
   startDate,
   endDate,
@@ -2186,7 +1347,7 @@ var PeriodSelector = ({
   allowFuture = false,
   className = ""
 }) => {
-  const [isExpanded, setIsExpanded] = (0, import_react17.useState)(false);
+  const [isExpanded, setIsExpanded] = (0, import_react11.useState)(false);
   const formatDisplayRange = (start, end) => {
     const s = (0, import_dayjs3.default)(start).format("DD/MM/YY HH:mm");
     const e = (0, import_dayjs3.default)(end).format("DD/MM/YY HH:mm");
@@ -2200,22 +1361,22 @@ var PeriodSelector = ({
     { key: "month", label: "\xDAltimo M\xEAs" },
     { key: "year", label: "\xDAltimo Ano" }
   ];
-  return /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_bootstrap20.Card, { className: `period-selector-card ${isExpanded ? "expanded" : ""} ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "compact-row", onClick: () => setIsExpanded(!isExpanded), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "d-flex align-items-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_fa4.FaCalendarAlt, { className: "me-2 text-primary" }),
-        /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("span", { className: "date-range-text", children: isExpanded ? label : formatDisplayRange(startDate, endDate) })
+  return /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_react_bootstrap18.Card, { className: `period-selector-card ${isExpanded ? "expanded" : ""} ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "compact-row", onClick: () => setIsExpanded(!isExpanded), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "d-flex align-items-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_fa3.FaCalendarAlt, { className: "me-2 text-primary" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("span", { className: "date-range-text", children: isExpanded ? label : formatDisplayRange(startDate, endDate) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("div", { className: "period-icon-btn", children: isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_fa4.FaChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("span", { className: "small text-muted", children: "Editar" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "period-icon-btn", children: isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_fa3.FaChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("span", { className: "small text-muted", children: "Editar" }) })
     ] }),
-    isExpanded && /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "expanded-content", children: [
-      onPresetSelect && /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "presets-container", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "d-flex align-items-center mb-1 w-100", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_fa4.FaHistory, { size: 12, className: "me-1 text-muted" }),
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("small", { className: "text-muted fw-bold text-uppercase", style: { fontSize: "0.65rem" }, children: "Atalhos" })
+    isExpanded && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "expanded-content", children: [
+      onPresetSelect && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "presets-container", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "d-flex align-items-center mb-1 w-100", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_fa3.FaHistory, { size: 12, className: "me-1 text-muted" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("small", { className: "text-muted fw-bold text-uppercase", style: { fontSize: "0.65rem" }, children: "Atalhos" })
         ] }),
-        presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(
-          import_react_bootstrap20.Button,
+        presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          import_react_bootstrap18.Button,
           {
             variant: "outline-primary",
             className: "preset-btn",
@@ -2228,11 +1389,11 @@ var PeriodSelector = ({
           p.key
         ))
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("div", { className: "date-inputs-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_bootstrap20.Form.Group, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_bootstrap20.Form.Label, { className: "small text-muted", children: "In\xEDcio" }),
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(
-            import_react_bootstrap20.Form.Control,
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "date-inputs-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_react_bootstrap18.Form.Group, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_react_bootstrap18.Form.Label, { className: "small text-muted", children: "In\xEDcio" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            import_react_bootstrap18.Form.Control,
             {
               type: "datetime-local",
               size: "sm",
@@ -2242,10 +1403,10 @@ var PeriodSelector = ({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_bootstrap20.Form.Group, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_bootstrap20.Form.Label, { className: "small text-muted", children: "Fim" }),
-          /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(
-            import_react_bootstrap20.Form.Control,
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_react_bootstrap18.Form.Group, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_react_bootstrap18.Form.Label, { className: "small text-muted", children: "Fim" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            import_react_bootstrap18.Form.Control,
             {
               type: "datetime-local",
               size: "sm",
@@ -2257,8 +1418,8 @@ var PeriodSelector = ({
           )
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("div", { className: "mt-3 d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(
-        import_react_bootstrap20.Button,
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "mt-3 d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+        import_react_bootstrap18.Button,
         {
           variant: "primary",
           size: "sm",
@@ -2271,10 +1432,10 @@ var PeriodSelector = ({
 };
 
 // src/filters/AdvancedFilterBar.tsx
-var import_react18 = require("react");
-var import_react_bootstrap21 = require("react-bootstrap");
+var import_react12 = require("react");
+var import_react_bootstrap19 = require("react-bootstrap");
 var import_fi2 = require("react-icons/fi");
-var import_jsx_runtime35 = require("react/jsx-runtime");
+var import_jsx_runtime29 = require("react/jsx-runtime");
 var AdvancedFilterBar = ({
   children,
   title = "Filtros e Busca",
@@ -2283,31 +1444,31 @@ var AdvancedFilterBar = ({
   defaultExpanded = false,
   className = ""
 }) => {
-  const [expanded, setExpanded] = (0, import_react18.useState)(defaultExpanded);
-  return /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)("div", { className: `advanced-filter-bar ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(
+  const [expanded, setExpanded] = (0, import_react12.useState)(defaultExpanded);
+  return /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("div", { className: `advanced-filter-bar ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)(
       "div",
       {
         className: "filter-bar-header",
         onClick: () => setExpanded(!expanded),
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)("div", { className: "filter-title-group", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_fi2.FiFilter, { className: "text-primary" }),
-            /* @__PURE__ */ (0, import_jsx_runtime35.jsx)("h5", { className: "filter-title", children: title }),
-            activeFiltersCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)("span", { className: "filter-count-badge", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("div", { className: "filter-title-group", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_fi2.FiFilter, { className: "text-primary" }),
+            /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("h5", { className: "filter-title", children: title }),
+            activeFiltersCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("span", { className: "filter-count-badge", children: [
               activeFiltersCount,
               " ativos"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime35.jsx)("div", { className: "filter-chevron", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_fi2.FiChevronUp, { size: 20 }) : /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_fi2.FiChevronDown, { size: 20 }) })
+          /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { className: "filter-chevron", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_fi2.FiChevronUp, { size: 20 }) : /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_fi2.FiChevronDown, { size: 20 }) })
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap21.Collapse, { in: expanded, children: /* @__PURE__ */ (0, import_jsx_runtime35.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)("div", { className: "filter-bar-content", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime35.jsx)("div", { className: "filter-grid", children }),
-      (onClearAll || activeFiltersCount > 0) && /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)("div", { className: "filter-actions", children: [
-        onClearAll && /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(
-          import_react_bootstrap21.Button,
+    /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_react_bootstrap19.Collapse, { in: expanded, children: /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("div", { className: "filter-bar-content", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime29.jsx)("div", { className: "filter-grid", children }),
+      (onClearAll || activeFiltersCount > 0) && /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)("div", { className: "filter-actions", children: [
+        onClearAll && /* @__PURE__ */ (0, import_jsx_runtime29.jsxs)(
+          import_react_bootstrap19.Button,
           {
             variant: "link",
             className: "text-danger text-decoration-none btn-sm d-flex align-items-center",
@@ -2316,13 +1477,13 @@ var AdvancedFilterBar = ({
               onClearAll();
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_fi2.FiTrash2, { className: "me-1" }),
+              /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(import_fi2.FiTrash2, { className: "me-1" }),
               "Limpar Filtros"
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(
-          import_react_bootstrap21.Button,
+        /* @__PURE__ */ (0, import_jsx_runtime29.jsx)(
+          import_react_bootstrap19.Button,
           {
             variant: "primary",
             size: "sm",
@@ -2336,12 +1497,12 @@ var AdvancedFilterBar = ({
 };
 
 // src/filters/UnifiedPeriodSelector.tsx
-var import_react19 = require("react");
-var import_react_bootstrap22 = require("react-bootstrap");
-var import_fa5 = require("react-icons/fa");
+var import_react13 = require("react");
+var import_react_bootstrap20 = require("react-bootstrap");
+var import_fa4 = require("react-icons/fa");
 var import_dayjs4 = __toESM(require("dayjs"));
 var import_isoWeek = __toESM(require("dayjs/plugin/isoWeek"));
-var import_jsx_runtime36 = require("react/jsx-runtime");
+var import_jsx_runtime30 = require("react/jsx-runtime");
 import_dayjs4.default.extend(import_isoWeek.default);
 var MONTHS = [
   "Jan",
@@ -2409,9 +1570,9 @@ var DEFAULT_PRESETS = [
   }
 ];
 var TABS = [
-  { key: "quick", icon: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaClock, { size: 12 }), label: "R\xE1pido" },
-  { key: "month", icon: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaCalendarAlt, { size: 12 }), label: "Meses" },
-  { key: "custom", icon: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaCalendarAlt, { size: 12 }), label: "Per\xEDodo" }
+  { key: "quick", icon: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaClock, { size: 12 }), label: "R\xE1pido" },
+  { key: "month", icon: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaCalendarAlt, { size: 12 }), label: "Meses" },
+  { key: "custom", icon: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaCalendarAlt, { size: 12 }), label: "Per\xEDodo" }
 ];
 var UnifiedPeriodSelector = ({
   dataInicio,
@@ -2424,19 +1585,19 @@ var UnifiedPeriodSelector = ({
   disabled = false,
   compact = false
 }) => {
-  const [activeTab, setActiveTab] = (0, import_react19.useState)(defaultTab);
-  const [isExpanded, setIsExpanded] = (0, import_react19.useState)(!compact);
-  const [activePresetKey, setActivePresetKey] = (0, import_react19.useState)(null);
-  const [selectedYear, setSelectedYear] = (0, import_react19.useState)(() => {
+  const [activeTab, setActiveTab] = (0, import_react13.useState)(defaultTab);
+  const [isExpanded, setIsExpanded] = (0, import_react13.useState)(!compact);
+  const [activePresetKey, setActivePresetKey] = (0, import_react13.useState)(null);
+  const [selectedYear, setSelectedYear] = (0, import_react13.useState)(() => {
     const d = parseDate(dataInicio);
     return d ? d.getFullYear() : (/* @__PURE__ */ new Date()).getFullYear();
   });
-  const [selectedMonths, setSelectedMonths] = (0, import_react19.useState)(/* @__PURE__ */ new Set());
-  const [lastClickedMonth, setLastClickedMonth] = (0, import_react19.useState)(null);
-  const [customStart, setCustomStart] = (0, import_react19.useState)("");
-  const [customEnd, setCustomEnd] = (0, import_react19.useState)("");
+  const [selectedMonths, setSelectedMonths] = (0, import_react13.useState)(/* @__PURE__ */ new Set());
+  const [lastClickedMonth, setLastClickedMonth] = (0, import_react13.useState)(null);
+  const [customStart, setCustomStart] = (0, import_react13.useState)("");
+  const [customEnd, setCustomEnd] = (0, import_react13.useState)("");
   const presets = quickPresets || DEFAULT_PRESETS;
-  (0, import_react19.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     const start = parseDate(dataInicio);
     const end = parseDate(dataFim);
     if (!start || !end) return;
@@ -2452,11 +1613,11 @@ var UnifiedPeriodSelector = ({
       setSelectedMonths(next);
     }
   }, [dataInicio, dataFim, selectedYear]);
-  (0, import_react19.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     if (dataInicio) setCustomStart((0, import_dayjs4.default)(dataInicio).format("YYYY-MM-DDTHH:mm"));
     if (dataFim) setCustomEnd((0, import_dayjs4.default)(dataFim).format("YYYY-MM-DDTHH:mm"));
   }, [dataInicio, dataFim]);
-  const displayLabel = (0, import_react19.useMemo)(() => {
+  const displayLabel = (0, import_react13.useMemo)(() => {
     const s = parseDate(dataInicio);
     const e = parseDate(dataFim);
     if (!s || !e) return "Selecione um per\xEDodo";
@@ -2469,7 +1630,7 @@ var UnifiedPeriodSelector = ({
     }
     return `${(0, import_dayjs4.default)(s).format("DD/MM/YYYY")} \u2013 ${(0, import_dayjs4.default)(e).format("DD/MM/YYYY")}`;
   }, [dataInicio, dataFim, activePresetKey, presets]);
-  const handlePreset = (0, import_react19.useCallback)(
+  const handlePreset = (0, import_react13.useCallback)(
     (preset) => {
       if (disabled) return;
       setActivePresetKey(preset.key);
@@ -2480,7 +1641,7 @@ var UnifiedPeriodSelector = ({
     },
     [disabled, onSelect]
   );
-  const handleMonthClick = (0, import_react19.useCallback)(
+  const handleMonthClick = (0, import_react13.useCallback)(
     (index, event) => {
       if (disabled) return;
       const ctrl = event.ctrlKey || event.metaKey;
@@ -2517,7 +1678,7 @@ var UnifiedPeriodSelector = ({
     },
     [disabled, lastClickedMonth, onSelect, selectedYear]
   );
-  const handleYearChange = (0, import_react19.useCallback)(
+  const handleYearChange = (0, import_react13.useCallback)(
     (delta) => {
       const newYear = selectedYear + delta;
       setSelectedYear(newYear);
@@ -2532,7 +1693,7 @@ var UnifiedPeriodSelector = ({
     },
     [selectedYear, selectedMonths, onSelect]
   );
-  const handleCustomApply = (0, import_react19.useCallback)(() => {
+  const handleCustomApply = (0, import_react13.useCallback)(() => {
     if (!customStart || !customEnd) return;
     setActivePresetKey(null);
     onSelect({
@@ -2540,7 +1701,7 @@ var UnifiedPeriodSelector = ({
       dataFim: (0, import_dayjs4.default)(customEnd).toISOString()
     });
   }, [customStart, customEnd, onSelect]);
-  const handleClear = (0, import_react19.useCallback)(() => {
+  const handleClear = (0, import_react13.useCallback)(() => {
     setSelectedMonths(/* @__PURE__ */ new Set());
     setActivePresetKey(null);
     setCustomStart("");
@@ -2550,30 +1711,30 @@ var UnifiedPeriodSelector = ({
   const today = /* @__PURE__ */ new Date();
   const maxDateStr = allowFuture ? void 0 : (0, import_dayjs4.default)().format("YYYY-MM-DDTHH:mm");
   if (compact && !isExpanded) {
-    return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-      import_react_bootstrap22.Card,
+    return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+      import_react_bootstrap20.Card,
       {
         className: `ups-card ups-card--compact ${className}`,
         onClick: () => !disabled && setIsExpanded(true),
         role: "button",
         tabIndex: 0,
-        children: /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-compact-row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaCalendarAlt, { className: "text-primary me-2" }),
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("span", { className: "ups-display-label", children: displayLabel }),
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("span", { className: "ups-edit-hint text-muted small", children: "Editar" })
+        children: /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-compact-row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaCalendarAlt, { className: "text-primary me-2" }),
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "ups-display-label", children: displayLabel }),
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "ups-edit-hint text-muted small", children: "Editar" })
         ] })
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_react_bootstrap22.Card, { className: `ups-card ${className}`, children: /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_react_bootstrap22.Card.Body, { className: "ups-body", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-header", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "d-flex align-items-center gap-2 flex-grow-1 min-w-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaCalendarAlt, { className: "text-primary flex-shrink-0" }),
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("span", { className: "ups-display-label text-truncate", children: displayLabel })
+  return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap20.Card, { className: `ups-card ${className}`, children: /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(import_react_bootstrap20.Card.Body, { className: "ups-body", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "d-flex align-items-center gap-2 flex-grow-1 min-w-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaCalendarAlt, { className: "text-primary flex-shrink-0" }),
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "ups-display-label text-truncate", children: displayLabel })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "d-flex align-items-center gap-1", children: [
-        (dataInicio || dataFim) && /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-          import_react_bootstrap22.Button,
+      /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "d-flex align-items-center gap-1", children: [
+        (dataInicio || dataFim) && /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          import_react_bootstrap20.Button,
           {
             variant: "link",
             size: "sm",
@@ -2581,11 +1742,11 @@ var UnifiedPeriodSelector = ({
             onClick: handleClear,
             title: "Limpar per\xEDodo",
             disabled,
-            children: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaTimesCircle, { size: 14 })
+            children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaTimesCircle, { size: 14 })
           }
         ),
-        compact && /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-          import_react_bootstrap22.Button,
+        compact && /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          import_react_bootstrap20.Button,
           {
             variant: "link",
             size: "sm",
@@ -2596,7 +1757,7 @@ var UnifiedPeriodSelector = ({
         )
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("div", { className: "ups-tabs", children: TABS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "ups-tabs", children: TABS.map((tab) => /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
       "button",
       {
         className: `ups-tab ${activeTab === tab.key ? "ups-tab--active" : ""}`,
@@ -2604,14 +1765,14 @@ var UnifiedPeriodSelector = ({
         disabled,
         children: [
           tab.icon,
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("span", { children: tab.label })
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { children: tab.label })
         ]
       },
       tab.key
     )) }),
-    /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-content", children: [
-      activeTab === "quick" && /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-        import_react_bootstrap22.Button,
+    /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-content", children: [
+      activeTab === "quick" && /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+        import_react_bootstrap20.Button,
         {
           size: "sm",
           variant: activePresetKey === p.key ? "primary" : "outline-secondary",
@@ -2622,36 +1783,36 @@ var UnifiedPeriodSelector = ({
         },
         p.key
       )) }),
-      activeTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-month-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-year-nav", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-            import_react_bootstrap22.Button,
+      activeTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-month-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-year-nav", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+            import_react_bootstrap20.Button,
             {
               variant: "outline-secondary",
               size: "sm",
               className: "ups-year-btn",
               onClick: () => handleYearChange(-1),
               disabled,
-              children: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaChevronLeft, { size: 10 })
+              children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaChevronLeft, { size: 10 })
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("span", { className: "ups-year-label", children: selectedYear }),
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-            import_react_bootstrap22.Button,
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("span", { className: "ups-year-label", children: selectedYear }),
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+            import_react_bootstrap20.Button,
             {
               variant: "outline-secondary",
               size: "sm",
               className: "ups-year-btn",
               onClick: () => handleYearChange(1),
               disabled,
-              children: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_fa5.FaChevronRight, { size: 10 })
+              children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_fa4.FaChevronRight, { size: 10 })
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("div", { className: "ups-month-grid", children: MONTHS.map((label, idx) => {
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "ups-month-grid", children: MONTHS.map((label, idx) => {
           const isSelected = selectedMonths.has(idx);
           const isCurrent = today.getFullYear() === selectedYear && today.getMonth() === idx;
-          return /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
+          return /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
             "button",
             {
               className: [
@@ -2667,14 +1828,14 @@ var UnifiedPeriodSelector = ({
             idx
           );
         }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("p", { className: "ups-month-hint text-muted", children: "Shift+clique para range \xB7 Ctrl/Cmd+clique para multi-sele\xE7\xE3o" })
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("p", { className: "ups-month-hint text-muted", children: "Shift+clique para range \xB7 Ctrl/Cmd+clique para multi-sele\xE7\xE3o" })
       ] }),
-      activeTab === "custom" && /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { className: "ups-custom-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_react_bootstrap22.Row, { className: "g-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_react_bootstrap22.Col, { xs: 12, sm: 6, children: /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_react_bootstrap22.Form.Group, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_react_bootstrap22.Form.Label, { className: "small text-muted mb-1", children: "In\xEDcio" }),
-            /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-              import_react_bootstrap22.Form.Control,
+      activeTab === "custom" && /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-custom-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(import_react_bootstrap20.Row, { className: "g-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap20.Col, { xs: 12, sm: 6, children: /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(import_react_bootstrap20.Form.Group, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap20.Form.Label, { className: "small text-muted mb-1", children: "In\xEDcio" }),
+            /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+              import_react_bootstrap20.Form.Control,
               {
                 type: "datetime-local",
                 size: "sm",
@@ -2685,10 +1846,10 @@ var UnifiedPeriodSelector = ({
               }
             )
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_react_bootstrap22.Col, { xs: 12, sm: 6, children: /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)(import_react_bootstrap22.Form.Group, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(import_react_bootstrap22.Form.Label, { className: "small text-muted mb-1", children: "Fim" }),
-            /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-              import_react_bootstrap22.Form.Control,
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap20.Col, { xs: 12, sm: 6, children: /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(import_react_bootstrap20.Form.Group, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap20.Form.Label, { className: "small text-muted mb-1", children: "Fim" }),
+            /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+              import_react_bootstrap20.Form.Control,
               {
                 type: "datetime-local",
                 size: "sm",
@@ -2701,8 +1862,8 @@ var UnifiedPeriodSelector = ({
             )
           ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime36.jsx)("div", { className: "d-flex justify-content-end mt-2", children: /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
-          import_react_bootstrap22.Button,
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "d-flex justify-content-end mt-2", children: /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          import_react_bootstrap20.Button,
           {
             variant: "primary",
             size: "sm",
@@ -2717,10 +1878,10 @@ var UnifiedPeriodSelector = ({
 };
 
 // src/forms/MailSender.tsx
-var import_react20 = require("react");
-var import_react_bootstrap23 = require("react-bootstrap");
+var import_react14 = require("react");
+var import_react_bootstrap21 = require("react-bootstrap");
 var import_fi3 = require("react-icons/fi");
-var import_jsx_runtime37 = require("react/jsx-runtime");
+var import_jsx_runtime31 = require("react/jsx-runtime");
 var MailSender = ({
   htmlContent,
   companyName,
@@ -2729,15 +1890,15 @@ var MailSender = ({
   hide = false,
   renderTrigger
 }) => {
-  const [opened, setOpened] = (0, import_react20.useState)(false);
-  const [addingEmail, setAddingEmail] = (0, import_react20.useState)(false);
-  const [selectedEmails, setSelectedEmails] = (0, import_react20.useState)([]);
-  const [emails, setEmails] = (0, import_react20.useState)([]);
-  const [loading, setLoading] = (0, import_react20.useState)(false);
-  const [postLoading, setPostLoading] = (0, import_react20.useState)(false);
-  const [customEmail, setCustomEmail] = (0, import_react20.useState)("");
-  const [emailError, setEmailError] = (0, import_react20.useState)("");
-  const [searchFilter, setSearchFilter] = (0, import_react20.useState)("");
+  const [opened, setOpened] = (0, import_react14.useState)(false);
+  const [addingEmail, setAddingEmail] = (0, import_react14.useState)(false);
+  const [selectedEmails, setSelectedEmails] = (0, import_react14.useState)([]);
+  const [emails, setEmails] = (0, import_react14.useState)([]);
+  const [loading, setLoading] = (0, import_react14.useState)(false);
+  const [postLoading, setPostLoading] = (0, import_react14.useState)(false);
+  const [customEmail, setCustomEmail] = (0, import_react14.useState)("");
+  const [emailError, setEmailError] = (0, import_react14.useState)("");
+  const [searchFilter, setSearchFilter] = (0, import_react14.useState)("");
   const handleOpen = async () => {
     setLoading(true);
     try {
@@ -2820,9 +1981,9 @@ var MailSender = ({
     if (renderTrigger) {
       return renderTrigger({ onClick: handleOpen, loading });
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Button, { disabled: loading, className: "w-100", onClick: handleOpen, children: loading ? "Carregando..." : "Enviar por E-mail" });
+    return /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Button, { disabled: loading, className: "w-100", onClick: handleOpen, children: loading ? "Carregando..." : "Enviar por E-mail" });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(
     "div",
     {
       style: {
@@ -2833,7 +1994,7 @@ var MailSender = ({
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
           "div",
           {
             style: {
@@ -2841,20 +2002,20 @@ var MailSender = ({
               color: "white",
               padding: "25px"
             },
-            children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "d-flex justify-content-between align-items-center", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("h4", { className: "mb-1", style: { fontWeight: "600", fontSize: "22px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiMail, { className: "me-2", size: 20 }),
+            children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { className: "d-flex justify-content-between align-items-center", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("h4", { className: "mb-1", style: { fontWeight: "600", fontSize: "22px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiMail, { className: "me-2", size: 20 }),
                   "Enviar Relat\xF3rio por E-mail"
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("small", { style: { opacity: "0.9", fontSize: "14px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("small", { style: { opacity: "0.9", fontSize: "14px" }, children: [
                   "Selecione os destinat\xE1rios para envio do relat\xF3rio de ",
                   companyName
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "d-flex gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                  import_react_bootstrap23.Button,
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { className: "d-flex gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                  import_react_bootstrap21.Button,
                   {
                     variant: "light",
                     onClick: sendEmail,
@@ -2865,38 +2026,38 @@ var MailSender = ({
                       minWidth: "130px",
                       height: "40px"
                     },
-                    children: postLoading ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Spinner, { size: "sm", className: "me-2" }),
+                    children: postLoading ? /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Spinner, { size: "sm", className: "me-2" }),
                       "Enviando..."
-                    ] }) : /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiSend, { className: "me-2", size: 14 }),
+                    ] }) : /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiSend, { className: "me-2", size: 14 }),
                       "Enviar E-mail"
                     ] })
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                  import_react_bootstrap23.Button,
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                  import_react_bootstrap21.Button,
                   {
                     variant: "outline-light",
                     onClick: () => setOpened(false),
                     disabled: postLoading,
                     style: { borderRadius: "8px", width: "40px", height: "40px" },
-                    children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiX, { size: 16 })
+                    children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiX, { size: 16 })
                   }
                 )
               ] })
             ] })
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { style: { padding: "25px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Card, { className: "mb-4", style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Card.Body, { style: { padding: "20px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Row, { className: "align-items-center", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Col, { md: 6, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("h6", { className: "mb-2", style: { color: "#495057", fontWeight: "600" }, children: "\u{1F527} Filtros e A\xE7\xF5es" }),
-                /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.InputGroup, { style: { maxWidth: "300px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.InputGroup.Text, { style: { backgroundColor: "#f8f9fa", border: "1px solid #dee2e6" }, children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiSearch, { size: 14, color: "#6c757d" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                    import_react_bootstrap23.Form.Control,
+        /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { style: { padding: "25px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Card, { className: "mb-4", style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Card.Body, { style: { padding: "20px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Row, { className: "align-items-center", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Col, { md: 6, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("h6", { className: "mb-2", style: { color: "#495057", fontWeight: "600" }, children: "\u{1F527} Filtros e A\xE7\xF5es" }),
+                /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.InputGroup, { style: { maxWidth: "300px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.InputGroup.Text, { style: { backgroundColor: "#f8f9fa", border: "1px solid #dee2e6" }, children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiSearch, { size: 14, color: "#6c757d" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                    import_react_bootstrap21.Form.Control,
                     {
                       type: "text",
                       placeholder: "Buscar e-mails...",
@@ -2907,25 +2068,25 @@ var MailSender = ({
                   )
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Col, { md: 6, className: "text-end", children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                import_react_bootstrap23.Button,
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Col, { md: 6, className: "text-end", children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                import_react_bootstrap21.Button,
                 {
                   variant: addingEmail ? "outline-secondary" : "outline-primary",
                   size: "sm",
                   onClick: () => setAddingEmail(!addingEmail),
                   disabled: postLoading,
                   style: { borderRadius: "8px" },
-                  children: addingEmail ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiX, { className: "me-1", size: 14 }),
+                  children: addingEmail ? /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiX, { className: "me-1", size: 14 }),
                     "Cancelar"
-                  ] }) : /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_jsx_runtime37.Fragment, { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiPlus, { className: "me-1", size: 14 }),
+                  ] }) : /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_jsx_runtime31.Fragment, { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiPlus, { className: "me-1", size: 14 }),
                     "E-mail Personalizado"
                   ] })
                 }
               ) })
             ] }),
-            addingEmail && /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
+            addingEmail && /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(
               "div",
               {
                 style: {
@@ -2936,12 +2097,12 @@ var MailSender = ({
                   border: "1px solid #e3f2fd"
                 },
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("h6", { className: "mb-3", style: { color: "#1976d2", fontWeight: "600" }, children: "\u2709\uFE0F Adicionar E-mail Personalizado" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Row, { className: "align-items-end", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Col, { md: 8, children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Form.Label, { style: { fontSize: "13px", color: "#6c757d", fontWeight: "500" }, children: "Endere\xE7o de E-mail" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                        import_react_bootstrap23.Form.Control,
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("h6", { className: "mb-3", style: { color: "#1976d2", fontWeight: "600" }, children: "\u2709\uFE0F Adicionar E-mail Personalizado" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Row, { className: "align-items-end", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Col, { md: 8, children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Form.Label, { style: { fontSize: "13px", color: "#6c757d", fontWeight: "500" }, children: "Endere\xE7o de E-mail" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                        import_react_bootstrap21.Form.Control,
                         {
                           type: "email",
                           placeholder: "exemplo@empresa.com",
@@ -2956,17 +2117,17 @@ var MailSender = ({
                           onKeyPress: (e) => e.key === "Enter" && handleEmailAdd()
                         }
                       ),
-                      /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Form.Control.Feedback, { type: "invalid", children: emailError })
+                      /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Form.Control.Feedback, { type: "invalid", children: emailError })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Col, { md: 4, children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
-                      import_react_bootstrap23.Button,
+                    /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Col, { md: 4, children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(
+                      import_react_bootstrap21.Button,
                       {
                         variant: "success",
                         onClick: handleEmailAdd,
                         disabled: postLoading,
                         style: { borderRadius: "8px", width: "100%" },
                         children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiPlus, { className: "me-1", size: 14 }),
+                          /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiPlus, { className: "me-1", size: 14 }),
                           "Adicionar"
                         ]
                       }
@@ -2976,16 +2137,16 @@ var MailSender = ({
               }
             )
           ] }) }),
-          selectedEmails.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Card, { className: "mb-4", style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Card.Body, { style: { padding: "20px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "d-flex justify-content-between align-items-center mb-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("h6", { className: "mb-0", style: { color: "#495057", fontWeight: "600" }, children: "\u{1F4CB} Destinat\xE1rios Selecionados" }),
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Badge, { bg: "primary", style: { fontSize: "12px", padding: "6px 12px" }, children: [
+          selectedEmails.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Card, { className: "mb-4", style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Card.Body, { style: { padding: "20px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { className: "d-flex justify-content-between align-items-center mb-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("h6", { className: "mb-0", style: { color: "#495057", fontWeight: "600" }, children: "\u{1F4CB} Destinat\xE1rios Selecionados" }),
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Badge, { bg: "primary", style: { fontSize: "12px", padding: "6px 12px" }, children: [
                 selectedEmails.length,
                 " selecionado",
                 selectedEmails.length > 1 ? "s" : ""
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("div", { className: "d-flex flex-wrap gap-2", children: selectedEmails.map((email, index) => /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
+            /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("div", { className: "d-flex flex-wrap gap-2", children: selectedEmails.map((email, index) => /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(
               "div",
               {
                 style: {
@@ -2999,10 +2160,10 @@ var MailSender = ({
                   fontWeight: "500"
                 },
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiUser, { size: 12, className: "me-2", color: "#1976d2" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", { children: email.email || email }),
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-                    import_react_bootstrap23.Button,
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiUser, { size: 12, className: "me-2", color: "#1976d2" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("span", { children: email.email || email }),
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+                    import_react_bootstrap21.Button,
                     {
                       variant: "link",
                       size: "sm",
@@ -3014,7 +2175,7 @@ var MailSender = ({
                         textDecoration: "none",
                         fontSize: "16px"
                       },
-                      children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiX, { size: 14 })
+                      children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiX, { size: 14 })
                     }
                   )
                 ]
@@ -3022,17 +2183,17 @@ var MailSender = ({
               index
             )) })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Card, { style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Card.Body, { style: { padding: "20px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("h6", { className: "mb-3", style: { color: "#495057", fontWeight: "600" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiUser, { className: "me-2", size: 16 }),
+          /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Card, { style: { border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Card.Body, { style: { padding: "20px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("h6", { className: "mb-3", style: { color: "#495057", fontWeight: "600" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiUser, { className: "me-2", size: 16 }),
               "E-mails de ",
               companyName
             ] }),
-            loading ? /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { className: "text-center py-4", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Spinner, {}),
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: "mt-2 text-muted", children: "Carregando e-mails..." })
-            ] }) : filteredEmails.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("div", { className: "text-center py-4", children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("p", { className: "text-muted mb-0", children: searchFilter ? "Nenhum e-mail encontrado com esse filtro" : "Nenhum e-mail dispon\xEDvel" }) }) : /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Row, { children: filteredEmails.map((email) => /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap23.Col, { xs: 12, sm: 6, lg: 4, className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
-              import_react_bootstrap23.Card,
+            loading ? /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)("div", { className: "text-center py-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Spinner, {}),
+              /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("p", { className: "mt-2 text-muted", children: "Carregando e-mails..." })
+            ] }) : filteredEmails.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("div", { className: "text-center py-4", children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)("p", { className: "text-muted mb-0", children: searchFilter ? "Nenhum e-mail encontrado com esse filtro" : "Nenhum e-mail dispon\xEDvel" }) }) : /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Row, { children: filteredEmails.map((email) => /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_react_bootstrap21.Col, { xs: 12, sm: 6, lg: 4, className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
+              import_react_bootstrap21.Card,
               {
                 onClick: () => setSelectedEmails([...selectedEmails, email]),
                 style: {
@@ -3052,9 +2213,9 @@ var MailSender = ({
                   e.currentTarget.style.boxShadow = "none";
                   e.currentTarget.style.borderColor = "#e9ecef";
                 },
-                children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap23.Card.Body, { style: { padding: "15px", textAlign: "center" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fi3.FiMail, { size: 20, color: "#007bff", className: "mb-2" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
+                children: /* @__PURE__ */ (0, import_jsx_runtime31.jsxs)(import_react_bootstrap21.Card.Body, { style: { padding: "15px", textAlign: "center" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(import_fi3.FiMail, { size: 20, color: "#007bff", className: "mb-2" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime31.jsx)(
                     "div",
                     {
                       style: {
@@ -3076,13 +2237,228 @@ var MailSender = ({
   );
 };
 
+// src/forms/AutoComplete.tsx
+var import_react15 = require("react");
+var import_react_bootstrap22 = require("react-bootstrap");
+var import_jsx_runtime32 = require("react/jsx-runtime");
+var AutoComplete = ({
+  className,
+  ops = [],
+  sortKey,
+  displayKey,
+  displayKeys,
+  onValueChanged,
+  onSelectedClick,
+  value,
+  actionButton,
+  actionButton2,
+  placeH,
+  title,
+  filter,
+  filterField,
+  loadFunc,
+  loadCondition,
+  onBlurEvent,
+  formatationFunc,
+  onEscKeyDown,
+  onEnterKeyDown,
+  margT,
+  margB,
+  hideComponent,
+  disableComponent = false,
+  disableSelect = false,
+  autoFocusConfig,
+  onLoad,
+  cacheKey,
+  minChars = 0,
+  maxItems,
+  showListOnFocus = true,
+  lazyLoad = false
+}) => {
+  const [liItem, setListItem] = (0, import_react15.useState)([]);
+  const [options, setOptions] = (0, import_react15.useState)([]);
+  const [input, setInput] = (0, import_react15.useState)("");
+  const [hide, setHide] = (0, import_react15.useState)(true);
+  const [onLoaded, setOnLoaded] = (0, import_react15.useState)(false);
+  const [loading, setLoading] = (0, import_react15.useState)(false);
+  const cacheStore = (0, import_react15.useMemo)(() => {
+    const win = window;
+    if (!win.__AUTO_COMPLETE_CACHE__) {
+      win.__AUTO_COMPLETE_CACHE__ = /* @__PURE__ */ new Map();
+    }
+    return win.__AUTO_COMPLETE_CACHE__;
+  }, []);
+  const sortOptions = (data, key) => {
+    if (!key || !Array.isArray(data)) return data;
+    return [...data].sort((a, b) => String(a[key]).localeCompare(String(b[key])));
+  };
+  (0, import_react15.useEffect)(() => {
+    setInput(value || "");
+  }, [value]);
+  (0, import_react15.useEffect)(() => {
+    if (!Array.isArray(ops) || ops.length === 0) return;
+    const sortedOptions = sortOptions(ops, sortKey);
+    setListItem(sortedOptions);
+    setOptions(sortedOptions);
+  }, [ops, sortKey]);
+  (0, import_react15.useEffect)(() => {
+    const loadData = async () => {
+      if (!(loadCondition && loadFunc)) return;
+      if (lazyLoad && minChars > 0 && !showListOnFocus && (!value || String(value).length < minChars)) {
+        return;
+      }
+      const key = cacheKey ? `${cacheKey}${filter ? `:${filterField}:${filter}` : ""}` : null;
+      if (key && cacheStore.has(key)) {
+        const cacheEntry = cacheStore.get(key);
+        const data = cacheEntry.promise ? await cacheEntry.promise : cacheEntry.data || cacheEntry;
+        setListItem(data);
+        setOptions(data);
+        triggerOnLoad(data);
+        return;
+      }
+      setLoading(true);
+      try {
+        const requestPromise = loadFunc().then((res) => {
+          let newOps = (res == null ? void 0 : res.content) || res;
+          newOps = Array.isArray(newOps) ? newOps.filter((op) => op != null) : [];
+          if (filter && filterField) {
+            newOps = newOps.filter((op) => op[filterField] === filter);
+          }
+          return sortOptions(newOps, sortKey);
+        });
+        if (key) cacheStore.set(key, { promise: requestPromise });
+        const sortedOptions = await requestPromise;
+        setListItem(sortedOptions);
+        setOptions(sortedOptions);
+        if (key) cacheStore.set(key, { data: sortedOptions });
+        triggerOnLoad(sortedOptions);
+      } catch (error) {
+        if (key) cacheStore.delete(key);
+        setListItem([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [loadCondition, filter, filterField, sortKey, cacheKey, lazyLoad, minChars, showListOnFocus]);
+  const triggerOnLoad = (data) => {
+    if (onLoad && !onLoaded) {
+      setOnLoaded(true);
+      onLoad(data);
+    }
+  };
+  const keysJoinner = (li) => {
+    if (!displayKeys || !Array.isArray(displayKeys)) return "";
+    return displayKeys.map((key) => `${li[key]} `).join("").trim();
+  };
+  const getDisplayText = (item) => {
+    if (formatationFunc) return formatationFunc(item);
+    if (displayKey) return item[displayKey];
+    if (displayKeys) return keysJoinner(item);
+    return String(item);
+  };
+  const onFieldUpdate = (val) => {
+    const search = val.toLowerCase();
+    const canSearch = search.length >= minChars;
+    if (canSearch && Array.isArray(options)) {
+      const filtered = options.filter((item) => {
+        const text = getDisplayText(item);
+        return String(text).toLowerCase().includes(search);
+      });
+      setListItem(filtered);
+    } else {
+      setListItem(options || []);
+    }
+    onValueChanged == null ? void 0 : onValueChanged(val);
+    setInput(val);
+    setHide(!canSearch && options.length === 0);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(
+    "div",
+    {
+      className,
+      style: { marginTop: margT != null ? margT : 4, marginBottom: margB != null ? margB : 4, position: "relative" },
+      onBlur: (e) => {
+        setTimeout(() => {
+          onBlurEvent == null ? void 0 : onBlurEvent(e, input);
+          setHide(true);
+        }, 200);
+      },
+      onKeyDown: (e) => {
+        if (e.key === "Escape") {
+          setHide(true);
+          onEscKeyDown == null ? void 0 : onEscKeyDown();
+        }
+        if (e.key === "Enter" && onEnterKeyDown) {
+          onEnterKeyDown(input);
+        }
+      },
+      onMouseLeave: () => setHide(true),
+      children: [
+        !hideComponent && /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_react_bootstrap22.InputGroup, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
+            import_react_bootstrap22.Form.Control,
+            {
+              autoFocus: autoFocusConfig,
+              disabled: disableComponent || disableSelect,
+              placeholder: placeH,
+              autoComplete: "off",
+              value: input,
+              onClickCapture: () => {
+                const canOpen = showListOnFocus && input.length >= minChars;
+                setHide(!canOpen);
+              },
+              onChange: (e) => onFieldUpdate(e.currentTarget.value),
+              type: "text"
+            }
+          ) }),
+          loading && /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.InputGroup.Text, { children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.Spinner, { animation: "border", size: "sm" }) }),
+          !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
+          !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
+          import_react_bootstrap22.ListGroup,
+          {
+            className: "listgroup-autocomplete shadow-sm",
+            hidden: hide || liItem.length === 0,
+            style: {
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              width: "100%",
+              maxHeight: "250px",
+              overflowY: "auto",
+              zIndex: 1050,
+              backgroundColor: "#fff"
+            },
+            children: (maxItems ? liItem.slice(0, maxItems) : liItem).map((li, index) => /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
+              import_react_bootstrap22.ListGroup.Item,
+              {
+                action: true,
+                onClick: () => {
+                  const text = getDisplayText(li);
+                  setInput(text);
+                  onSelectedClick(li, index, liItem);
+                  setHide(true);
+                },
+                children: getDisplayText(li)
+              },
+              index
+            ))
+          }
+        )
+      ]
+    }
+  );
+};
+
 // src/forms/GenericForm.tsx
-var import_react21 = require("react");
-var import_react_bootstrap24 = require("react-bootstrap");
-var import_jsx_runtime38 = require("react/jsx-runtime");
+var import_react16 = require("react");
+var import_react_bootstrap23 = require("react-bootstrap");
+var import_jsx_runtime33 = require("react/jsx-runtime");
 var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
-  const [formValues, setFormValues] = (0, import_react21.useState)({});
-  const [errors, setErrors] = (0, import_react21.useState)({});
+  const [formValues, setFormValues] = (0, import_react16.useState)({});
+  const [errors, setErrors] = (0, import_react16.useState)({});
   const handleChange = (key, value) => {
     setFormValues({
       ...formValues,
@@ -3111,10 +2487,10 @@ var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
     switch (type) {
       case "text":
       case "number":
-        return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_react_bootstrap24.Form.Group, { className: "mb-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Label, { children: label }),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
-            import_react_bootstrap24.Form.Control,
+        return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_react_bootstrap23.Form.Group, { className: "mb-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Label, { children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(
+            import_react_bootstrap23.Form.Control,
             {
               type,
               placeholder,
@@ -3123,30 +2499,30 @@ var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
               isInvalid: !!errors[key]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Control.Feedback, { type: "invalid", children: errors[key] })
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Control.Feedback, { type: "invalid", children: errors[key] })
         ] }, key);
       case "select": {
         const orderedOptions = (options || []).filter((opt) => opt && opt.value !== void 0 && opt.label !== void 0).sort((a, b) => a.label.localeCompare(b.label));
-        return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_react_bootstrap24.Form.Group, { className: "mb-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Label, { children: label }),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(
-            import_react_bootstrap24.Form.Select,
+        return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_react_bootstrap23.Form.Group, { className: "mb-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Label, { children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(
+            import_react_bootstrap23.Form.Select,
             {
               value,
               onChange: (e) => handleChange(key, e.target.value),
               isInvalid: !!errors[key],
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("option", { value: "", children: "Selecione..." }),
-                orderedOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("option", { value: option.value, children: option.label }, String(option.value)))
+                /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("option", { value: "", children: "Selecione..." }),
+                orderedOptions.map((option) => /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("option", { value: option.value, children: option.label }, String(option.value)))
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Control.Feedback, { type: "invalid", children: errors[key] })
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Control.Feedback, { type: "invalid", children: errors[key] })
         ] }, key);
       }
       case "custom-select":
         if (renderCustomSelect) {
-          return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)("div", { children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)("div", { children: [
             renderCustomSelect({
               label,
               value,
@@ -3154,15 +2530,15 @@ var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
               onChange: (v) => handleChange(key, v),
               placeholder
             }),
-            errors[key] && /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "invalid-feedback d-block", children: errors[key] })
+            errors[key] && /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("div", { className: "invalid-feedback d-block", children: errors[key] })
           ] }, key);
         }
         return null;
       case "date":
-        return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_react_bootstrap24.Form.Group, { className: "mb-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Label, { children: label }),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
-            import_react_bootstrap24.Form.Control,
+        return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_react_bootstrap23.Form.Group, { className: "mb-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Label, { children: label }),
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(
+            import_react_bootstrap23.Form.Control,
             {
               type: "date",
               value,
@@ -3170,23 +2546,23 @@ var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
               isInvalid: !!errors[key]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Form.Control.Feedback, { type: "invalid", children: errors[key] })
+          /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Form.Control.Feedback, { type: "invalid", children: errors[key] })
         ] }, key);
       default:
         return null;
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime38.jsxs)(import_react_bootstrap24.Form, { onSubmit: handleSubmit, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime33.jsxs)(import_react_bootstrap23.Form, { onSubmit: handleSubmit, children: [
     fields.map((field) => renderField(field)),
-    /* @__PURE__ */ (0, import_jsx_runtime38.jsx)("div", { className: "d-grid", children: /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(import_react_bootstrap24.Button, { variant: "primary", type: "submit", children: "Salvar" }) })
+    /* @__PURE__ */ (0, import_jsx_runtime33.jsx)("div", { className: "d-grid", children: /* @__PURE__ */ (0, import_jsx_runtime33.jsx)(import_react_bootstrap23.Button, { variant: "primary", type: "submit", children: "Salvar" }) })
   ] });
 };
 var GenericForm_default = GenericForm;
 
 // src/forms/GenericSelect.tsx
-var import_react22 = require("react");
-var import_react_bootstrap25 = require("react-bootstrap");
-var import_jsx_runtime39 = require("react/jsx-runtime");
+var import_react17 = require("react");
+var import_react_bootstrap24 = require("react-bootstrap");
+var import_jsx_runtime34 = require("react/jsx-runtime");
 var GenericSelectOps = class {
   constructor(noLabel, title, onChange, ops, selection, returnType, displayType, filter, filterField, valueType, loadFunc, loadCondition, actionClick, locked) {
     this.noLabel = noLabel;
@@ -3223,8 +2599,8 @@ var GenericSelect = ({
   isBold,
   ...restProps
 }) => {
-  const [options, setOptions] = (0, import_react22.useState)(ops || []);
-  (0, import_react22.useEffect)(() => {
+  const [options, setOptions] = (0, import_react17.useState)(ops || []);
+  (0, import_react17.useEffect)(() => {
     const loadFunction = async () => {
       if (loadCondition && loadFunc) {
         loadFunc().then((res) => {
@@ -3249,15 +2625,15 @@ var GenericSelect = ({
     }
   };
   const defaultPlaceholder = (restProps == null ? void 0 : restProps.default) || "Seleciona uma Op\xE7\xE3o";
-  const selectContent = /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(
-    import_react_bootstrap25.Form.Control,
+  const selectContent = /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(
+    import_react_bootstrap24.Form.Control,
     {
       disabled: locked,
       as: "select",
       value: selection,
       onChange: (event) => getTrueValue(event.target.selectedIndex),
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("option", { value: void 0, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)("option", { value: void 0, children: [
           "-- ",
           defaultPlaceholder,
           " --"
@@ -3266,30 +2642,30 @@ var GenericSelect = ({
           const val = valueType && op[valueType] || op.id || op;
           let fill = displayType && op[displayType] || op;
           if (typeof fill == "object") fill = "";
-          return /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("option", { value: val, children: fill }, op.id || index);
+          return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("option", { value: val, children: fill }, op.id || index);
         })
       ]
     }
   );
   if (actionClick) {
-    return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(import_jsx_runtime39.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(import_react_bootstrap25.Form.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
-      /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(import_react_bootstrap25.InputGroup, { children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_jsx_runtime34.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_bootstrap24.Form.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
+      /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_react_bootstrap24.InputGroup, { children: [
         selectContent,
         actionClick()
       ] })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(import_jsx_runtime39.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(import_react_bootstrap25.Form.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
+  return /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_jsx_runtime34.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime34.jsx)(import_react_bootstrap24.Form.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
     selectContent
   ] });
 };
 var GenericSelect_default = GenericSelect;
 
 // src/forms/FormField.tsx
-var import_react_bootstrap26 = require("react-bootstrap");
-var import_jsx_runtime40 = require("react/jsx-runtime");
+var import_react_bootstrap25 = require("react-bootstrap");
+var import_jsx_runtime35 = require("react/jsx-runtime");
 var FormField = ({
   val,
   onValueUpdate,
@@ -3340,32 +2716,32 @@ var FormField = ({
       fieldProps.as = "textarea";
       fieldProps.rows = rows || 3;
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_bootstrap26.Form.Control, { ...fieldProps });
+    return /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.Form.Control, { ...fieldProps });
   };
   if (hide) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(
-    import_react_bootstrap26.Form.Group,
+  return /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(
+    import_react_bootstrap25.Form.Group,
     {
       onFocusCapture: (e) => onFocusHandler(e.target.value),
       onMouseLeave: onMouseLv,
       onKeyDown: onKeyDownHandler,
       style: { marginTop: 4, marginBottom: 4, width: "100%" },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(import_react_bootstrap26.InputGroup, { children: [
-          asTextArea ? renderField() : /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_bootstrap26.FloatingLabel, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }),
+        /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(import_react_bootstrap25.InputGroup, { children: [
+          asTextArea ? renderField() : /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.FloatingLabel, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }),
           actionClick && actionClick(),
           actionClick2 && actionClick2()
         ] }),
-        feedback && isInvalid && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_react_bootstrap26.Form.Control.Feedback, { type: "invalid", style: { display: "block" }, children: feedback })
+        feedback && isInvalid && /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.Form.Control.Feedback, { type: "invalid", style: { display: "block" }, children: feedback })
       ]
     }
   );
 };
 
 // src/forms/ClickToWriteField.tsx
-var import_react23 = require("react");
-var import_react_bootstrap27 = require("react-bootstrap");
-var import_jsx_runtime41 = require("react/jsx-runtime");
+var import_react18 = require("react");
+var import_react_bootstrap26 = require("react-bootstrap");
+var import_jsx_runtime36 = require("react/jsx-runtime");
 var ClickToWriteField = ({
   buttonDisplay,
   fieldType = "text",
@@ -3381,9 +2757,9 @@ var ClickToWriteField = ({
   onEnterPress,
   cleanRef
 }) => {
-  const [showClick, setShowClick] = (0, import_react23.useState)(false);
-  const inputRef = (0, import_react23.useRef)(null);
-  (0, import_react23.useEffect)(() => {
+  const [showClick, setShowClick] = (0, import_react18.useState)(false);
+  const inputRef = (0, import_react18.useRef)(null);
+  (0, import_react18.useEffect)(() => {
     if (showClick) {
       setTimeout(() => {
         if (inputRef.current) {
@@ -3412,9 +2788,9 @@ var ClickToWriteField = ({
       onEnterPress(inputRef);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { style: { display: "flex", width: "100%", margin: 0, padding: 0 }, children: [
-    !showClick && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
-      import_react_bootstrap27.Button,
+  return /* @__PURE__ */ (0, import_jsx_runtime36.jsxs)("div", { style: { display: "flex", width: "100%", margin: 0, padding: 0 }, children: [
+    !showClick && /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
+      import_react_bootstrap26.Button,
       {
         style: { flexGrow: 1 },
         onClick: handleShowClick,
@@ -3422,7 +2798,7 @@ var ClickToWriteField = ({
         children: resolveButtonDisplay()
       }
     ),
-    showClick && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+    showClick && /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
       FormField,
       {
         reference: inputRef,
@@ -3432,8 +2808,8 @@ var ClickToWriteField = ({
         label: fieldLabel,
         onValueUpdate: onFieldValueUpdate,
         onBlur: () => setShowClick(false),
-        actionClick: () => enableFieldActionButton ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
-          import_react_bootstrap27.Button,
+        actionClick: () => enableFieldActionButton ? /* @__PURE__ */ (0, import_jsx_runtime36.jsx)(
+          import_react_bootstrap26.Button,
           {
             ...fieldActionButtonProps,
             onClick: () => fieldActionButtonCallback(inputRef),
@@ -3446,28 +2822,28 @@ var ClickToWriteField = ({
 };
 
 // src/forms/ColorPicker.tsx
-var import_react_bootstrap28 = require("react-bootstrap");
-var import_fa6 = require("react-icons/fa");
-var import_jsx_runtime42 = require("react/jsx-runtime");
+var import_react_bootstrap27 = require("react-bootstrap");
+var import_fa5 = require("react-icons/fa");
+var import_jsx_runtime37 = require("react/jsx-runtime");
 var ColorPicker = ({
   selectedColor,
   onColorChange,
   presetColors = ["#ff0000", "#ffd700", "#008000", "#0000ff", "#800080"],
   title = "Cor de Identifica\xE7\xE3o"
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
-    import_react_bootstrap28.Card,
+  return /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
+    import_react_bootstrap27.Card,
     {
       className: "shadow-sm border-primary-hover mb-3",
       style: { maxWidth: "320px", transition: "0.3s" },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(import_react_bootstrap28.Card.Header, { className: "bg-light d-flex align-items-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_fa6.FaPalette, { className: "me-2 text-primary" }),
-          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "fw-medium", children: title })
+        /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap27.Card.Header, { className: "bg-light d-flex align-items-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_fa5.FaPalette, { className: "me-2 text-primary" }),
+          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)("span", { className: "fw-medium", children: title })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(import_react_bootstrap28.Card.Body, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(import_react_bootstrap28.Row, { className: "g-3 align-items-center mb-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap28.Col, { xs: "auto", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap27.Card.Body, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(import_react_bootstrap27.Row, { className: "g-3 align-items-center mb-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap27.Col, { xs: "auto", children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
               "div",
               {
                 className: "rounded-circle shadow-sm border",
@@ -3485,8 +2861,8 @@ var ColorPicker = ({
                 title: "Clique para abrir o seletor"
               }
             ) }),
-            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap28.Col, { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
-              import_react_bootstrap28.Form.Control,
+            /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap27.Col, { children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
+              import_react_bootstrap27.Form.Control,
               {
                 type: "color",
                 id: "color-input-hidden",
@@ -3497,7 +2873,7 @@ var ColorPicker = ({
               }
             ) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap28.Row, { className: "g-2 justify-content-start", children: presetColors.map((cor) => /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap28.Col, { xs: "auto", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap27.Row, { className: "g-2 justify-content-start", children: presetColors.map((cor) => /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(import_react_bootstrap27.Col, { xs: "auto", children: /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
             "div",
             {
               className: "rounded-1 shadow-sm",
@@ -3518,8 +2894,8 @@ var ColorPicker = ({
 };
 
 // src/forms/Switch.tsx
-var import_react_bootstrap29 = require("react-bootstrap");
-var import_jsx_runtime43 = require("react/jsx-runtime");
+var import_react_bootstrap28 = require("react-bootstrap");
+var import_jsx_runtime38 = require("react/jsx-runtime");
 var Switch = ({
   label,
   onSwitchChange,
@@ -3528,8 +2904,8 @@ var Switch = ({
   defaultChecked,
   ...props
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
-    import_react_bootstrap29.Form.Check,
+  return /* @__PURE__ */ (0, import_jsx_runtime38.jsx)(
+    import_react_bootstrap28.Form.Check,
     {
       ...props,
       disabled,
@@ -3543,17 +2919,17 @@ var Switch = ({
 };
 
 // src/forms/UploadArea.tsx
-var import_react24 = require("react");
+var import_react19 = require("react");
 var import_react_dropzone = require("react-dropzone");
 var import_fi4 = require("react-icons/fi");
-var import_jsx_runtime44 = require("react/jsx-runtime");
+var import_jsx_runtime39 = require("react/jsx-runtime");
 var UploadArea = ({
   onFilePut,
   anexo,
   accept = { "image/jpeg": [], "image/png": [] },
   maxSize = 50 * 1024 * 1024
 }) => {
-  const onDrop = (0, import_react24.useCallback)(
+  const onDrop = (0, import_react19.useCallback)(
     (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (file && typeof onFilePut === "function") {
@@ -3568,7 +2944,7 @@ var UploadArea = ({
     accept
   });
   const hasAnexo = Boolean(anexo);
-  return /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(
     "div",
     {
       ...getRootProps(),
@@ -3577,23 +2953,23 @@ var UploadArea = ({
 				${hasAnexo ? "upload-has-file" : ""}
 			`,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("input", { ...getInputProps() }),
-        /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "upload-content", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "upload-icon", children: hasAnexo ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi4.FiCheckCircle, { size: 24 }) : /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi4.FiUploadCloud, { size: 24 }) }),
-          hasAnexo ? /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_jsx_runtime44.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("p", { className: "upload-link", children: "Arquivo anexado" }),
-            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("p", { className: "upload-info", children: anexo == null ? void 0 : anexo.name })
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_jsx_runtime44.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("p", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "upload-link", children: "Adicione" }),
+        /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("input", { ...getInputProps() }),
+        /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("div", { className: "upload-content", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "upload-icon", children: hasAnexo ? /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(import_fi4.FiCheckCircle, { size: 24 }) : /* @__PURE__ */ (0, import_jsx_runtime39.jsx)(import_fi4.FiUploadCloud, { size: 24 }) }),
+          hasAnexo ? /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(import_jsx_runtime39.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("p", { className: "upload-link", children: "Arquivo anexado" }),
+            /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("p", { className: "upload-info", children: anexo == null ? void 0 : anexo.name })
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)(import_jsx_runtime39.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("p", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("span", { className: "upload-link", children: "Adicione" }),
               " ou arraste arquivos aqui"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("p", { className: "upload-info", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("p", { className: "upload-info", children: [
               "Formatos aceitos: ",
-              /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("b", { children: Object.keys(accept).map((t) => t.split("/")[1].toUpperCase()).join(", ") }),
+              /* @__PURE__ */ (0, import_jsx_runtime39.jsx)("b", { children: Object.keys(accept).map((t) => t.split("/")[1].toUpperCase()).join(", ") }),
               " | Tamanho m\xE1ximo:",
               " ",
-              /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("b", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime39.jsxs)("b", { children: [
                 (maxSize / (1024 * 1024)).toFixed(0),
                 "MB"
               ] })
@@ -3606,11 +2982,11 @@ var UploadArea = ({
 };
 
 // src/forms/AnexoManager.tsx
-var import_react25 = require("react");
+var import_react20 = require("react");
 var import_react_dropzone2 = require("react-dropzone");
 var import_fi5 = require("react-icons/fi");
-var import_fa7 = require("react-icons/fa");
-var import_jsx_runtime45 = require("react/jsx-runtime");
+var import_fa6 = require("react-icons/fa");
+var import_jsx_runtime40 = require("react/jsx-runtime");
 var UNIVERSAL_ACCEPT = {
   "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"],
   "application/pdf": [".pdf"],
@@ -3645,23 +3021,23 @@ function getFileCategory(tipo, nome) {
 function FileIcon({ category }) {
   switch (category) {
     case "pdf":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fa7.FaFilePdf, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFilePdf, {});
     case "doc":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fa7.FaFileWord, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileWord, {});
     case "xls":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fa7.FaFileExcel, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileExcel, {});
     case "csv":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fa7.FaFileCsv, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileCsv, {});
     case "img":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiImage, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiImage, {});
     case "vid":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiFilm, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiFilm, {});
     case "aud":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiMusic, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiMusic, {});
     case "zip":
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fa7.FaFileArchive, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileArchive, {});
     default:
-      return /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiFile, {});
+      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiFile, {});
   }
 }
 var AnexoManager = ({
@@ -3678,9 +3054,9 @@ var AnexoManager = ({
   maxFiles = 10,
   dropzoneLabel
 }) => {
-  const [thumbUrls, setThumbUrls] = (0, import_react25.useState)({});
-  const [unavailableIds, setUnavailableIds] = (0, import_react25.useState)(/* @__PURE__ */ new Set());
-  const handleDownload = (0, import_react25.useCallback)(async (anexo) => {
+  const [thumbUrls, setThumbUrls] = (0, import_react20.useState)({});
+  const [unavailableIds, setUnavailableIds] = (0, import_react20.useState)(/* @__PURE__ */ new Set());
+  const handleDownload = (0, import_react20.useCallback)(async (anexo) => {
     if (!onDownload) return;
     const url = anexo.url || anexo.signedUrl;
     if (url) {
@@ -3697,7 +3073,7 @@ var AnexoManager = ({
     }
     onDownload(anexo);
   }, [onDownload]);
-  (0, import_react25.useEffect)(() => {
+  (0, import_react20.useEffect)(() => {
     const newUrls = {};
     locais.forEach((a) => {
       if (a.tipo.startsWith("image/") && !thumbUrls[a.localId]) {
@@ -3711,7 +3087,7 @@ var AnexoManager = ({
       Object.values(newUrls).forEach(URL.revokeObjectURL);
     };
   }, [locais]);
-  const onDrop = (0, import_react25.useCallback)(
+  const onDrop = (0, import_react20.useCallback)(
     (acceptedFiles) => {
       if (onAddFiles) onAddFiles(acceptedFiles);
     },
@@ -3724,26 +3100,26 @@ var AnexoManager = ({
     accept: UNIVERSAL_ACCEPT,
     disabled: readonly
   });
-  const allExtensions = (0, import_react25.useMemo)(
+  const allExtensions = (0, import_react20.useMemo)(
     () => Object.values(UNIVERSAL_ACCEPT).flat().map((e) => e.replace(".", "").toUpperCase()),
     []
   );
   const totalCount = persistidos.length + locais.length;
-  return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-manager", children: [
-    !readonly && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-manager", children: [
+    !readonly && /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(
       "div",
       {
         ...getRootProps(),
         className: `anexo-dropzone ${isDragActive ? "anexo-drag-active" : ""}`,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("input", { ...getInputProps() }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-dropzone-inner", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiUploadCloud, { className: "anexo-dropzone-icon" }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "anexo-dropzone-text", children: dropzoneLabel || /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_jsx_runtime45.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("strong", { children: "Clique para selecionar" }),
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("input", { ...getInputProps() }),
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-dropzone-inner", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiUploadCloud, { className: "anexo-dropzone-icon" }),
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("p", { className: "anexo-dropzone-text", children: dropzoneLabel || /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(import_jsx_runtime40.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("strong", { children: "Clique para selecionar" }),
               " ou arraste arquivos aqui"
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("p", { className: "anexo-dropzone-hint", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("p", { className: "anexo-dropzone-hint", children: [
               "M\xE1x. ",
               formatFileSize(maxFileSize),
               " por arquivo \xB7 At\xE9 ",
@@ -3754,40 +3130,40 @@ var AnexoManager = ({
         ]
       }
     ),
-    (totalCount > 0 || loading) && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-list", children: [
-      loading && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-empty", children: "Carregando anexos..." }),
+    (totalCount > 0 || loading) && /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-list", children: [
+      loading && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-empty", children: "Carregando anexos..." }),
       persistidos.map((anexo) => {
         const cat = getFileCategory(anexo.tipo || "", anexo.nome);
         const isUnavailable = anexo.unavailable || unavailableIds.has(anexo.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: `anexo-file-item ${isUnavailable ? "anexo-file-unavailable" : ""}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-meta", children: [
-              isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "anexo-status-error", children: "Anexo indisponivel" }),
-              !isUnavailable && anexo.tamanho ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { children: formatFileSize(anexo.tamanho) }) : null,
-              anexo.createdAt && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { children: new Date(anexo.createdAt).toLocaleDateString("pt-BR") })
+        return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: `anexo-file-item ${isUnavailable ? "anexo-file-unavailable" : ""}`, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(FileIcon, { category: cat }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-info", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-meta", children: [
+              isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-error", children: "Anexo indisponivel" }),
+              !isUnavailable && anexo.tamanho ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: formatFileSize(anexo.tamanho) }) : null,
+              anexo.createdAt && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: new Date(anexo.createdAt).toLocaleDateString("pt-BR") })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-actions", children: [
-            onDownload && !isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-actions", children: [
+            onDownload && !isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
               "button",
               {
                 type: "button",
                 className: "anexo-btn-action anexo-btn-download",
                 title: "Download",
                 onClick: () => handleDownload(anexo),
-                children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiDownload, {})
+                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiDownload, {})
               }
             ),
-            !readonly && onRemovePersistido && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+            !readonly && onRemovePersistido && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
               "button",
               {
                 type: "button",
                 className: "anexo-btn-action anexo-btn-danger",
                 title: "Remover",
                 onClick: () => onRemovePersistido(anexo.id),
-                children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiTrash2, {})
+                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiTrash2, {})
               }
             )
           ] })
@@ -3796,58 +3172,61 @@ var AnexoManager = ({
       locais.map((anexo) => {
         const cat = getFileCategory(anexo.tipo, anexo.nome);
         const isImg = anexo.tipo.startsWith("image/");
-        return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-item", children: [
-          isImg && thumbUrls[anexo.localId] ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("img", { src: thumbUrls[anexo.localId], alt: "", className: "anexo-file-thumb" }) : /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { children: formatFileSize(anexo.tamanho) }),
-              anexo.status === "uploading" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "anexo-status-uploading", children: "Enviando..." }),
-              anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "anexo-status-error", children: anexo.errorMessage || "Erro" })
+        return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-item", children: [
+          isImg && thumbUrls[anexo.localId] ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("img", { src: thumbUrls[anexo.localId], alt: "", className: "anexo-file-thumb" }) : /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(FileIcon, { category: cat }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-info", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
+            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: formatFileSize(anexo.tamanho) }),
+              anexo.status === "uploading" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-uploading", children: "Enviando..." }),
+              anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-error", children: anexo.errorMessage || "Erro" })
             ] }),
-            (anexo.status === "uploading" || anexo.status === "done") && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+            (anexo.status === "uploading" || anexo.status === "done") && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
               "div",
               {
                 className: `anexo-progress-fill ${anexo.status === "done" ? "anexo-progress-done" : ""}`,
                 style: { width: `${anexo.progress}%` }
               }
             ) }),
-            anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-progress-fill anexo-progress-error", style: { width: "100%" } }) })
+            anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-fill anexo-progress-error", style: { width: "100%" } }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "anexo-file-actions", children: [
-            anexo.status === "error" && onRetry && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-actions", children: [
+            anexo.status === "error" && onRetry && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
               "button",
               {
                 type: "button",
                 className: "anexo-btn-action",
                 title: "Tentar novamente",
                 onClick: () => onRetry(anexo.localId),
-                children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiRefreshCw, {})
+                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiRefreshCw, {})
               }
             ),
-            (anexo.status === "pending" || anexo.status === "error") && onRemoveLocal && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+            (anexo.status === "pending" || anexo.status === "error") && onRemoveLocal && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
               "button",
               {
                 type: "button",
                 className: "anexo-btn-action anexo-btn-danger",
                 title: "Remover",
                 onClick: () => onRemoveLocal(anexo.localId),
-                children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi5.FiTrash2, {})
+                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiTrash2, {})
               }
             )
           ] })
         ] }, `l-${anexo.localId}`);
       })
     ] }),
-    !loading && totalCount === 0 && readonly && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "anexo-empty", children: "Nenhum anexo encontrado." })
+    !loading && totalCount === 0 && readonly && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-empty", children: "Nenhum anexo encontrado." })
   ] });
 };
 
+// src/forms/FindRecursoByTagField.tsx
+var import_ui_kit_sgm3 = require("@teraprox/ui-kit-sgm");
+
 // src/forms/SectorSelector.tsx
-var import_react26 = require("react");
-var import_react_bootstrap30 = require("react-bootstrap");
-var import_bs3 = require("react-icons/bs");
-var import_jsx_runtime46 = require("react/jsx-runtime");
+var import_react21 = require("react");
+var import_react_bootstrap29 = require("react-bootstrap");
+var import_bs2 = require("react-icons/bs");
+var import_jsx_runtime41 = require("react/jsx-runtime");
 var SectorSelector = ({
   setores,
   onSectorSelect,
@@ -3857,9 +3236,9 @@ var SectorSelector = ({
   defaultSectorName = false,
   allowAll = false
 }) => {
-  const [expanded, setExpanded] = (0, import_react26.useState)(false);
-  const [selectedSector, setSelectedSector] = (0, import_react26.useState)(null);
-  (0, import_react26.useEffect)(() => {
+  const [expanded, setExpanded] = (0, import_react21.useState)(false);
+  const [selectedSector, setSelectedSector] = (0, import_react21.useState)(null);
+  (0, import_react21.useEffect)(() => {
     if (defaultSectorName && setores.length > 0) {
       const setor = setores.find((s) => s.nome === defaultSectorName);
       if (setor && setor.id !== (selectedSector == null ? void 0 : selectedSector.id)) {
@@ -3879,19 +3258,19 @@ var SectorSelector = ({
   };
   if (hideComponent) return null;
   const setorOptions = allowAll ? [{ id: "all", nome: "Todos" }, ...setores] : [...setores];
-  return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap30.Form.Floating, { className: "sector-selector-floating", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("div", { className: "custom-select-container", onClick: toggleExpand, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
-      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_bs3.BsChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_bs3.BsChevronDown, {}) })
+  return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(import_react_bootstrap29.Form.Floating, { className: "sector-selector-floating", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "custom-select-container", onClick: toggleExpand, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
+      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_bs2.BsChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_bs2.BsChevronDown, {}) })
     ] }),
-    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
-    expanded && /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(
+    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
+    expanded && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
       "div",
       {
         className: "custom-dropdown-menu",
         onMouseLeave: () => setExpanded(false),
         children: [
-          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
+          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
             "div",
             {
               className: `dropdown-option ${setor.nome === (selectedSector == null ? void 0 : selectedSector.nome) ? "selected-option" : ""}`,
@@ -3900,7 +3279,7 @@ var SectorSelector = ({
             },
             idx
           )),
-          setores.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
+          setores.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
         ]
       }
     )
@@ -3908,8 +3287,8 @@ var SectorSelector = ({
 };
 
 // src/forms/UnidadeMaterialForm.tsx
-var import_react_bootstrap31 = require("react-bootstrap");
-var import_jsx_runtime47 = require("react/jsx-runtime");
+var import_react_bootstrap30 = require("react-bootstrap");
+var import_jsx_runtime42 = require("react/jsx-runtime");
 var UnidadeMaterialForm = ({
   value,
   onMaterialSelected,
@@ -3926,10 +3305,10 @@ var UnidadeMaterialForm = ({
   className = ""
 }) => {
   var _a, _b, _c;
-  const renderNewMaterialButton = () => /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap31.Button, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
-  const renderNewUnidadeButton = () => /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap31.Button, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
-  return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)("div", { className: `unidade-material-form ${className}`, children: [
-    !hideMaterial && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
+  const renderNewMaterialButton = () => /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
+  const renderNewUnidadeButton = () => /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
+  return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: `unidade-material-form ${className}`, children: [
+    !hideMaterial && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3941,7 +3320,7 @@ var UnidadeMaterialForm = ({
         actionButton: onNavigateToCreateMaterial ? renderNewMaterialButton : void 0
       }
     ),
-    !hideQuantidade && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
+    !hideQuantidade && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
       FormField,
       {
         label: "Quantidade",
@@ -3950,7 +3329,7 @@ var UnidadeMaterialForm = ({
         ty: "number"
       }
     ),
-    !hideUnidade && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
+    !hideUnidade && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3966,7 +3345,7 @@ var UnidadeMaterialForm = ({
 };
 
 // src/icons/IconLabelItem.tsx
-var import_jsx_runtime48 = require("react/jsx-runtime");
+var import_jsx_runtime43 = require("react/jsx-runtime");
 var IconLabelItem = ({
   icon,
   label,
@@ -3975,16 +3354,16 @@ var IconLabelItem = ({
   onClick,
   style
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
     icon,
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: labelClassName, children: label })
+    /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: labelClassName, children: label })
   ] });
 };
 
 // src/icons/IconLabelList.tsx
-var import_jsx_runtime49 = require("react/jsx-runtime");
+var import_jsx_runtime44 = require("react/jsx-runtime");
 var IconLabelList = ({ items, className = "" }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
     IconLabelItem,
     {
       labelClassName: "icon-label",
@@ -3998,18 +3377,18 @@ var IconLabelList = ({ items, className = "" }) => {
 };
 
 // src/icons/NotificationItem.tsx
-var import_react27 = require("react");
-var import_react_bootstrap32 = require("react-bootstrap");
+var import_react22 = require("react");
+var import_react_bootstrap31 = require("react-bootstrap");
 var import_fi6 = require("react-icons/fi");
 var import_dayjs5 = __toESM(require("dayjs"));
-var import_jsx_runtime50 = require("react/jsx-runtime");
+var import_jsx_runtime45 = require("react/jsx-runtime");
 var NotificationItem = ({
   notification,
   onRead,
   onDismiss,
   emptyContentLabel = "Sem conte\xFAdo adicional dispon\xEDvel."
 }) => {
-  const [showModal, setShowModal] = (0, import_react27.useState)(false);
+  const [showModal, setShowModal] = (0, import_react22.useState)(false);
   const { context, contextId, content, status, createdAt, readAt } = notification;
   const handleOpenModal = (e) => {
     e.stopPropagation();
@@ -4025,49 +3404,49 @@ var NotificationItem = ({
     onDismiss(notification);
   };
   const displayTitle = contextId ? `${context} - ${contextId}` : context || "Notifica\xE7\xE3o";
-  return /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(import_jsx_runtime50.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_jsx_runtime45.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
       "div",
       {
         className: `notification-item-modern ${status === "unread" ? "unread" : ""}`,
         onClick: handleOpenModal,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiClock, { size: 14 }) : /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiCheck, { size: 14 }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-main-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "notification-header-row", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-title-modern", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "notification-context", children: context }),
-              contextId && /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(import_jsx_runtime50.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "notification-separator", children: "/" }),
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("span", { className: "notification-context-id", children: contextId })
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 14 }) : /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 14 }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-main-content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-header-row", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-title-modern", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-context", children: context }),
+              contextId && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_jsx_runtime45.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-separator", children: "/" }),
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-context-id", children: contextId })
               ] })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "notification-preview", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-timestamp", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("small", { children: (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY HH:mm") })
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-preview", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-timestamp", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("small", { children: (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY HH:mm") })
               ] }),
-              readAt && /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-read-time", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("small", { children: [
+              readAt && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-read-time", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { children: [
                   "Lida em ",
                   (0, import_dayjs5.default)(readAt).format("DD/MM HH:mm")
                 ] })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
-            import_react_bootstrap32.OverlayTrigger,
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+            import_react_bootstrap31.OverlayTrigger,
             {
               placement: "top",
-              overlay: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Tooltip, { children: "Descartar" }),
-              children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
+              overlay: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Tooltip, { children: "Descartar" }),
+              children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
                 "button",
                 {
                   className: "notification-action-btn notification-dismiss-btn",
                   onClick: handleDismiss,
                   "aria-label": "Descartar notifica\xE7\xE3o",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiTrash2, { size: 14 })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiTrash2, { size: 14 })
                 }
               )
             }
@@ -4075,39 +3454,39 @@ var NotificationItem = ({
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(
-      import_react_bootstrap32.Modal,
+    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
+      import_react_bootstrap31.Modal,
       {
         show: showModal,
         onHide: handleCloseModal,
         centered: true,
         className: "notification-modal",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Modal.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Modal.Title, { className: "notification-modal-title", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "d-flex align-items-center", children: [
-            status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiCheck, { className: "me-2 text-success" }),
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Title, { className: "notification-modal-title", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "d-flex align-items-center", children: [
+            status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { className: "me-2 text-success" }),
             "Detalhes da Notifica\xE7\xE3o"
           ] }) }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Modal.Body, { className: "notification-modal-body", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-modal-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-modal-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("h6", { className: "notification-modal-source", children: displayTitle }),
-              /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "notification-modal-timestamps", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("small", { className: "text-muted", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Body, { className: "notification-modal-body", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("h6", { className: "notification-modal-source", children: displayTitle }),
+              /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-timestamps", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { className: "text-muted", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
                   "Criada em ",
                   (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] }),
-                readAt && /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("small", { className: "text-muted ms-3", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
+                readAt && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { className: "text-muted ms-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
                   "Lida em ",
                   (0, import_dayjs5.default)(readAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "notification-modal-message", children: /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("p", { className: "mb-0", children: content || emptyContentLabel }) })
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-modal-message", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "mb-0", children: content || emptyContentLabel }) })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(import_react_bootstrap32.Modal.Footer, { className: "notification-modal-footer", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-            status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap32.Button, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_bootstrap31.Modal.Footer, { className: "notification-modal-footer", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+            status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Button, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
           ] })
         ]
       }
@@ -4116,9 +3495,9 @@ var NotificationItem = ({
 };
 
 // src/icons/NotificationBell.tsx
-var import_react_bootstrap33 = require("react-bootstrap");
+var import_react_bootstrap32 = require("react-bootstrap");
 var import_fi7 = require("react-icons/fi");
-var import_jsx_runtime51 = require("react/jsx-runtime");
+var import_jsx_runtime46 = require("react/jsx-runtime");
 var NotificationBell = ({
   notifications,
   onItemRead,
@@ -4128,11 +3507,11 @@ var NotificationBell = ({
   className = ""
 }) => {
   const unreadCount = notifications.filter((n) => n.status === "unread").length;
-  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(import_react_bootstrap33.Dropdown, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(import_react_bootstrap33.Dropdown.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(import_fi7.FiBell, { size }),
-      unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
-        import_react_bootstrap33.Badge,
+  return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap32.Dropdown, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap32.Dropdown.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_fi7.FiBell, { size }),
+      unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
+        import_react_bootstrap32.Badge,
         {
           pill: true,
           bg: "danger",
@@ -4142,15 +3521,15 @@ var NotificationBell = ({
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(
-      import_react_bootstrap33.Dropdown.Menu,
+    /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(
+      import_react_bootstrap32.Dropdown.Menu,
       {
         className: "shadow-lg border-0",
         style: { width: "320px", padding: 0, maxHeight: "500px", overflowY: "auto" },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
-            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
+            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
               "button",
               {
                 className: "btn btn-link btn-sm p-0 text-decoration-none",
@@ -4162,7 +3541,7 @@ var NotificationBell = ({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
             NotificationItem,
             {
               notification: n,
@@ -4170,11 +3549,11 @@ var NotificationBell = ({
               onDismiss: onItemDismiss
             },
             n.id
-          )) : /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "p-4 text-center text-muted", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(import_fi7.FiBell, { size: 24, className: "mb-2 opacity-25" }),
-            /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
+          )) : /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("div", { className: "p-4 text-center text-muted", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_fi7.FiBell, { size: 24, className: "mb-2 opacity-25" }),
+            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
           ] }) }),
-          notifications.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("small", { className: "text-muted", children: [
+          notifications.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("small", { className: "text-muted", children: [
             "Total: ",
             notifications.length,
             " notifica\xE7\xF5es"
@@ -4186,8 +3565,8 @@ var NotificationBell = ({
 };
 
 // src/modals/ModalBasicTemplate.tsx
-var import_react_bootstrap34 = require("react-bootstrap");
-var import_jsx_runtime52 = require("react/jsx-runtime");
+var import_react_bootstrap33 = require("react-bootstrap");
+var import_jsx_runtime47 = require("react/jsx-runtime");
 var ModalBasicTemplate = ({
   show,
   closeFunc,
@@ -4201,8 +3580,8 @@ var ModalBasicTemplate = ({
     if (typeof part === "function") return part();
     return part;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(
-    import_react_bootstrap34.Modal,
+  return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(
+    import_react_bootstrap33.Modal,
     {
       show,
       onHide: closeFunc,
@@ -4210,11 +3589,11 @@ var ModalBasicTemplate = ({
       style: dialogStyle,
       ...modalProps,
       children: [
-        header && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap34.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap34.Modal.Title, { children: renderPart(header) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap34.Modal.Body, { style: bodyStyle, children: renderPart(body) }),
-        footer && /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_react_bootstrap34.Modal.Footer, { children: [
+        header && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Title, { children: renderPart(header) }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Body, { style: bodyStyle, children: renderPart(body) }),
+        footer && /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_bootstrap33.Modal.Footer, { children: [
           renderPart(footer),
-          !footer && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap34.Button, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
+          !footer && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Button, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
         ] })
       ]
     }
@@ -4223,10 +3602,10 @@ var ModalBasicTemplate = ({
 var ModalBasicTemplate_default = ModalBasicTemplate;
 
 // src/modals/SelectDateModal.tsx
-var import_react28 = require("react");
-var import_react_bootstrap35 = require("react-bootstrap");
+var import_react23 = require("react");
+var import_react_bootstrap34 = require("react-bootstrap");
 var import_dayjs6 = __toESM(require("dayjs"));
-var import_jsx_runtime53 = require("react/jsx-runtime");
+var import_jsx_runtime48 = require("react/jsx-runtime");
 var SelectDateModal = ({
   show,
   onClose,
@@ -4236,19 +3615,19 @@ var SelectDateModal = ({
   initialDate,
   allowFuture = true
 }) => {
-  const [selectedDate, setSelectedDate] = (0, import_react28.useState)(
+  const [selectedDate, setSelectedDate] = (0, import_react23.useState)(
     initialDate || (0, import_dayjs6.default)().format("YYYY-MM-DDTHH:mm")
   );
   const handleConfirm = () => {
     onSelect(selectedDate);
     onClose();
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap35.Modal, { show, onHide: onClose, centered: true, size: "sm", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Modal.Title, { children: title }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Modal.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap35.Form.Group, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Form.Label, { children: label }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
-        import_react_bootstrap35.Form.Control,
+  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Modal, { show, onHide: onClose, centered: true, size: "sm", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Title, { children: title }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Form.Group, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Form.Label, { children: label }),
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
+        import_react_bootstrap34.Form.Control,
         {
           type: "datetime-local",
           value: selectedDate,
@@ -4257,19 +3636,19 @@ var SelectDateModal = ({
         }
       )
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap35.Modal.Footer, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Button, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap35.Button, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Modal.Footer, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Button, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Button, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
     ] })
   ] });
 };
 
 // src/modals/JustificativaModal.tsx
-var import_react29 = require("react");
-var import_react_bootstrap36 = require("react-bootstrap");
-var import_fa8 = require("react-icons/fa");
+var import_react24 = require("react");
+var import_react_bootstrap35 = require("react-bootstrap");
+var import_fa7 = require("react-icons/fa");
 var import_dayjs7 = __toESM(require("dayjs"));
-var import_jsx_runtime54 = require("react/jsx-runtime");
+var import_jsx_runtime49 = require("react/jsx-runtime");
 var JustificativaModal = ({
   show,
   onClose,
@@ -4278,10 +3657,10 @@ var JustificativaModal = ({
   currentUserName,
   onUpdateJustificativas
 }) => {
-  const [localJustificativas, setLocalJustificativas] = (0, import_react29.useState)(initialJustificativas);
-  const [novaDescricao, setNovaDescricao] = (0, import_react29.useState)("");
-  const [editandoId, setEditandoId] = (0, import_react29.useState)(null);
-  (0, import_react29.useEffect)(() => {
+  const [localJustificativas, setLocalJustificativas] = (0, import_react24.useState)(initialJustificativas);
+  const [novaDescricao, setNovaDescricao] = (0, import_react24.useState)("");
+  const [editandoId, setEditandoId] = (0, import_react24.useState)(null);
+  (0, import_react24.useEffect)(() => {
     setLocalJustificativas(initialJustificativas);
   }, [initialJustificativas]);
   const handleAddOrEdit = async () => {
@@ -4317,14 +3696,14 @@ var JustificativaModal = ({
     await onUpdateJustificativas(updated);
     setLocalJustificativas(updated);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_bootstrap36.Modal, { show, onHide: onClose, centered: true, size: "lg", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Modal.Title, { children: "Justificativas / Coment\xE1rios" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_bootstrap36.Modal.Body, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_bootstrap36.Form, { className: "mb-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_react_bootstrap36.Form.Group, { controlId: "justificativaInput", className: "mb-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Form.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
-          /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
-            import_react_bootstrap36.Form.Control,
+  return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Modal, { show, onHide: onClose, centered: true, size: "lg", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Title, { children: "Justificativas / Coment\xE1rios" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Modal.Body, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Form, { className: "mb-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Form.Group, { controlId: "justificativaInput", className: "mb-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Form.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
+          /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+            import_react_bootstrap35.Form.Control,
             {
               as: "textarea",
               rows: 2,
@@ -4334,13 +3713,13 @@ var JustificativaModal = ({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Button, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Button, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.ListGroup, { className: "border-0", children: localJustificativas.map((j) => {
+      /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.ListGroup, { className: "border-0", children: localJustificativas.map((j) => {
         var _a, _b, _c;
         const isMe = ((_a = j.user) == null ? void 0 : _a.userId) === currentUserId;
-        return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(
-          import_react_bootstrap36.ListGroup.Item,
+        return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(
+          import_react_bootstrap35.ListGroup.Item,
           {
             className: "border-0 px-0",
             style: {
@@ -4351,11 +3730,11 @@ var JustificativaModal = ({
               backgroundColor: "transparent"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
-                /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Badge, { bg: "secondary", style: { fontSize: "0.65rem" }, children: (0, import_dayjs7.default)(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
+              /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
+                /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Badge, { bg: "secondary", style: { fontSize: "0.65rem" }, children: (0, import_dayjs7.default)(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
                 "div",
                 {
                   onClick: () => !j.removed && isMe && (setNovaDescricao(j.descricao), setEditandoId(j.id)),
@@ -4374,15 +3753,15 @@ var JustificativaModal = ({
                   children: j.descricao
                 }
               ),
-              isMe && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Tooltip, { children: "Desfazer" }), children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
-                import_fa8.FaUndo,
+              isMe && /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Tooltip, { children: "Desfazer" }), children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+                import_fa7.FaUndo,
                 {
                   onClick: () => handleUndoRemove(j.id),
                   className: "text-success cursor-pointer",
                   size: 14
                 }
-              ) }) : /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Tooltip, { children: "Remover" }), children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
-                import_fa8.FaTrashAlt,
+              ) }) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Tooltip, { children: "Remover" }), children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+                import_fa7.FaTrashAlt,
                 {
                   onClick: () => handleRemove(j.id),
                   className: "text-danger cursor-pointer",
@@ -4395,14 +3774,14 @@ var JustificativaModal = ({
         );
       }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Modal.Footer, { children: /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(import_react_bootstrap36.Button, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
+    /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Footer, { children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Button, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
   ] });
 };
 
 // src/modals/ImageViewModal.tsx
-var import_react30 = require("react");
-var import_react_bootstrap37 = require("react-bootstrap");
-var import_jsx_runtime55 = require("react/jsx-runtime");
+var import_react25 = require("react");
+var import_react_bootstrap36 = require("react-bootstrap");
+var import_jsx_runtime50 = require("react/jsx-runtime");
 var ImageViewModal = ({
   show,
   onHide,
@@ -4411,10 +3790,10 @@ var ImageViewModal = ({
   imageAltText = "Visualiza\xE7\xE3o de imagem",
   resolveImageUrl
 }) => {
-  const [selectedImageKey, setSelectedImageKey] = (0, import_react30.useState)(null);
-  const [imageSrc, setImageSrc] = (0, import_react30.useState)(null);
-  const [currentAuthor, setCurrentAuthor] = (0, import_react30.useState)("Desconhecido");
-  (0, import_react30.useEffect)(() => {
+  const [selectedImageKey, setSelectedImageKey] = (0, import_react25.useState)(null);
+  const [imageSrc, setImageSrc] = (0, import_react25.useState)(null);
+  const [currentAuthor, setCurrentAuthor] = (0, import_react25.useState)("Desconhecido");
+  (0, import_react25.useEffect)(() => {
     if (show && initialImageData) {
       setSelectedImageKey(initialImageData.key);
       setCurrentAuthor(initialImageData.author || "Desconhecido");
@@ -4423,7 +3802,7 @@ var ImageViewModal = ({
       setCurrentAuthor(imagesData[0].author || "Desconhecido");
     }
   }, [show, initialImageData]);
-  (0, import_react30.useEffect)(() => {
+  (0, import_react25.useEffect)(() => {
     if (show && selectedImageKey) {
       setImageSrc(null);
       const file = imagesData.find((f) => f.key === selectedImageKey);
@@ -4436,8 +3815,8 @@ var ImageViewModal = ({
   }, [show, selectedImageKey]);
   const renderImageSelector = () => {
     if (imagesData.length <= 1) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(
-      import_react_bootstrap37.Button,
+    return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
+      import_react_bootstrap36.Button,
       {
         variant: selectedImageKey === img.key ? "primary" : "outline-secondary",
         size: "sm",
@@ -4450,9 +3829,9 @@ var ImageViewModal = ({
       idx
     )) });
   };
-  const body = /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "text-center", children: [
+  const body = /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "text-center", children: [
     renderImageSelector(),
-    imageSrc ? /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(
+    imageSrc ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
       "img",
       {
         src: imageSrc,
@@ -4460,9 +3839,9 @@ var ImageViewModal = ({
         className: "img-fluid rounded shadow-sm",
         style: { maxHeight: "75vh", objectFit: "contain" }
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
+    ) : /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
   ] });
-  return /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
     ModalBasicTemplate_default,
     {
       header: "Visualiza\xE7\xE3o de Imagem",
@@ -4470,21 +3849,169 @@ var ImageViewModal = ({
       show,
       body,
       props: { size: "lg" },
-      footer: () => /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsxs)("small", { className: "text-muted", children: [
+      footer: () => /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("small", { className: "text-muted", children: [
           "Enviado por: ",
-          /* @__PURE__ */ (0, import_jsx_runtime55.jsx)("strong", { children: currentAuthor })
+          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("strong", { children: currentAuthor })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime55.jsx)(import_react_bootstrap37.Button, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
+        /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap36.Button, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
       ] })
     }
   );
 };
 
+// src/qr/QrReader.tsx
+var import_qr_scanner = __toESM(require("qr-scanner"));
+var import_react26 = require("react");
+var import_jsx_runtime51 = require("react/jsx-runtime");
+var QrReader = ({ callback }) => {
+  const scanner = (0, import_react26.useRef)(null);
+  const videoEl = (0, import_react26.useRef)(null);
+  const qrBoxEl = (0, import_react26.useRef)(null);
+  const [qrOn, setQrOn] = (0, import_react26.useState)(true);
+  const [scannedResult, setScannedResult] = (0, import_react26.useState)("");
+  const onScanSuccess = (result) => {
+    setScannedResult(result.data);
+    callback(result.data);
+  };
+  const onScanFail = (err) => {
+    if (typeof err === "string" && !err.includes("No QR code found")) {
+      console.error("QR Scanner Error:", err);
+    }
+  };
+  (0, import_react26.useEffect)(() => {
+    if (videoEl.current && !scanner.current) {
+      scanner.current = new import_qr_scanner.default(videoEl.current, onScanSuccess, {
+        onDecodeError: onScanFail,
+        preferredCamera: "environment",
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        overlay: qrBoxEl.current || void 0
+      });
+      scanner.current.start().then(() => setQrOn(true)).catch((err) => {
+        console.error("Failed to start QR Scanner:", err);
+        setQrOn(false);
+      });
+    }
+    return () => {
+      if (scanner.current) {
+        scanner.current.stop();
+        scanner.current.destroy();
+        scanner.current = null;
+      }
+    };
+  }, []);
+  (0, import_react26.useEffect)(() => {
+    if (!qrOn) {
+      alert(
+        "C\xE2mera est\xE1 bloqueada ou inacess\xEDvel. Por favor, habilite a c\xE2mera nas permiss\xF5es do seu navegador e recarregue a p\xE1gina."
+      );
+    }
+  }, [qrOn]);
+  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
+    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { ref: qrBoxEl, className: "qr-box" }),
+    scannedResult && /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(
+      "div",
+      {
+        style: {
+          position: "absolute",
+          top: 10,
+          left: 10,
+          zIndex: 10,
+          background: "rgba(0,0,0,0.6)",
+          color: "white",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          fontSize: "0.8rem"
+        },
+        children: [
+          "Lido: ",
+          scannedResult
+        ]
+      }
+    )
+  ] });
+};
+
+// src/qr/QrCodeScanButton.tsx
+var import_react27 = require("react");
+var import_bs3 = require("react-icons/bs");
+var import_jsx_runtime52 = require("react/jsx-runtime");
+var QrCodeScanButton = ({ callback, size = 25 }) => {
+  const [showQr, setShowQr] = (0, import_react27.useState)(false);
+  const toggleQr = () => {
+    setShowQr((prev) => !prev);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(
+    "div",
+    {
+      className: "hoverable-div",
+      style: {
+        border: "solid",
+        borderTopRightRadius: "3px",
+        borderBottomRightRadius: "3px",
+        padding: "8px",
+        borderLeft: "none",
+        borderColor: "#ccc",
+        borderWidth: "1px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center"
+      },
+      onClick: toggleQr,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_bs3.BsQrCode, { size }),
+        showQr && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+          "div",
+          {
+            style: {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.8)",
+              zIndex: 9999,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "20px"
+            },
+            onClick: (e) => e.stopPropagation(),
+            children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+                "div",
+                {
+                  onClick: toggleQr,
+                  style: { position: "absolute", top: "10px", right: "15px", fontSize: "1.5rem", cursor: "pointer", zIndex: 10001 },
+                  children: "\xD7"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+                QrReader,
+                {
+                  callback: (v) => {
+                    toggleQr();
+                    callback(v);
+                  }
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
+            ] })
+          }
+        )
+      ]
+    }
+  );
+};
+
 // src/tables/ReusableTableWithModal.tsx
-var import_react31 = require("react");
-var import_react_bootstrap38 = require("react-bootstrap");
-var import_jsx_runtime56 = require("react/jsx-runtime");
+var import_react28 = require("react");
+var import_react_bootstrap37 = require("react-bootstrap");
+var import_jsx_runtime53 = require("react/jsx-runtime");
 var ReusableTableWithModal = ({
   fetchDataCallback,
   modalButtonCallback,
@@ -4494,11 +4021,11 @@ var ReusableTableWithModal = ({
   confirmLabel = "Aceitar",
   onFetchData
 }) => {
-  const [data, setData] = (0, import_react31.useState)([]);
-  const [selectedItem, setSelectedItem] = (0, import_react31.useState)(null);
-  const [showModal, setShowModal] = (0, import_react31.useState)(false);
-  const [loading, setLoading] = (0, import_react31.useState)(false);
-  const [tableDataRows, setTableDataRows] = (0, import_react31.useState)([]);
+  const [data, setData] = (0, import_react28.useState)([]);
+  const [selectedItem, setSelectedItem] = (0, import_react28.useState)(null);
+  const [showModal, setShowModal] = (0, import_react28.useState)(false);
+  const [loading, setLoading] = (0, import_react28.useState)(false);
+  const [tableDataRows, setTableDataRows] = (0, import_react28.useState)([]);
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -4514,7 +4041,7 @@ var ReusableTableWithModal = ({
       setLoading(false);
     }
   };
-  (0, import_react31.useEffect)(() => {
+  (0, import_react28.useEffect)(() => {
     fetchData();
   }, []);
   const handleRowClick = (td) => {
@@ -4525,26 +4052,26 @@ var ReusableTableWithModal = ({
     setShowModal(false);
     setSelectedItem(null);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_jsx_runtime56.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_bootstrap38.Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("tr", { children: headers.map((col, index) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("th", { children: col }, index)) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("tbody", { children: loading ? /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: headers.map((col, index) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("th", { children: col }, index)) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tbody", { children: loading ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
         "tr",
         {
           onClick: () => handleRowClick(td),
           style: { cursor: "pointer" },
-          children: td.columns.map((col, colIndex) => /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("td", { children: col || "N/A" }, colIndex))
+          children: td.columns.map((col, colIndex) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { children: col || "N/A" }, colIndex))
         },
         index
-      )) : /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
+      )) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_bootstrap38.Modal, { show: showModal, onHide: handleCloseModal, centered: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_bootstrap38.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_bootstrap38.Modal.Title, { children: "Detalhes" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_bootstrap38.Modal.Body, { children: selectedItem && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime56.jsxs)(import_react_bootstrap38.Modal.Footer, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(import_react_bootstrap38.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-        modalButtonCallback && /* @__PURE__ */ (0, import_jsx_runtime56.jsx)(
-          import_react_bootstrap38.Button,
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Modal, { show: showModal, onHide: handleCloseModal, centered: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Title, { children: "Detalhes" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Body, { children: selectedItem && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Modal.Footer, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+        modalButtonCallback && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+          import_react_bootstrap37.Button,
           {
             variant: "primary",
             onClick: () => {
@@ -4560,25 +4087,25 @@ var ReusableTableWithModal = ({
 };
 
 // src/text/TextWithMore.tsx
-var import_react32 = require("react");
-var import_react_bootstrap39 = require("react-bootstrap");
-var import_jsx_runtime57 = require("react/jsx-runtime");
+var import_react29 = require("react");
+var import_react_bootstrap38 = require("react-bootstrap");
+var import_jsx_runtime54 = require("react/jsx-runtime");
 var TextWithMore = ({
   text = "Carregando...",
   maxLength,
   moreLabel = "ver mais",
   lessLabel = "ver menos"
 }) => {
-  const [expanded, setExpanded] = (0, import_react32.useState)(false);
+  const [expanded, setExpanded] = (0, import_react29.useState)(false);
   const handleToggleExpand = () => {
     setExpanded(!expanded);
   };
   const isTruncated = text.length > maxLength;
   const displayText = isTruncated && !expanded ? text.slice(0, maxLength) + "\u2026" : text;
-  return /* @__PURE__ */ (0, import_jsx_runtime57.jsxs)(import_jsx_runtime57.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime57.jsx)("span", { className: "text-with-more-content", children: displayText }),
-    isTruncated && /* @__PURE__ */ (0, import_jsx_runtime57.jsx)(
-      import_react_bootstrap39.Button,
+  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-with-more-content", children: displayText }),
+    isTruncated && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
+      import_react_bootstrap38.Button,
       {
         variant: "link",
         className: "p-0 ms-2",
@@ -4599,6 +4126,7 @@ var TextWithMore = ({
   AsyncButton,
   AutoComplete,
   BonusButton,
+  BranchDropDisplay,
   ButtonWithDropdown,
   CheckBox,
   ClickToWriteField,
