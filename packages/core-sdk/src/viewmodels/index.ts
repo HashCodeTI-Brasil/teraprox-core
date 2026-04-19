@@ -74,3 +74,24 @@ export {
   useFindRecursoByTagViewModel,
   type FindRecursoByTagAdapterOverrides,
 } from './useFindRecursoByTagViewModel'
+
+// JustificativaModal (Wave 2E)
+export type {
+  IJustificativaModalViewModel,
+  Justificativa,
+  JustificativaUserRef,
+  JustificativaValidationResult,
+} from './IJustificativaModalViewModel'
+
+export {
+  useJustificativaModalViewModel,
+  type JustificativaAdapterOptions,
+} from './useJustificativaModalViewModel'
+
+// AnexoManager (Wave 2E — formaliza hook parcial pre-existente)
+export type {
+  IAnexoManagerViewModel,
+  UseAnexoManagerOptions as UseAnexoManagerViewModelOptions,
+} from './IAnexoManagerViewModel'
+
+export { useAnexoManagerViewModel } from './useAnexoManagerViewModel'

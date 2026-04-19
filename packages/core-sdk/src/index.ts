@@ -61,6 +61,13 @@ export type {
   IFindRecursoByTagViewModel,
   RecursoTagRef,
   FindRecursoByTagAdapterOverrides,
+  IJustificativaModalViewModel,
+  Justificativa,
+  JustificativaUserRef,
+  JustificativaValidationResult,
+  JustificativaAdapterOptions,
+  IAnexoManagerViewModel,
+  UseAnexoManagerViewModelOptions,
 } from './viewmodels'
 export {
   useUnidadeMaterialViewModel,
@@ -86,6 +93,8 @@ export {
   INSPECAO_MODAL_DEFAULT_KEY,
   useRecursoDisplayerViewModel,
   useFindRecursoByTagViewModel,
+  useJustificativaModalViewModel,
+  useAnexoManagerViewModel,
 } from './viewmodels'
 
 // Reducers (existentes)
