@@ -40,13 +40,30 @@ export const RecursoDisplayer = ({
   const [multiMode, setMultiMode] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
     const init = async () => {
-      const b = await arvoreEstruturalController.get('branchByBranchLevel/1')
-      setBranches(b)
-      const lv = await branchLevelController.readAll()
-      dispatch(setLevels(lv))
+      try {
+        const b = await arvoreEstruturalController.get('branchByBranchLevel/1')
+        if (cancelled) return
+        setBranches(Array.isArray(b) ? b : [])
+      } catch (err) {
+        if (!cancelled) {
+          console.warn('[RecursoDisplayer] branchByBranchLevel/1 failed:', err)
+          setBranches([])
+        }
+      }
+      try {
+        const lv = await branchLevelController.readAll()
+        if (cancelled) return
+        dispatch(setLevels(Array.isArray(lv) ? lv : []))
+      } catch (err) {
+        if (!cancelled) console.warn('[RecursoDisplayer] branchLevel.readAll failed:', err)
+      }
     }
-    init()
+    init().catch((err) => console.warn('[RecursoDisplayer] init failed:', err))
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const branchSetter = async (bn: any) => {

@@ -1,7 +1,7 @@
 {
   "name": "teraprox-ui-kit",
-  "version": "0.1.10",
-  "description": "Componentes visuais compartilhados entre módulos federados TeraproX",
+  "version": "0.2.0",
+  "description": "Meta-package em transição: re-exporta @teraprox/ui-kit-core + @teraprox/ui-kit-sgm + @teraprox/ui-kit-sgp. Mantém retrocompatibilidade com os 7 remotes federados enquanto os componentes migram (Waves 1-3).",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -80,6 +80,11 @@
     "react-google-charts": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "@teraprox/ui-kit-core": "file:../ui-kit-core",
+    "@teraprox/ui-kit-sgm": "file:../ui-kit-sgm",
+    "@teraprox/ui-kit-sgp": "file:../ui-kit-sgp"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

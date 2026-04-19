@@ -1,3 +1,7 @@
+// A partir de v0.2.0, teraprox-ui-kit é um meta-package em transição.
+// Os componentes abaixo migrarão gradualmente para @teraprox/ui-kit-core,
+// @teraprox/ui-kit-sgm e @teraprox/ui-kit-sgp nas Waves 1-3 — preservados aqui para retrocompat.
+
 // ─── Buttons ─────────────────────────────────────────────────────────────────
 export { default as AddButton } from './buttons/AddButton'
 export { default as DeleteButton } from './buttons/DeleteButton'

@@ -37,7 +37,6 @@ export const ButtonWithDropdown: React.FC<ButtonWithDropdownProps> = ({
 			as={ButtonGroup}
 			className="d-flex w-100"
 			style={{ flex: 1, minWidth: 0 }}
-			menuVariant={menuVariant}
 		>
 			<Button
 				variant={variant}
@@ -62,7 +61,7 @@ export const ButtonWithDropdown: React.FC<ButtonWithDropdownProps> = ({
 				}}
 			/>
 
-			<Dropdown.Menu>
+			<Dropdown.Menu variant={menuVariant}>
 				{options.map((opt, idx) => (
 					<Dropdown.Item key={`${opt.label}-${idx}`} onClick={opt.callback}>
 						{opt.label}

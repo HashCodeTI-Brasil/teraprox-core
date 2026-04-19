@@ -120,6 +120,10 @@ export const AutoComplete: React.FC<AutoCompleteProps> = ({
 	}, [value])
 
 	useEffect(() => {
+		// Skip quando ops está vazio (caso usual: dados vêm via loadFunc).
+		// Evita loop infinito quando o caller não passa `ops` e o default [] gera
+		// referência nova a cada render.
+		if (!Array.isArray(ops) || ops.length === 0) return
 		const sortedOptions = sortOptions(ops, sortKey)
 		setListItem(sortedOptions)
 		setOptions(sortedOptions)

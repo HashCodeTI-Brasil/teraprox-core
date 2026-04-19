@@ -85,7 +85,7 @@ export const UnidadeMaterialForm: React.FC<UnidadeMaterialFormProps> = ({
       {!hideQuantidade && (
         <FormField
           label={"Quantidade"}
-          val={value.quantidade || ""}
+          val={value?.quantidade ?? ""}
           onValueUpdate={onQuantidadeUpdate}
           ty={"number"}
         />

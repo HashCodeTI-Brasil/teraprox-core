@@ -343,7 +343,6 @@ var ButtonWithDropdown = ({
       as: ButtonGroup,
       className: "d-flex w-100",
       style: { flex: 1, minWidth: 0 },
-      menuVariant,
       children: [
         /* @__PURE__ */ jsx9(
           Button7,
@@ -371,7 +370,7 @@ var ButtonWithDropdown = ({
             }
           }
         ),
-        /* @__PURE__ */ jsx9(Dropdown.Menu, { children: options.map((opt, idx) => /* @__PURE__ */ jsx9(Dropdown.Item, { onClick: opt.callback, children: opt.label }, `${opt.label}-${idx}`)) })
+        /* @__PURE__ */ jsx9(Dropdown.Menu, { variant: menuVariant, children: options.map((opt, idx) => /* @__PURE__ */ jsx9(Dropdown.Item, { onClick: opt.callback, children: opt.label }, `${opt.label}-${idx}`)) })
       ]
     }
   );
@@ -1533,6 +1532,7 @@ var AutoComplete = ({
     setInput(value || "");
   }, [value]);
   useEffect5(() => {
+    if (!Array.isArray(ops) || ops.length === 0) return;
     const sortedOptions = sortOptions(ops, sortKey);
     setListItem(sortedOptions);
     setOptions(sortedOptions);
@@ -1943,13 +1943,30 @@ var RecursoDisplayer = ({
   const [selectorDisplay, setSelectorDisplay] = useState14("");
   const [multiMode, setMultiMode] = useState14(false);
   useEffect7(() => {
+    let cancelled = false;
     const init = async () => {
-      const b = await arvoreEstruturalController.get("branchByBranchLevel/1");
-      setBranches(b);
-      const lv = await branchLevelController.readAll();
-      dispatch(setLevels(lv));
+      try {
+        const b = await arvoreEstruturalController.get("branchByBranchLevel/1");
+        if (cancelled) return;
+        setBranches(Array.isArray(b) ? b : []);
+      } catch (err) {
+        if (!cancelled) {
+          console.warn("[RecursoDisplayer] branchByBranchLevel/1 failed:", err);
+          setBranches([]);
+        }
+      }
+      try {
+        const lv = await branchLevelController.readAll();
+        if (cancelled) return;
+        dispatch(setLevels(Array.isArray(lv) ? lv : []));
+      } catch (err) {
+        if (!cancelled) console.warn("[RecursoDisplayer] branchLevel.readAll failed:", err);
+      }
     };
-    init();
+    init().catch((err) => console.warn("[RecursoDisplayer] init failed:", err));
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const branchSetter = async (bn) => {
     var _a, _b, _c, _d;
@@ -3847,7 +3864,7 @@ var UnidadeMaterialForm = ({
   hideUnidade = false,
   className = ""
 }) => {
-  var _a, _b;
+  var _a, _b, _c;
   const renderNewMaterialButton = () => /* @__PURE__ */ jsx47(Button18, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
   const renderNewUnidadeButton = () => /* @__PURE__ */ jsx47(Button18, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
   return /* @__PURE__ */ jsxs37("div", { className: `unidade-material-form ${className}`, children: [
@@ -3867,7 +3884,7 @@ var UnidadeMaterialForm = ({
       FormField,
       {
         label: "Quantidade",
-        val: value.quantidade || "",
+        val: (_b = value == null ? void 0 : value.quantidade) != null ? _b : "",
         onValueUpdate: onQuantidadeUpdate,
         ty: "number"
       }
@@ -3876,7 +3893,7 @@ var UnidadeMaterialForm = ({
       AutoComplete,
       {
         displayKey: "nome",
-        value: ((_b = value == null ? void 0 : value.unidade) == null ? void 0 : _b.nome) || "",
+        value: ((_c = value == null ? void 0 : value.unidade) == null ? void 0 : _c.nome) || "",
         loadCondition: true,
         title: "Unidade",
         loadFunc: loadUnidadesFunc,
