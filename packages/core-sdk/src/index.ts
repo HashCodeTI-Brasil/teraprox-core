@@ -53,6 +53,14 @@ export type {
   LimiteDeControle,
   InspecaoValidationResult,
   InspecaoModalSliceState,
+  IRecursoDisplayerViewModel,
+  Branch,
+  BranchLevelRef,
+  BranchNodeRef,
+  RecursoDisplayerAdapterOverrides,
+  IFindRecursoByTagViewModel,
+  RecursoTagRef,
+  FindRecursoByTagAdapterOverrides,
 } from './viewmodels'
 export {
   useUnidadeMaterialViewModel,
@@ -76,6 +84,8 @@ export {
   clearInspecaoModal,
   selectInspecaoModal,
   INSPECAO_MODAL_DEFAULT_KEY,
+  useRecursoDisplayerViewModel,
+  useFindRecursoByTagViewModel,
 } from './viewmodels'
 
 // Reducers (existentes)

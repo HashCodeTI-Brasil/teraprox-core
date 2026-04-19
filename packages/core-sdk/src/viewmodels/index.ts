@@ -50,3 +50,27 @@ export {
   INSPECAO_MODAL_DEFAULT_KEY,
 } from './inspecaoModalSlice'
 export type { InspecaoModalSliceState } from './inspecaoModalSlice'
+
+// RecursoDisplayer (Wave 2A)
+export type {
+  IRecursoDisplayerViewModel,
+  Branch,
+  BranchLevelRef,
+  BranchNodeRef,
+} from './IRecursoDisplayerViewModel'
+
+export {
+  useRecursoDisplayerViewModel,
+  type RecursoDisplayerAdapterOverrides,
+} from './useRecursoDisplayerViewModel'
+
+// FindRecursoByTag (Wave 2A)
+export type {
+  IFindRecursoByTagViewModel,
+  RecursoTagRef,
+} from './IFindRecursoByTagViewModel'
+
+export {
+  useFindRecursoByTagViewModel,
+  type FindRecursoByTagAdapterOverrides,
+} from './useFindRecursoByTagViewModel'
