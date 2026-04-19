@@ -19,7 +19,20 @@ import {
 } from './inspecaoModalSlice'
 
 const TIPO_NUMERICO = 'Numerico'
+const TIPO_NUMERICO_ACENTUADO = 'Numérico'
 const TIPO_BOOLEAN = 'Verdadeiro ou Falso'
+
+/** Normaliza o tipo para comparação tolerando acento/caixa. */
+function isNumericoTipo(tipo?: string): boolean {
+  if (!tipo) return false
+  const normalized = tipo.trim()
+  return (
+    normalized === TIPO_NUMERICO ||
+    normalized === TIPO_NUMERICO_ACENTUADO ||
+    normalized.toLowerCase() === 'numerico' ||
+    normalized.toLowerCase() === 'numérico'
+  )
+}
 
 function runValidate(value: InspecaoValue): InspecaoValidationResult {
   const errors: Record<string, string> = {}
@@ -28,7 +41,7 @@ function runValidate(value: InspecaoValue): InspecaoValidationResult {
     errors.tipo = 'O tipo de dado é obrigatório.'
   }
 
-  if (value?.tipo === TIPO_NUMERICO) {
+  if (isNumericoTipo(value?.tipo)) {
     const ativos = (value?.limitesDeControle ?? []).filter(
       (l) => l && l.removed !== true
     )
