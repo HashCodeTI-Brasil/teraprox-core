@@ -55,6 +55,10 @@
     "dayjs": { "optional": true },
     "react-google-charts": { "optional": true }
   },
+  "dependencies": {
+    "@teraprox/ui-kit-core": "file:../ui-kit-core",
+    "teraprox-ui-kit": "file:../ui-kit"
+  },
   "devDependencies": {
     "@types/react": "^18.2.0",
     "react": "^18.2.0",

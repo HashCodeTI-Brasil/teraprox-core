@@ -1,4 +1,13 @@
-// @teraprox/ui-kit-sgm — skeleton (Wave 0).
-// Será populado com widgets específicos de Manutenção (SGM-OS, SGM-SS, SGM-OM, SGM-UTILS)
-// extraídos de teraprox-ui-kit na Wave 2 da sprint ui-kit-domain-split.
-export {}
+// @teraprox/ui-kit-sgm — Wave 1 fase 2.
+// Modais compostos do domínio SGM (Manutenção). Consomem ViewModels
+// (Ports) exportados por teraprox-core-sdk — sem Redux na UI.
+
+export {
+  UnidadeMaterialModal,
+  type UnidadeMaterialModalProps,
+} from './unidade-material/UnidadeMaterialModal'
+
+export {
+  InspecaoModal,
+  type InspecaoModalProps,
+} from './inspecao/InspecaoModal'
