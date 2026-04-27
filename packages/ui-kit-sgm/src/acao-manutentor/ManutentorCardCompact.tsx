@@ -78,5 +78,3 @@ export const ManutentorCardCompact: React.FC<ManutentorCardCompactProps> = ({
     </Card>
   )
 }
-
-export default ManutentorCardCompact

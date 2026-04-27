@@ -353,7 +353,7 @@ var MetricasDisplay = ({
 };
 
 // src/acao-manutentor/ManutentorCard.tsx
-import { Fragment as Fragment2, jsx as jsx8, jsxs as jsxs6 } from "react/jsx-runtime";
+import { jsx as jsx8, jsxs as jsxs6 } from "react/jsx-runtime";
 var ManutentorCard = ({
   mantenedor,
   index,
@@ -363,147 +363,188 @@ var ManutentorCard = ({
   onStatusClick,
   loadMetrics = null
 }) => {
-  var _a;
+  var _a, _b;
   const hasMetrics = mantenedor.metricas;
-  const statusIndicator = (color) => ({
-    backgroundColor: color,
-    borderRadius: "50%",
-    width: "12px",
-    height: "12px",
-    marginRight: "10px"
-  });
+  const getStatusColor = (type) => {
+    switch (type) {
+      case "executing":
+        return "#10b981";
+      // emerald-500
+      case "pending":
+        return "#f59e0b";
+      // amber-500
+      case "concluded":
+        return "#94a3b8";
+      // slate-400
+      case "busy":
+        return "#ef4444";
+      // red-500
+      case "available":
+        return "#10b981";
+      // emerald-500
+      default:
+        return "#cbd5e1";
+    }
+  };
   const handleStatusClick = (ordens) => {
     onStatusClick && onStatusClick(ordens);
   };
-  return /* @__PURE__ */ jsx8(Col, { children: /* @__PURE__ */ jsxs6(Card, { className: "mantenedor-card", children: [
-    /* @__PURE__ */ jsx8(Card.Body, { className: "d-flex align-items-center", children: /* @__PURE__ */ jsxs6("div", { className: "mantenedor-info", children: [
-      /* @__PURE__ */ jsxs6(
-        Card.Title,
-        {
-          style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          },
-          children: [
-            mantenedor == null ? void 0 : mantenedor.nomeUsuario,
-            loadMetrics && /* @__PURE__ */ jsx8(
-              GrLineChart,
-              {
-                className: "zoom-container",
-                title: "Ver Metricas",
-                onClick: () => loadMetrics(mantenedor),
-                size: 20
-              }
-            )
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxs6(Card.Text, { children: [
-        "ID: ",
-        mantenedor.id
+  return /* @__PURE__ */ jsx8(Col, { children: /* @__PURE__ */ jsxs6(Card, { className: "mantenedor-card border-0 shadow-sm overflow-hidden", children: [
+    /* @__PURE__ */ jsxs6(Card.Body, { className: "p-3", children: [
+      /* @__PURE__ */ jsxs6("div", { className: "d-flex justify-content-between align-items-start mb-2", children: [
+        /* @__PURE__ */ jsxs6("div", { className: "mantenedor-info flex-grow-1", children: [
+          /* @__PURE__ */ jsx8("h6", { className: "mb-0 fw-bold text-dark", style: { fontSize: "0.95rem" }, children: mantenedor == null ? void 0 : mantenedor.nomeUsuario }),
+          /* @__PURE__ */ jsxs6("div", { className: "text-muted", style: { fontSize: "0.75rem" }, children: [
+            "ID: ",
+            mantenedor.id,
+            " ",
+            mantenedor.setor && `\xB7 ${mantenedor.setor}`
+          ] })
+        ] }),
+        loadMetrics && /* @__PURE__ */ jsx8(
+          Button3,
+          {
+            variant: "link",
+            className: "p-0 text-muted",
+            onClick: () => loadMetrics(mantenedor),
+            title: "Ver M\xE9tricas",
+            children: /* @__PURE__ */ jsx8(GrLineChart, { size: 16 })
+          }
+        )
       ] }),
-      hasMetrics && /* @__PURE__ */ jsx8(Card.Text, { children: (_a = mantenedor.turno) == null ? void 0 : _a.nome }),
-      /* @__PURE__ */ jsxs6("div", { className: "status-list", children: [
-        mantenedor.executing && /* @__PURE__ */ jsxs6(
+      /* @__PURE__ */ jsxs6("div", { className: "status-list d-flex gap-2 mb-3", children: [
+        ((_a = mantenedor.executing) == null ? void 0 : _a.length) > 0 && /* @__PURE__ */ jsxs6(
           "div",
           {
-            className: "clickable-status d-flex align-items-center mb-2",
+            className: "d-flex align-items-center gap-1 badge bg-light text-success border border-success-subtle",
+            style: { cursor: "pointer", fontSize: "0.7rem" },
             onClick: () => handleStatusClick(mantenedor.executing),
             children: [
-              /* @__PURE__ */ jsx8(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("green")
-                }
-              ),
-              /* @__PURE__ */ jsxs6("span", { className: "status-text", children: [
-                "Executando: ",
-                mantenedor.executing.length
-              ] })
+              /* @__PURE__ */ jsx8("div", { style: { width: 6, height: 6, borderRadius: "50%", background: getStatusColor("executing") } }),
+              mantenedor.executing.length,
+              " Ex."
             ]
           }
         ),
-        mantenedor.pending && /* @__PURE__ */ jsxs6(
+        ((_b = mantenedor.pending) == null ? void 0 : _b.length) > 0 && /* @__PURE__ */ jsxs6(
           "div",
           {
-            className: "clickable-status d-flex align-items-center mb-2",
+            className: "d-flex align-items-center gap-1 badge bg-light text-warning border border-warning-subtle",
+            style: { cursor: "pointer", fontSize: "0.7rem" },
             onClick: () => handleStatusClick(mantenedor.pending),
             children: [
-              /* @__PURE__ */ jsx8(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("#ffc107")
-                }
-              ),
-              /* @__PURE__ */ jsxs6("span", { className: "status-text", children: [
-                "Pendentes: ",
-                mantenedor.pending.length
-              ] })
-            ]
-          }
-        ),
-        mantenedor.concluded && /* @__PURE__ */ jsxs6(
-          "div",
-          {
-            className: "clickable-status d-flex align-items-center mb-2",
-            onClick: () => handleStatusClick(mantenedor.concluded),
-            children: [
-              /* @__PURE__ */ jsx8(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("#ccc")
-                }
-              ),
-              /* @__PURE__ */ jsxs6("span", { className: "status-text", children: [
-                "Conclu\xEDdas: ",
-                mantenedor.concluded.length
-              ] })
+              /* @__PURE__ */ jsx8("div", { style: { width: 6, height: 6, borderRadius: "50%", background: getStatusColor("pending") } }),
+              mantenedor.pending.length,
+              " Pend."
             ]
           }
         )
       ] }),
-      showBusyStatus && /* @__PURE__ */ jsxs6("div", { className: "d-flex align-items-center status-container", children: [
-        /* @__PURE__ */ jsx8(
-          "div",
-          {
-            className: "status-indicator",
-            style: statusIndicator(mantenedor._busy ? "red" : "green")
-          }
-        ),
-        mantenedor._busy ? /* @__PURE__ */ jsxs6(Fragment2, { children: [
-          /* @__PURE__ */ jsx8("span", { className: "status-text", children: `Alocado em OS-${mantenedor.osId}` }),
+      showBusyStatus && /* @__PURE__ */ jsx8("div", { className: "mt-auto pt-2 border-top", children: /* @__PURE__ */ jsxs6("div", { className: "d-flex align-items-center justify-content-between", children: [
+        /* @__PURE__ */ jsxs6("div", { className: "d-flex align-items-center gap-2", children: [
           /* @__PURE__ */ jsx8(
-            Button3,
+            "div",
             {
-              variant: "link",
-              className: "navigate-button",
-              onClick: () => viewDetailsCallback && viewDetailsCallback({ ...mantenedor, index }),
-              children: /* @__PURE__ */ jsx8(FaArrowRightToBracket, { size: 20 })
+              style: {
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: getStatusColor(mantenedor._busy ? "busy" : "available"),
+                boxShadow: mantenedor._busy ? "0 0 4px #ef4444" : "none"
+              }
             }
-          )
-        ] }) : /* @__PURE__ */ jsx8("span", { className: "status-text", children: "Dispon\xEDvel" })
-      ] }),
-      onRemoveCallback && /* @__PURE__ */ jsx8(
-        "div",
+          ),
+          /* @__PURE__ */ jsx8("span", { className: "fw-semibold", style: { fontSize: "0.8rem", color: mantenedor._busy ? "#ef4444" : "#10b981" }, children: mantenedor._busy ? `Ocupado (OS-${mantenedor.osId})` : "Dispon\xEDvel" })
+        ] }),
+        mantenedor._busy && viewDetailsCallback && /* @__PURE__ */ jsx8(
+          Button3,
+          {
+            variant: "link",
+            className: "p-0 text-primary",
+            onClick: () => viewDetailsCallback({ ...mantenedor, index }),
+            children: /* @__PURE__ */ jsx8(FaArrowRightToBracket, { size: 14 })
+          }
+        )
+      ] }) }),
+      onRemoveCallback && /* @__PURE__ */ jsx8("div", { className: "mt-2 text-end", children: /* @__PURE__ */ jsx8(
+        "span",
         {
           onClick: () => onRemoveCallback({ ...mantenedor, index }),
-          className: "remove-text",
+          className: "text-danger small cursor-pointer",
+          style: { fontSize: "0.7rem", cursor: "pointer", textDecoration: "underline" },
           children: "remover"
         }
-      )
-    ] }) }),
-    /* @__PURE__ */ jsx8(Card.Footer, { children: /* @__PURE__ */ jsx8(
+      ) })
+    ] }),
+    hasMetrics && /* @__PURE__ */ jsx8(Card.Footer, { className: "bg-light border-0 p-2", children: /* @__PURE__ */ jsx8(
       MetricasDisplay,
       {
-        metricas: hasMetrics ? mantenedor.metricas.horas : "-",
-        wrenchTime: hasMetrics ? mantenedor.metricas.wrenchTime : "-"
+        metricas: mantenedor.metricas.horas || "-",
+        wrenchTime: mantenedor.metricas.wrenchTime || "-"
       }
     ) })
   ] }) }, mantenedor.id);
+};
+
+// src/acao-manutentor/ManutentorCardCompact.tsx
+import { Card as Card2 } from "react-bootstrap";
+import { jsx as jsx9, jsxs as jsxs7 } from "react/jsx-runtime";
+var ManutentorCardCompact = ({
+  mantenedor,
+  onClick
+}) => {
+  const isBusy = mantenedor._busy;
+  const statusColor = isBusy ? "#ef4444" : "#10b981";
+  return /* @__PURE__ */ jsx9(
+    Card2,
+    {
+      className: "border rounded-3 h-100 transition-all shadow-sm-hover",
+      onClick,
+      style: {
+        cursor: onClick ? "pointer" : "default",
+        borderColor: "#e2e8f0",
+        backgroundColor: "#ffffff",
+        transition: "transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out"
+      },
+      onMouseEnter: (e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1)";
+        }
+      },
+      onMouseLeave: (e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "none";
+        }
+      },
+      children: /* @__PURE__ */ jsxs7(Card2.Body, { className: "p-3", children: [
+        /* @__PURE__ */ jsxs7("div", { className: "d-flex justify-content-between align-items-start mb-2", children: [
+          /* @__PURE__ */ jsx9("h6", { className: "mb-0 fw-bold text-dark text-truncate", style: { fontSize: "0.9rem" }, children: mantenedor == null ? void 0 : mantenedor.nomeUsuario }),
+          /* @__PURE__ */ jsxs7("span", { className: "text-muted", style: { fontSize: "0.7rem" }, children: [
+            "ID: ",
+            mantenedor.id
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs7("div", { className: "d-flex align-items-center gap-2", children: [
+          /* @__PURE__ */ jsx9(
+            "div",
+            {
+              style: {
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: statusColor,
+                boxShadow: isBusy ? `0 0 4px ${statusColor}` : "none"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsx9("span", { className: "fw-medium", style: { fontSize: "0.75rem", color: isBusy ? "#ef4444" : "#10b981" }, children: isBusy ? `Ocupado (OS-${mantenedor.osId || "?"})` : "Dispon\xEDvel" })
+        ] }),
+        mantenedor.setor && /* @__PURE__ */ jsx9("div", { className: "mt-2 pt-2 border-top text-muted", style: { fontSize: "0.7rem", opacity: 0.8 }, children: mantenedor.setor })
+      ] })
+    }
+  );
 };
 
 // src/recurso/RecursoDisplayer.tsx
@@ -519,7 +560,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaCheckSquare, FaSearch, FaChevronDown } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { pickTextColorBasedOnBgColorAdvanced } from "teraprox-core-sdk";
-import { jsx as jsx9, jsxs as jsxs7 } from "react/jsx-runtime";
+import { jsx as jsx10, jsxs as jsxs8 } from "react/jsx-runtime";
 var BranchDropDisplay = ({
   branch,
   addBranch,
@@ -580,7 +621,7 @@ var BranchDropDisplay = ({
   const visibleNodes = (branch.branchNodes || []).filter(
     (bn) => bn.recurso.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  return /* @__PURE__ */ jsxs7(
+  return /* @__PURE__ */ jsxs8(
     "div",
     {
       ref: dropdownRef,
@@ -591,7 +632,7 @@ var BranchDropDisplay = ({
         fontFamily: "Arial, sans-serif"
       },
       children: [
-        /* @__PURE__ */ jsxs7(
+        /* @__PURE__ */ jsxs8(
           "button",
           {
             onClick: () => setShow((s) => !s),
@@ -612,15 +653,15 @@ var BranchDropDisplay = ({
               fontSize: "1rem"
             },
             children: [
-              /* @__PURE__ */ jsxs7("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, children: [
+              /* @__PURE__ */ jsxs8("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, children: [
                 branch.nomeRecurso || branch.branchLevel.nome,
-                branch.nomeRecurso && !multiMode && isLastBranchClicked() && /* @__PURE__ */ jsx9("em", { style: { fontStyle: "italic", opacity: 0.8, marginLeft: "0.5rem" }, children: "(Selecionado)" })
+                branch.nomeRecurso && !multiMode && isLastBranchClicked() && /* @__PURE__ */ jsx10("em", { style: { fontStyle: "italic", opacity: 0.8, marginLeft: "0.5rem" }, children: "(Selecionado)" })
               ] }),
-              /* @__PURE__ */ jsx9(FaChevronDown, {})
+              /* @__PURE__ */ jsx10(FaChevronDown, {})
             ]
           }
         ),
-        show && /* @__PURE__ */ jsxs7(
+        show && /* @__PURE__ */ jsxs8(
           "div",
           {
             style: {
@@ -637,7 +678,7 @@ var BranchDropDisplay = ({
               overflow: "auto"
             },
             children: [
-              /* @__PURE__ */ jsxs7(
+              /* @__PURE__ */ jsxs8(
                 "div",
                 {
                   style: {
@@ -647,8 +688,8 @@ var BranchDropDisplay = ({
                     borderBottom: "1px solid #ddd"
                   },
                   children: [
-                    /* @__PURE__ */ jsx9(FaSearch, { style: { marginRight: "0.5rem", color: "#555" } }),
-                    /* @__PURE__ */ jsx9(
+                    /* @__PURE__ */ jsx10(FaSearch, { style: { marginRight: "0.5rem", color: "#555" } }),
+                    /* @__PURE__ */ jsx10(
                       "input",
                       {
                         type: "text",
@@ -668,7 +709,7 @@ var BranchDropDisplay = ({
                   ]
                 }
               ),
-              !multiMode && !singleReturn ? /* @__PURE__ */ jsxs7(
+              !multiMode && !singleReturn ? /* @__PURE__ */ jsxs8(
                 "button",
                 {
                   onClick: startMulti,
@@ -687,12 +728,12 @@ var BranchDropDisplay = ({
                     margin: "0.5rem 0"
                   },
                   children: [
-                    /* @__PURE__ */ jsx9(FaCheckSquare, { style: { marginRight: "0.5rem" } }),
+                    /* @__PURE__ */ jsx10(FaCheckSquare, { style: { marginRight: "0.5rem" } }),
                     "Selecionar multiplos"
                   ]
                 }
-              ) : /* @__PURE__ */ jsxs7("div", { style: { display: "flex", gap: "0.5rem", margin: "0.5rem 0" }, children: [
-                /* @__PURE__ */ jsxs7(
+              ) : /* @__PURE__ */ jsxs8("div", { style: { display: "flex", gap: "0.5rem", margin: "0.5rem 0" }, children: [
+                /* @__PURE__ */ jsxs8(
                   "button",
                   {
                     onClick: handleConfirm,
@@ -710,12 +751,12 @@ var BranchDropDisplay = ({
                       cursor: "pointer"
                     },
                     children: [
-                      /* @__PURE__ */ jsx9(FaCheck, { style: { marginRight: "0.5rem" } }),
+                      /* @__PURE__ */ jsx10(FaCheck, { style: { marginRight: "0.5rem" } }),
                       "Confirmar selecao"
                     ]
                   }
                 ),
-                /* @__PURE__ */ jsxs7(
+                /* @__PURE__ */ jsxs8(
                   "button",
                   {
                     onClick: cancelMulti,
@@ -733,15 +774,15 @@ var BranchDropDisplay = ({
                       cursor: "pointer"
                     },
                     children: [
-                      /* @__PURE__ */ jsx9(MdClose, { style: { marginRight: "0.5rem" } }),
+                      /* @__PURE__ */ jsx10(MdClose, { style: { marginRight: "0.5rem" } }),
                       "Cancelar"
                     ]
                   }
                 )
               ] }),
-              /* @__PURE__ */ jsx9("div", { style: { padding: "0.5rem" }, children: visibleNodes.map((bn) => {
+              /* @__PURE__ */ jsx10("div", { style: { padding: "0.5rem" }, children: visibleNodes.map((bn) => {
                 const selected = multiMode ? multiSelected.some((r) => r.id === bn.recurso.id) : false;
-                return /* @__PURE__ */ jsxs7(
+                return /* @__PURE__ */ jsxs8(
                   "div",
                   {
                     onClick: () => handleItemClick(bn),
@@ -762,8 +803,8 @@ var BranchDropDisplay = ({
                       e.currentTarget.style.background = selected ? "#e9ecef" : "transparent";
                     },
                     children: [
-                      /* @__PURE__ */ jsx9("span", { children: bn.recurso.nome }),
-                      selected && /* @__PURE__ */ jsx9(FaCheck, {})
+                      /* @__PURE__ */ jsx10("span", { children: bn.recurso.nome }),
+                      selected && /* @__PURE__ */ jsx10(FaCheck, {})
                     ]
                   },
                   bn.recurso.id
@@ -783,7 +824,7 @@ import { useState as useState2 } from "react";
 import { GrCheckmark } from "react-icons/gr";
 import { AutoComplete as AutoComplete3, QrCodeScanButton } from "teraprox-ui-kit";
 import { useFindRecursoByTagViewModel } from "teraprox-core-sdk";
-import { jsx as jsx10 } from "react/jsx-runtime";
+import { jsx as jsx11 } from "react/jsx-runtime";
 var FindRecursoByTagField = ({
   callback,
   vm: vmProp,
@@ -808,7 +849,7 @@ var FindRecursoByTagField = ({
     }
   };
   const confirmRecursoSelectionButton = () => {
-    return /* @__PURE__ */ jsx10(
+    return /* @__PURE__ */ jsx11(
       "div",
       {
         className: "hoverable-div",
@@ -824,7 +865,7 @@ var FindRecursoByTagField = ({
           display: "flex",
           alignItems: "center"
         },
-        children: /* @__PURE__ */ jsx10(
+        children: /* @__PURE__ */ jsx11(
           GrCheckmark,
           {
             size: 25,
@@ -834,7 +875,7 @@ var FindRecursoByTagField = ({
       }
     );
   };
-  return /* @__PURE__ */ jsx10("div", { children: /* @__PURE__ */ jsx10(
+  return /* @__PURE__ */ jsx11("div", { children: /* @__PURE__ */ jsx11(
     AutoComplete3,
     {
       sortKey: "id",
@@ -843,7 +884,7 @@ var FindRecursoByTagField = ({
       displayKey: "descricao",
       title: "Selecione ou Digite a TAG",
       actionButton: confirmRecursoSelectionButton,
-      actionButton2: () => /* @__PURE__ */ jsx10(
+      actionButton2: () => /* @__PURE__ */ jsx11(
         QrCodeScanButton,
         {
           callback: (description) => findRecursoByTagDescriptionHandler(description)
@@ -859,7 +900,7 @@ var FindRecursoByTagField = ({
 };
 
 // src/recurso/RecursoDisplayer.tsx
-import { jsx as jsx11, jsxs as jsxs8 } from "react/jsx-runtime";
+import { jsx as jsx12, jsxs as jsxs9 } from "react/jsx-runtime";
 var RecursoDisplayer = ({
   selectedList = [],
   onSaveRecurso,
@@ -879,10 +920,10 @@ var RecursoDisplayer = ({
       (err) => console.warn("[RecursoDisplayer] loadInitialBranches failed:", err)
     );
   }, []);
-  return /* @__PURE__ */ jsxs8("div", { style: { width: "100%", padding: 0 }, className: "recurso-displayer-generic", children: [
-    /* @__PURE__ */ jsx11("div", { className: "d-flex justify-content-between align-items-center mb-3", children: /* @__PURE__ */ jsxs8("div", { children: [
-      /* @__PURE__ */ jsx11("label", { className: "me-2", children: "Selecionar Recurso Por:" }),
-      /* @__PURE__ */ jsx11(
+  return /* @__PURE__ */ jsxs9("div", { style: { width: "100%", padding: 0 }, className: "recurso-displayer-generic", children: [
+    /* @__PURE__ */ jsx12("div", { className: "d-flex justify-content-between align-items-center mb-3", children: /* @__PURE__ */ jsxs9("div", { children: [
+      /* @__PURE__ */ jsx12("label", { className: "me-2", children: "Selecionar Recurso Por:" }),
+      /* @__PURE__ */ jsx12(
         Button4,
         {
           size: "sm",
@@ -892,7 +933,7 @@ var RecursoDisplayer = ({
           children: "Arvore"
         }
       ),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx12(
         Button4,
         {
           size: "sm",
@@ -902,7 +943,7 @@ var RecursoDisplayer = ({
         }
       )
     ] }) }),
-    selectorDisplay === "branch" && vm.branches.map((branch, i) => /* @__PURE__ */ jsx11(
+    selectorDisplay === "branch" && vm.branches.map((branch, i) => /* @__PURE__ */ jsx12(
       BranchDropDisplay_default,
       {
         branch,
@@ -920,7 +961,7 @@ var RecursoDisplayer = ({
       },
       branch.id || i
     )),
-    selectorDisplay === "TAG" && /* @__PURE__ */ jsx11(
+    selectorDisplay === "TAG" && /* @__PURE__ */ jsx12(
       FindRecursoByTagField,
       {
         vm: findVm,
@@ -935,7 +976,7 @@ var RecursoDisplayer = ({
 // src/tarefa/TarefaCard.tsx
 import {
   Button as Button6,
-  Card as Card2,
+  Card as Card3,
   ListGroup as ListGroup2
 } from "react-bootstrap";
 import { FaRegCommentDots } from "react-icons/fa6";
@@ -952,7 +993,7 @@ import { MdClose as MdClose2 } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { TiDeleteOutline } from "react-icons/ti";
 import { DeleteConfirm, UnidadeMaterialForm as UnidadeMaterialForm2 } from "teraprox-ui-kit";
-import { Fragment as Fragment3, jsx as jsx12, jsxs as jsxs9 } from "react/jsx-runtime";
+import { Fragment as Fragment2, jsx as jsx13, jsxs as jsxs10 } from "react/jsx-runtime";
 var removeAt = (arr, idx) => {
   if (!Array.isArray(arr)) return [];
   const copy = [...arr];
@@ -1042,7 +1083,7 @@ var UnidadeMaterialPicker = ({
     if (formatationFunc) return formatationFunc(pi);
     return `${optionDisplayKey && pi[optionDisplayKey] || pi.id || index}`;
   };
-  const renderTooltip = (props) => /* @__PURE__ */ jsx12(Tooltip2, { id: "button-tooltip", ...props, children: "Remover todas as opcoes" });
+  const renderTooltip = (props) => /* @__PURE__ */ jsx13(Tooltip2, { id: "button-tooltip", ...props, children: "Remover todas as opcoes" });
   const onDeleteConfirmHandler = () => {
     const { pi, index } = optionIndexToDelete;
     const removedOptions = removeAt(optionsPicked, index);
@@ -1069,22 +1110,22 @@ var UnidadeMaterialPicker = ({
     setEditingIndex(null);
     setView(true);
   };
-  const renderOps = () => /* @__PURE__ */ jsxs9(Fragment3, { children: [
-    /* @__PURE__ */ jsxs9("h4", { children: [
+  const renderOps = () => /* @__PURE__ */ jsxs10(Fragment2, { children: [
+    /* @__PURE__ */ jsxs10("h4", { children: [
       optionDisplayName,
-      clearPickerOptions && /* @__PURE__ */ jsx12(
+      clearPickerOptions && /* @__PURE__ */ jsx13(
         OverlayTrigger2,
         {
           placement: "right",
           delay: { show: 250, hide: 250 },
           overlay: renderTooltip,
-          children: /* @__PURE__ */ jsx12(Button5, { variant: "warning", children: /* @__PURE__ */ jsx12(RiDeleteBin5Line, { onClick: () => clearPickerOptions() }) })
+          children: /* @__PURE__ */ jsx13(Button5, { variant: "warning", children: /* @__PURE__ */ jsx13(RiDeleteBin5Line, { onClick: () => clearPickerOptions() }) })
         }
       )
     ] }),
-    /* @__PURE__ */ jsx12(ListGroup, { numbered: true, id: "pickerOps", children: optionsPicked.map((pi, index) => {
+    /* @__PURE__ */ jsx13(ListGroup, { numbered: true, id: "pickerOps", children: optionsPicked.map((pi, index) => {
       if (optionComponent) {
-        return /* @__PURE__ */ jsx12(
+        return /* @__PURE__ */ jsx13(
           "div",
           {
             style: {
@@ -1096,7 +1137,7 @@ var UnidadeMaterialPicker = ({
               payload: pi,
               index,
               onClickOp: (input) => onOptionEditClickHandler(input || pi, index),
-              deleteButton: () => onOptionDelete ? /* @__PURE__ */ jsx12(
+              deleteButton: () => onOptionDelete ? /* @__PURE__ */ jsx13(
                 TiDeleteOutline,
                 {
                   style: { marginLeft: 8 },
@@ -1108,7 +1149,7 @@ var UnidadeMaterialPicker = ({
           index
         );
       }
-      return /* @__PURE__ */ jsxs9(
+      return /* @__PURE__ */ jsxs10(
         ListGroup.Item,
         {
           disabled: pi == null ? void 0 : pi.removed,
@@ -1120,8 +1161,8 @@ var UnidadeMaterialPicker = ({
           },
           action: true,
           children: [
-            /* @__PURE__ */ jsx12("div", { onClick: () => onOptionEditClickHandler(pi, index), children: getDisplayValueHandler(pi, index) }),
-            onOptionDelete && /* @__PURE__ */ jsx12(
+            /* @__PURE__ */ jsx13("div", { onClick: () => onOptionEditClickHandler(pi, index), children: getDisplayValueHandler(pi, index) }),
+            onOptionDelete && /* @__PURE__ */ jsx13(
               TiDeleteOutline,
               {
                 style: {
@@ -1136,7 +1177,7 @@ var UnidadeMaterialPicker = ({
         index
       );
     }) }),
-    !singlePick && !readOnlyMode && /* @__PURE__ */ jsx12("div", { style: { textAlign: "center", padding: 8 }, children: /* @__PURE__ */ jsx12(
+    !singlePick && !readOnlyMode && /* @__PURE__ */ jsx13("div", { style: { textAlign: "center", padding: 8 }, children: /* @__PURE__ */ jsx13(
       Button5,
       {
         className: "pickerButton",
@@ -1151,7 +1192,7 @@ var UnidadeMaterialPicker = ({
   const buildCloseDisplay = () => {
     var _a, _b;
     if (!hideOptions) {
-      return ((_a = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _a : 0) === 0 ? /* @__PURE__ */ jsx12(
+      return ((_a = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _a : 0) === 0 ? /* @__PURE__ */ jsx13(
         Button5,
         {
           disabled: readOnlyMode,
@@ -1162,7 +1203,7 @@ var UnidadeMaterialPicker = ({
           },
           children: displayButtonName
         }
-      ) : ((_b = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _b : 0) > 0 && /* @__PURE__ */ jsx12(
+      ) : ((_b = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _b : 0) > 0 && /* @__PURE__ */ jsx13(
         "div",
         {
           style: {
@@ -1174,7 +1215,7 @@ var UnidadeMaterialPicker = ({
         }
       );
     }
-    return /* @__PURE__ */ jsx12(
+    return /* @__PURE__ */ jsx13(
       Button5,
       {
         className: "pickerButton",
@@ -1191,8 +1232,8 @@ var UnidadeMaterialPicker = ({
     setEditingIndex(null);
     setView(true);
   };
-  return /* @__PURE__ */ jsxs9(Fragment3, { children: [
-    /* @__PURE__ */ jsx12(
+  return /* @__PURE__ */ jsxs10(Fragment2, { children: [
+    /* @__PURE__ */ jsx13(
       DeleteConfirm,
       {
         dialogText: deleteDiaologText,
@@ -1203,7 +1244,7 @@ var UnidadeMaterialPicker = ({
         show: deleteConfirm
       }
     ),
-    view ? buildCloseDisplay() : /* @__PURE__ */ jsx12(
+    view ? buildCloseDisplay() : /* @__PURE__ */ jsx13(
       "div",
       {
         style: {
@@ -1215,17 +1256,17 @@ var UnidadeMaterialPicker = ({
           borderRadius: 4,
           borderColor: "gray"
         },
-        children: /* @__PURE__ */ jsxs9("div", { style: { padding: 8 }, children: [
-          /* @__PURE__ */ jsx12(
+        children: /* @__PURE__ */ jsxs10("div", { style: { padding: 8 }, children: [
+          /* @__PURE__ */ jsx13(
             "div",
             {
               onClick: () => closePickerHandler(),
               style: { float: "right" },
-              children: /* @__PURE__ */ jsx12(MdClose2, {})
+              children: /* @__PURE__ */ jsx13(MdClose2, {})
             }
           ),
-          /* @__PURE__ */ jsx12("h3", { children: displayName }),
-          /* @__PURE__ */ jsx12(
+          /* @__PURE__ */ jsx13("h3", { children: displayName }),
+          /* @__PURE__ */ jsx13(
             UnidadeMaterialForm2,
             {
               value: outOption,
@@ -1236,7 +1277,7 @@ var UnidadeMaterialPicker = ({
               loadUnidadesFunc
             }
           ),
-          editingIndex == null && showOpsWhenEdit && /* @__PURE__ */ jsx12(
+          editingIndex == null && showOpsWhenEdit && /* @__PURE__ */ jsx13(
             "div",
             {
               style: {
@@ -1247,7 +1288,7 @@ var UnidadeMaterialPicker = ({
               children: !hideOptions && renderOps()
             }
           ),
-          editingIndex != null && onOptionEditClick ? /* @__PURE__ */ jsx12("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ jsx12(
+          editingIndex != null && onOptionEditClick ? /* @__PURE__ */ jsx13("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ jsx13(
             Button5,
             {
               style: { display: readOnlyMode ? "none" : "" },
@@ -1255,7 +1296,7 @@ var UnidadeMaterialPicker = ({
               onClick: saveEditOption,
               children: "Salvar Edicao"
             }
-          ) }) : /* @__PURE__ */ jsx12("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ jsx12(
+          ) }) : /* @__PURE__ */ jsx13("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ jsx13(
             Button5,
             {
               style: { display: readOnlyMode ? "none" : "" },
@@ -1270,7 +1311,7 @@ var UnidadeMaterialPicker = ({
 };
 
 // src/tarefa/TarefaCard.tsx
-import { jsx as jsx13, jsxs as jsxs10 } from "react/jsx-runtime";
+import { jsx as jsx14, jsxs as jsxs11 } from "react/jsx-runtime";
 var TarefaCard = ({
   tarefa,
   posindex,
@@ -1293,24 +1334,24 @@ var TarefaCard = ({
   const unidadeDisplay = (unidade) => `${unidade} `;
   const conditionalActionButton = () => {
     if (tarefa.status !== "PENDENTE") {
-      return /* @__PURE__ */ jsx13(Button6, { disabled: true, variant: "secondary", children: "Tarefa Conclu\xEDda" });
+      return /* @__PURE__ */ jsx14(Button6, { disabled: true, variant: "secondary", children: "Tarefa Conclu\xEDda" });
     }
-    return /* @__PURE__ */ jsx13(Button6, { variant: "danger", onClick: () => remove(), children: "Remover" });
+    return /* @__PURE__ */ jsx14(Button6, { variant: "danger", onClick: () => remove(), children: "Remover" });
   };
-  return /* @__PURE__ */ jsxs10(Card2, { style: { margin: 12 }, children: [
-    /* @__PURE__ */ jsx13(Card2.Header, { children: /* @__PURE__ */ jsxs10("div", { className: "d-flex justify-content-between align-items-center gap-2", children: [
-      /* @__PURE__ */ jsx13("strong", { children: `Ordem: ${ordem}` }),
+  return /* @__PURE__ */ jsxs11(Card3, { style: { margin: 12 }, children: [
+    /* @__PURE__ */ jsx14(Card3.Header, { children: /* @__PURE__ */ jsxs11("div", { className: "d-flex justify-content-between align-items-center gap-2", children: [
+      /* @__PURE__ */ jsx14("strong", { children: `Ordem: ${ordem}` }),
       !onlyView && conditionalActionButton()
     ] }) }),
-    /* @__PURE__ */ jsx13(Card2.Body, { children: /* @__PURE__ */ jsxs10(ListGroup2, { children: [
-      /* @__PURE__ */ jsxs10(ListGroup2.Item, { children: [
-        /* @__PURE__ */ jsx13("strong", { children: "A realizar:" }),
+    /* @__PURE__ */ jsx14(Card3.Body, { children: /* @__PURE__ */ jsxs11(ListGroup2, { children: [
+      /* @__PURE__ */ jsxs11(ListGroup2.Item, { children: [
+        /* @__PURE__ */ jsx14("strong", { children: "A realizar:" }),
         " ",
         `${(tarefa == null ? void 0 : tarefa.modelIdentifier) ? tarefa == null ? void 0 : tarefa.modelIdentifier : (_b = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _b.nome} - ${(_c = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _c.descricao}`
       ] }),
-      tarefa.unidadesMateriais && /* @__PURE__ */ jsxs10(ListGroup2.Item, { children: [
-        /* @__PURE__ */ jsx13("strong", { children: "Material Nescessario:" }),
-        tarefa.unidadesMateriais && tarefa.status !== "ENCERRADO" ? !readOnlyMode && !onlyView && /* @__PURE__ */ jsx13(
+      tarefa.unidadesMateriais && /* @__PURE__ */ jsxs11(ListGroup2.Item, { children: [
+        /* @__PURE__ */ jsx14("strong", { children: "Material Nescessario:" }),
+        tarefa.unidadesMateriais && tarefa.status !== "ENCERRADO" ? !readOnlyMode && !onlyView && /* @__PURE__ */ jsx14(
           UnidadeMaterialPicker,
           {
             onBuild: (setView) => setView(true),
@@ -1332,18 +1373,18 @@ var TarefaCard = ({
             ]),
             ...unidadeMaterialPickerProps
           }
-        ) : /* @__PURE__ */ jsx13(ListGroup2, { as: "ol", numbered: true, children: tarefa.unidadesMateriais && tarefa.unidadesMateriais.map((uM, idx) => /* @__PURE__ */ jsxs10(ListGroup2.Item, { children: [
+        ) : /* @__PURE__ */ jsx14(ListGroup2, { as: "ol", numbered: true, children: tarefa.unidadesMateriais && tarefa.unidadesMateriais.map((uM, idx) => /* @__PURE__ */ jsxs11(ListGroup2.Item, { children: [
           materialDisplay(uM.nomeMaterial),
           uM.quantidade,
           unidadeDisplay(uM.labelUnidade)
         ] }, idx)) })
       ] }),
-      tarefa.inspecoes && /* @__PURE__ */ jsxs10(ListGroup2.Item, { children: [
-        /* @__PURE__ */ jsx13("strong", { children: "Inspe\xE7\xF5es:" }),
-        /* @__PURE__ */ jsx13(ListGroup2, { as: "ol", numbered: true, children: tarefa.inspecoes && renderInspecoes ? renderInspecoes(tarefa.inspecoes) : null })
+      tarefa.inspecoes && /* @__PURE__ */ jsxs11(ListGroup2.Item, { children: [
+        /* @__PURE__ */ jsx14("strong", { children: "Inspe\xE7\xF5es:" }),
+        /* @__PURE__ */ jsx14(ListGroup2, { as: "ol", numbered: true, children: tarefa.inspecoes && renderInspecoes ? renderInspecoes(tarefa.inspecoes) : null })
       ] }),
-      ((_e = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _e.length) > 0 && /* @__PURE__ */ jsxs10(ListGroup2.Item, { children: [
-        /* @__PURE__ */ jsx13(FaRegCommentDots, { size: 20 }),
+      ((_e = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _e.length) > 0 && /* @__PURE__ */ jsxs11(ListGroup2.Item, { children: [
+        /* @__PURE__ */ jsx14(FaRegCommentDots, { size: 20 }),
         " ",
         tarefa.tarefaJustificativas[tarefa.tarefaJustificativas.length - 1].descricao
       ] })
@@ -1353,7 +1394,7 @@ var TarefaCard = ({
 
 // src/tarefa/TarefaItem.tsx
 import { useMemo, useState as useState5 } from "react";
-import { Card as Card3, Spinner, Table } from "react-bootstrap";
+import { Card as Card4, Spinner, Table } from "react-bootstrap";
 import {
   FaClipboardList,
   FaComments,
@@ -1370,7 +1411,7 @@ import {
   SwitchOnClick as SwitchOnClick2,
   TextWithMore
 } from "teraprox-ui-kit";
-import { Fragment as Fragment4, jsx as jsx14, jsxs as jsxs11 } from "react/jsx-runtime";
+import { Fragment as Fragment3, jsx as jsx15, jsxs as jsxs12 } from "react/jsx-runtime";
 var TarefaItem = (props) => {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i;
   const {
@@ -1428,9 +1469,9 @@ var TarefaItem = (props) => {
   };
   const conditionalMaterialUtilizadoFieldRender = (tUM, i) => {
     if (saving) {
-      return /* @__PURE__ */ jsx14("div", { className: "w-100", children: /* @__PURE__ */ jsx14(Spinner, { animation: "border" }) });
+      return /* @__PURE__ */ jsx15("div", { className: "w-100", children: /* @__PURE__ */ jsx15(Spinner, { animation: "border" }) });
     }
-    return /* @__PURE__ */ jsx14(
+    return /* @__PURE__ */ jsx15(
       FormField,
       {
         styleObj: { fontSize: "1.2rem" },
@@ -1445,27 +1486,27 @@ var TarefaItem = (props) => {
       }
     );
   };
-  return /* @__PURE__ */ jsxs11(Fragment4, { children: [
-    /* @__PURE__ */ jsxs11(Card3, { className: "shadow-sm", children: [
-      /* @__PURE__ */ jsxs11("div", { className: "tarefa-grid", children: [
-        /* @__PURE__ */ jsxs11("div", { children: [
-          /* @__PURE__ */ jsxs11("div", { className: "tarefa-title-line", children: [
-            /* @__PURE__ */ jsxs11("strong", { children: [
+  return /* @__PURE__ */ jsxs12(Fragment3, { children: [
+    /* @__PURE__ */ jsxs12(Card4, { className: "shadow-sm", children: [
+      /* @__PURE__ */ jsxs12("div", { className: "tarefa-grid", children: [
+        /* @__PURE__ */ jsxs12("div", { children: [
+          /* @__PURE__ */ jsxs12("div", { className: "tarefa-title-line", children: [
+            /* @__PURE__ */ jsxs12("strong", { children: [
               tarefaForm.sequencia,
               "."
             ] }),
             renderEditableDescricao({
               initialValue: tarefaForm.descricao,
               onHide: (descricao) => onDescricaoUpdate(descricao),
-              renderFallback: (setActive, setOldValue) => /* @__PURE__ */ jsxs11("div", { className: "editable-text-container", children: [
-                /* @__PURE__ */ jsx14(
+              renderFallback: (setActive, setOldValue) => /* @__PURE__ */ jsxs12("div", { className: "editable-text-container", children: [
+                /* @__PURE__ */ jsx15(
                   TextWithMore,
                   {
                     text: tarefaForm.descricao,
                     maxLength: 25
                   }
                 ),
-                /* @__PURE__ */ jsx14(IconGenericDisplay, { children: !readOnly && /* @__PURE__ */ jsx14(
+                /* @__PURE__ */ jsx15(IconGenericDisplay, { children: !readOnly && /* @__PURE__ */ jsx15(
                   FaRegEdit,
                   {
                     onClick: () => {
@@ -1478,14 +1519,14 @@ var TarefaItem = (props) => {
               ] })
             })
           ] }),
-          ((_a = tarefaForm.acao) == null ? void 0 : _a.nome) && /* @__PURE__ */ jsxs11("div", { className: "tarefa-acao-line", children: [
-            /* @__PURE__ */ jsx14(FaWrench, {}),
+          ((_a = tarefaForm.acao) == null ? void 0 : _a.nome) && /* @__PURE__ */ jsxs12("div", { className: "tarefa-acao-line", children: [
+            /* @__PURE__ */ jsx15(FaWrench, {}),
             " ",
             tarefaForm.acao.nome
           ] })
         ] }),
-        /* @__PURE__ */ jsxs11("div", { className: "d-flex gap-3 align-items-center", children: [
-          /* @__PURE__ */ jsx14(
+        /* @__PURE__ */ jsxs12("div", { className: "d-flex gap-3 align-items-center", children: [
+          /* @__PURE__ */ jsx15(
             FaComments,
             {
               title: "Observa\xE7\xF5es",
@@ -1495,7 +1536,7 @@ var TarefaItem = (props) => {
             }
           ),
           renderIconWithBadge({
-            icon: /* @__PURE__ */ jsx14(
+            icon: /* @__PURE__ */ jsx15(
               FaClipboardList,
               {
                 title: "Inspe\xE7\xF5es",
@@ -1507,7 +1548,7 @@ var TarefaItem = (props) => {
             content: (_c = (_b = tarefaForm == null ? void 0 : tarefaForm.inspecoes) == null ? void 0 : _b.length) != null ? _c : 0
           }),
           renderIconWithBadge({
-            icon: /* @__PURE__ */ jsx14(
+            icon: /* @__PURE__ */ jsx15(
               FaCubes,
               {
                 title: "Materiais",
@@ -1524,7 +1565,7 @@ var TarefaItem = (props) => {
             filesData: anexos
           })
         ] }),
-        /* @__PURE__ */ jsx14("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ jsx14(
+        /* @__PURE__ */ jsx15("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ jsx15(
           StatusBadge,
           {
             status: tarefaForm.status,
@@ -1535,9 +1576,9 @@ var TarefaItem = (props) => {
           }
         ) })
       ] }),
-      ((_f = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _f.length) > 0 && /* @__PURE__ */ jsx14(Card3.Footer, { children: (_g = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _g.map((tum, i) => {
+      ((_f = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _f.length) > 0 && /* @__PURE__ */ jsx15(Card4.Footer, { children: (_g = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _g.map((tum, i) => {
         var _a2, _b2;
-        return /* @__PURE__ */ jsxs11(
+        return /* @__PURE__ */ jsxs12(
           "div",
           {
             style: {
@@ -1548,9 +1589,9 @@ var TarefaItem = (props) => {
               opacity: 0.7
             },
             children: [
-              /* @__PURE__ */ jsx14("div", { style: { textAlign: "center" }, children: i + 1 }),
-              /* @__PURE__ */ jsx14("div", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-              /* @__PURE__ */ jsxs11("div", { children: [
+              /* @__PURE__ */ jsx15("div", { style: { textAlign: "center" }, children: i + 1 }),
+              /* @__PURE__ */ jsx15("div", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
+              /* @__PURE__ */ jsxs12("div", { children: [
                 tum.quantidade,
                 " ",
                 (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.labelUnidade
@@ -1567,7 +1608,7 @@ var TarefaItem = (props) => {
       close: () => setShowObs(false),
       saveCallback: onSaveObservacao
     }),
-    /* @__PURE__ */ jsxs11(
+    /* @__PURE__ */ jsxs12(
       ResponsiveContainer,
       {
         title: "Inspe\xE7\xF5es",
@@ -1580,7 +1621,7 @@ var TarefaItem = (props) => {
             isMobile,
             updateInspecaoCallback: onUpdateInspecaoField
           }),
-          !readOnly && /* @__PURE__ */ jsx14("div", { className: "mt-3", children: /* @__PURE__ */ jsx14(SwitchOnClick2, { children: ({ handleClose }) => /* @__PURE__ */ jsx14(
+          !readOnly && /* @__PURE__ */ jsx15("div", { className: "mt-3", children: /* @__PURE__ */ jsx15(SwitchOnClick2, { children: ({ handleClose }) => /* @__PURE__ */ jsx15(
             ResponsiveContainer,
             {
               setShow: handleClose,
@@ -1595,21 +1636,21 @@ var TarefaItem = (props) => {
         ]
       }
     ),
-    /* @__PURE__ */ jsxs11(
+    /* @__PURE__ */ jsxs12(
       ResponsiveContainer,
       {
         title: "Materiais",
         show: showMat,
         setShow: setShowMat,
         children: [
-          !isMobile ? /* @__PURE__ */ jsxs11(Table, { bordered: true, size: "sm", className: "mt-3", children: [
-            /* @__PURE__ */ jsx14("thead", { children: /* @__PURE__ */ jsxs11("tr", { style: { textAlign: "center" }, children: [
-              /* @__PURE__ */ jsx14("th", { children: "N\u02DA" }),
-              /* @__PURE__ */ jsx14("th", { children: "Material" }),
-              /* @__PURE__ */ jsx14("th", { children: "Planejada" }),
-              /* @__PURE__ */ jsx14("th", { children: "Utilizada" })
+          !isMobile ? /* @__PURE__ */ jsxs12(Table, { bordered: true, size: "sm", className: "mt-3", children: [
+            /* @__PURE__ */ jsx15("thead", { children: /* @__PURE__ */ jsxs12("tr", { style: { textAlign: "center" }, children: [
+              /* @__PURE__ */ jsx15("th", { children: "N\u02DA" }),
+              /* @__PURE__ */ jsx15("th", { children: "Material" }),
+              /* @__PURE__ */ jsx15("th", { children: "Planejada" }),
+              /* @__PURE__ */ jsx15("th", { children: "Utilizada" })
             ] }) }),
-            /* @__PURE__ */ jsx14(
+            /* @__PURE__ */ jsx15(
               "tbody",
               {
                 style: {
@@ -1619,22 +1660,22 @@ var TarefaItem = (props) => {
                 },
                 children: (_h = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _h.map((tum, i) => {
                   var _a2, _b2, _c2;
-                  return /* @__PURE__ */ jsxs11("tr", { children: [
-                    /* @__PURE__ */ jsx14("td", { children: i + 1 }),
-                    /* @__PURE__ */ jsx14("td", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-                    /* @__PURE__ */ jsxs11("td", { children: [
+                  return /* @__PURE__ */ jsxs12("tr", { children: [
+                    /* @__PURE__ */ jsx15("td", { children: i + 1 }),
+                    /* @__PURE__ */ jsx15("td", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
+                    /* @__PURE__ */ jsxs12("td", { children: [
                       (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.quantidade,
                       " ",
                       (_c2 = tum.unidadeMaterial) == null ? void 0 : _c2.labelUnidade
                     ] }),
-                    /* @__PURE__ */ jsx14("td", { children: conditionalMaterialUtilizadoFieldRender(tum, i) })
+                    /* @__PURE__ */ jsx15("td", { children: conditionalMaterialUtilizadoFieldRender(tum, i) })
                   ] }, tum.id);
                 })
               }
             )
           ] }) : (_i = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _i.map((tum, i) => {
             var _a2, _b2, _c2, _d2;
-            return /* @__PURE__ */ jsx14("div", { className: "mb-3", children: /* @__PURE__ */ jsx14(
+            return /* @__PURE__ */ jsx15("div", { className: "mb-3", children: /* @__PURE__ */ jsx15(
               ExpandableCard,
               {
                 items: [
@@ -1654,7 +1695,7 @@ var TarefaItem = (props) => {
               }
             ) }, (_a2 = tum.id) != null ? _a2 : i);
           }),
-          !readOnly && /* @__PURE__ */ jsx14(SwitchOnClick2, { children: ({ handleClose }) => renderNovaUnidadeMaterialForm({
+          !readOnly && /* @__PURE__ */ jsx15(SwitchOnClick2, { children: ({ handleClose }) => renderNovaUnidadeMaterialForm({
             onSaveClick: (form) => onAddUnidadeMaterial(form, handleClose),
             handleClose,
             value: unidadeMaterialFormValue,
@@ -1671,7 +1712,7 @@ import React4 from "react";
 import { ListGroup as ListGroup3 } from "react-bootstrap";
 import { GrCheckmark as GrCheckmark2 } from "react-icons/gr";
 import { ApproveAndReproveButtons, FormField as FormField2 } from "teraprox-ui-kit";
-import { jsx as jsx15, jsxs as jsxs12 } from "react/jsx-runtime";
+import { jsx as jsx16, jsxs as jsxs13 } from "react/jsx-runtime";
 var MantenedorPicker = ({
   viewModel,
   currentOsId,
@@ -1698,8 +1739,8 @@ var MantenedorPicker = ({
       viewModel.search(item.nomeUsuario);
     }
   };
-  return /* @__PURE__ */ jsxs12("div", { onMouseLeave: () => setHideOps(true), className, children: [
-    /* @__PURE__ */ jsx15(
+  return /* @__PURE__ */ jsxs13("div", { onMouseLeave: () => setHideOps(true), className, children: [
+    /* @__PURE__ */ jsx16(
       FormField2,
       {
         label,
@@ -1721,28 +1762,28 @@ var MantenedorPicker = ({
         }
       }
     ),
-    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ jsx15(ListGroup3, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ jsx15(ListGroup3.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
+    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ jsx16(ListGroup3, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ jsx16(ListGroup3.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
       const isBusyOther = m._busy && m.osId !== currentOsId;
       const isBusyHere = m._busy && m.osId === currentOsId;
-      return /* @__PURE__ */ jsx15(
+      return /* @__PURE__ */ jsx16(
         ListGroup3.Item,
         {
           action: true,
           onClick: () => handleClick(m),
           className: `mantenedor-option ${isBusyOther ? "busy" : ""} ${isBusyHere ? "current-os" : ""}`,
-          children: /* @__PURE__ */ jsxs12("li", { className: "d-flex align-items-center", children: [
-            /* @__PURE__ */ jsx15("span", { children: m.nomeUsuario }),
-            isBusyHere && /* @__PURE__ */ jsxs12("span", { className: "current-os-indicator", children: [
-              /* @__PURE__ */ jsx15(GrCheckmark2, { size: 18 }),
+          children: /* @__PURE__ */ jsxs13("li", { className: "d-flex align-items-center", children: [
+            /* @__PURE__ */ jsx16("span", { children: m.nomeUsuario }),
+            isBusyHere && /* @__PURE__ */ jsxs13("span", { className: "current-os-indicator", children: [
+              /* @__PURE__ */ jsx16(GrCheckmark2, { size: 18 }),
               " Trabalhando nesta OS"
             ] }),
-            isBusyOther && /* @__PURE__ */ jsx15("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
+            isBusyOther && /* @__PURE__ */ jsx16("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
           ] })
         },
         m.id
       );
     }) }),
-    viewModel.pendingConfirm && /* @__PURE__ */ jsx15("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ jsx15(
+    viewModel.pendingConfirm && /* @__PURE__ */ jsx16("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ jsx16(
       ApproveAndReproveButtons,
       {
         headerText: `Deseja desalocar ${viewModel.pendingConfirm.nomeUsuario} da OS-${viewModel.pendingConfirm.osId} para uma nova aloca\xE7\xE3o?`,
@@ -1768,6 +1809,7 @@ export {
   MantenedorRender,
   MantenedorRenderCompact,
   ManutentorCard,
+  ManutentorCardCompact,
   ManutentoresDisplay,
   MetricasDisplay,
   RecursoDisplayer,

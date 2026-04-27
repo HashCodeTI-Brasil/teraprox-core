@@ -38,6 +38,7 @@ __export(index_exports, {
   MantenedorRender: () => MantenedorRender,
   MantenedorRenderCompact: () => MantenedorRenderCompact,
   ManutentorCard: () => ManutentorCard,
+  ManutentorCardCompact: () => ManutentorCardCompact,
   ManutentoresDisplay: () => ManutentoresDisplay,
   MetricasDisplay: () => MetricasDisplay,
   RecursoDisplayer: () => RecursoDisplayer,
@@ -413,152 +414,193 @@ var ManutentorCard = ({
   onStatusClick,
   loadMetrics = null
 }) => {
-  var _a;
+  var _a, _b;
   const hasMetrics = mantenedor.metricas;
-  const statusIndicator = (color) => ({
-    backgroundColor: color,
-    borderRadius: "50%",
-    width: "12px",
-    height: "12px",
-    marginRight: "10px"
-  });
+  const getStatusColor = (type) => {
+    switch (type) {
+      case "executing":
+        return "#10b981";
+      // emerald-500
+      case "pending":
+        return "#f59e0b";
+      // amber-500
+      case "concluded":
+        return "#94a3b8";
+      // slate-400
+      case "busy":
+        return "#ef4444";
+      // red-500
+      case "available":
+        return "#10b981";
+      // emerald-500
+      default:
+        return "#cbd5e1";
+    }
+  };
   const handleStatusClick = (ordens) => {
     onStatusClick && onStatusClick(ordens);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Col, { children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap4.Card, { className: "mantenedor-card", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Card.Body, { className: "d-flex align-items-center", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mantenedor-info", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-        import_react_bootstrap4.Card.Title,
-        {
-          style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          },
-          children: [
-            mantenedor == null ? void 0 : mantenedor.nomeUsuario,
-            loadMetrics && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-              import_gr2.GrLineChart,
-              {
-                className: "zoom-container",
-                title: "Ver Metricas",
-                onClick: () => loadMetrics(mantenedor),
-                size: 20
-              }
-            )
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap4.Card.Text, { children: [
-        "ID: ",
-        mantenedor.id
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Col, { children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap4.Card, { className: "mantenedor-card border-0 shadow-sm overflow-hidden", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap4.Card.Body, { className: "p-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "d-flex justify-content-between align-items-start mb-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mantenedor-info flex-grow-1", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h6", { className: "mb-0 fw-bold text-dark", style: { fontSize: "0.95rem" }, children: mantenedor == null ? void 0 : mantenedor.nomeUsuario }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "text-muted", style: { fontSize: "0.75rem" }, children: [
+            "ID: ",
+            mantenedor.id,
+            " ",
+            mantenedor.setor && `\xB7 ${mantenedor.setor}`
+          ] })
+        ] }),
+        loadMetrics && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          import_react_bootstrap4.Button,
+          {
+            variant: "link",
+            className: "p-0 text-muted",
+            onClick: () => loadMetrics(mantenedor),
+            title: "Ver M\xE9tricas",
+            children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_gr2.GrLineChart, { size: 16 })
+          }
+        )
       ] }),
-      hasMetrics && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Card.Text, { children: (_a = mantenedor.turno) == null ? void 0 : _a.nome }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "status-list", children: [
-        mantenedor.executing && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "status-list d-flex gap-2 mb-3", children: [
+        ((_a = mantenedor.executing) == null ? void 0 : _a.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
           "div",
           {
-            className: "clickable-status d-flex align-items-center mb-2",
+            className: "d-flex align-items-center gap-1 badge bg-light text-success border border-success-subtle",
+            style: { cursor: "pointer", fontSize: "0.7rem" },
             onClick: () => handleStatusClick(mantenedor.executing),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("green")
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "status-text", children: [
-                "Executando: ",
-                mantenedor.executing.length
-              ] })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { width: 6, height: 6, borderRadius: "50%", background: getStatusColor("executing") } }),
+              mantenedor.executing.length,
+              " Ex."
             ]
           }
         ),
-        mantenedor.pending && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+        ((_b = mantenedor.pending) == null ? void 0 : _b.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
           "div",
           {
-            className: "clickable-status d-flex align-items-center mb-2",
+            className: "d-flex align-items-center gap-1 badge bg-light text-warning border border-warning-subtle",
+            style: { cursor: "pointer", fontSize: "0.7rem" },
             onClick: () => handleStatusClick(mantenedor.pending),
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("#ffc107")
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "status-text", children: [
-                "Pendentes: ",
-                mantenedor.pending.length
-              ] })
-            ]
-          }
-        ),
-        mantenedor.concluded && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-          "div",
-          {
-            className: "clickable-status d-flex align-items-center mb-2",
-            onClick: () => handleStatusClick(mantenedor.concluded),
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-                "div",
-                {
-                  className: "status-indicator",
-                  style: statusIndicator("#ccc")
-                }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "status-text", children: [
-                "Conclu\xEDdas: ",
-                mantenedor.concluded.length
-              ] })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { width: 6, height: 6, borderRadius: "50%", background: getStatusColor("pending") } }),
+              mantenedor.pending.length,
+              " Pend."
             ]
           }
         )
       ] }),
-      showBusyStatus && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "d-flex align-items-center status-container", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-          "div",
-          {
-            className: "status-indicator",
-            style: statusIndicator(mantenedor._busy ? "red" : "green")
-          }
-        ),
-        mantenedor._busy ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "status-text", children: `Alocado em OS-${mantenedor.osId}` }),
+      showBusyStatus && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-auto pt-2 border-top", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "d-flex align-items-center justify-content-between", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "d-flex align-items-center gap-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-            import_react_bootstrap4.Button,
+            "div",
             {
-              variant: "link",
-              className: "navigate-button",
-              onClick: () => viewDetailsCallback && viewDetailsCallback({ ...mantenedor, index }),
-              children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_fa6.FaArrowRightToBracket, { size: 20 })
+              style: {
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: getStatusColor(mantenedor._busy ? "busy" : "available"),
+                boxShadow: mantenedor._busy ? "0 0 4px #ef4444" : "none"
+              }
             }
-          )
-        ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "status-text", children: "Dispon\xEDvel" })
-      ] }),
-      onRemoveCallback && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-        "div",
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "fw-semibold", style: { fontSize: "0.8rem", color: mantenedor._busy ? "#ef4444" : "#10b981" }, children: mantenedor._busy ? `Ocupado (OS-${mantenedor.osId})` : "Dispon\xEDvel" })
+        ] }),
+        mantenedor._busy && viewDetailsCallback && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          import_react_bootstrap4.Button,
+          {
+            variant: "link",
+            className: "p-0 text-primary",
+            onClick: () => viewDetailsCallback({ ...mantenedor, index }),
+            children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_fa6.FaArrowRightToBracket, { size: 14 })
+          }
+        )
+      ] }) }),
+      onRemoveCallback && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-2 text-end", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+        "span",
         {
           onClick: () => onRemoveCallback({ ...mantenedor, index }),
-          className: "remove-text",
+          className: "text-danger small cursor-pointer",
+          style: { fontSize: "0.7rem", cursor: "pointer", textDecoration: "underline" },
           children: "remover"
         }
-      )
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Card.Footer, { children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      ) })
+    ] }),
+    hasMetrics && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap4.Card.Footer, { className: "bg-light border-0 p-2", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
       MetricasDisplay,
       {
-        metricas: hasMetrics ? mantenedor.metricas.horas : "-",
-        wrenchTime: hasMetrics ? mantenedor.metricas.wrenchTime : "-"
+        metricas: mantenedor.metricas.horas || "-",
+        wrenchTime: mantenedor.metricas.wrenchTime || "-"
       }
     ) })
   ] }) }, mantenedor.id);
 };
 
+// src/acao-manutentor/ManutentorCardCompact.tsx
+var import_react_bootstrap5 = require("react-bootstrap");
+var import_jsx_runtime9 = require("react/jsx-runtime");
+var ManutentorCardCompact = ({
+  mantenedor,
+  onClick
+}) => {
+  const isBusy = mantenedor._busy;
+  const statusColor = isBusy ? "#ef4444" : "#10b981";
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    import_react_bootstrap5.Card,
+    {
+      className: "border rounded-3 h-100 transition-all shadow-sm-hover",
+      onClick,
+      style: {
+        cursor: onClick ? "pointer" : "default",
+        borderColor: "#e2e8f0",
+        backgroundColor: "#ffffff",
+        transition: "transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out"
+      },
+      onMouseEnter: (e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1)";
+        }
+      },
+      onMouseLeave: (e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "none";
+        }
+      },
+      children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap5.Card.Body, { className: "p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "d-flex justify-content-between align-items-start mb-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h6", { className: "mb-0 fw-bold text-dark text-truncate", style: { fontSize: "0.9rem" }, children: mantenedor == null ? void 0 : mantenedor.nomeUsuario }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { className: "text-muted", style: { fontSize: "0.7rem" }, children: [
+            "ID: ",
+            mantenedor.id
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "d-flex align-items-center gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+            "div",
+            {
+              style: {
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: statusColor,
+                boxShadow: isBusy ? `0 0 4px ${statusColor}` : "none"
+              }
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "fw-medium", style: { fontSize: "0.75rem", color: isBusy ? "#ef4444" : "#10b981" }, children: isBusy ? `Ocupado (OS-${mantenedor.osId || "?"})` : "Dispon\xEDvel" })
+        ] }),
+        mantenedor.setor && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "mt-2 pt-2 border-top text-muted", style: { fontSize: "0.7rem", opacity: 0.8 }, children: mantenedor.setor })
+      ] })
+    }
+  );
+};
+
 // src/recurso/RecursoDisplayer.tsx
 var import_react3 = require("react");
-var import_react_bootstrap5 = require("react-bootstrap");
+var import_react_bootstrap6 = require("react-bootstrap");
 var import_teraprox_core_sdk3 = require("teraprox-core-sdk");
 
 // src/recurso/BranchDropDisplay.tsx
@@ -566,7 +608,7 @@ var import_react = require("react");
 var import_fa2 = require("react-icons/fa");
 var import_md = require("react-icons/md");
 var import_teraprox_core_sdk = require("teraprox-core-sdk");
-var import_jsx_runtime9 = require("react/jsx-runtime");
+var import_jsx_runtime10 = require("react/jsx-runtime");
 var BranchDropDisplay = ({
   branch,
   addBranch,
@@ -627,7 +669,7 @@ var BranchDropDisplay = ({
   const visibleNodes = (branch.branchNodes || []).filter(
     (bn) => bn.recurso.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
     "div",
     {
       ref: dropdownRef,
@@ -638,7 +680,7 @@ var BranchDropDisplay = ({
         fontFamily: "Arial, sans-serif"
       },
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
           "button",
           {
             onClick: () => setShow((s) => !s),
@@ -659,15 +701,15 @@ var BranchDropDisplay = ({
               fontSize: "1rem"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, children: [
                 branch.nomeRecurso || branch.branchLevel.nome,
-                branch.nomeRecurso && !multiMode && isLastBranchClicked() && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("em", { style: { fontStyle: "italic", opacity: 0.8, marginLeft: "0.5rem" }, children: "(Selecionado)" })
+                branch.nomeRecurso && !multiMode && isLastBranchClicked() && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("em", { style: { fontStyle: "italic", opacity: 0.8, marginLeft: "0.5rem" }, children: "(Selecionado)" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fa2.FaChevronDown, {})
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_fa2.FaChevronDown, {})
             ]
           }
         ),
-        show && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+        show && /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
           "div",
           {
             style: {
@@ -684,7 +726,7 @@ var BranchDropDisplay = ({
               overflow: "auto"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
                 "div",
                 {
                   style: {
@@ -694,8 +736,8 @@ var BranchDropDisplay = ({
                     borderBottom: "1px solid #ddd"
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fa2.FaSearch, { style: { marginRight: "0.5rem", color: "#555" } }),
-                    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_fa2.FaSearch, { style: { marginRight: "0.5rem", color: "#555" } }),
+                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                       "input",
                       {
                         type: "text",
@@ -715,7 +757,7 @@ var BranchDropDisplay = ({
                   ]
                 }
               ),
-              !multiMode && !singleReturn ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+              !multiMode && !singleReturn ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
                 "button",
                 {
                   onClick: startMulti,
@@ -734,12 +776,12 @@ var BranchDropDisplay = ({
                     margin: "0.5rem 0"
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fa2.FaCheckSquare, { style: { marginRight: "0.5rem" } }),
+                    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_fa2.FaCheckSquare, { style: { marginRight: "0.5rem" } }),
                     "Selecionar multiplos"
                   ]
                 }
-              ) : /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { style: { display: "flex", gap: "0.5rem", margin: "0.5rem 0" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+              ) : /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { style: { display: "flex", gap: "0.5rem", margin: "0.5rem 0" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
                   "button",
                   {
                     onClick: handleConfirm,
@@ -757,12 +799,12 @@ var BranchDropDisplay = ({
                       cursor: "pointer"
                     },
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fa2.FaCheck, { style: { marginRight: "0.5rem" } }),
+                      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_fa2.FaCheck, { style: { marginRight: "0.5rem" } }),
                       "Confirmar selecao"
                     ]
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+                /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
                   "button",
                   {
                     onClick: cancelMulti,
@@ -780,15 +822,15 @@ var BranchDropDisplay = ({
                       cursor: "pointer"
                     },
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_md.MdClose, { style: { marginRight: "0.5rem" } }),
+                      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_md.MdClose, { style: { marginRight: "0.5rem" } }),
                       "Cancelar"
                     ]
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { style: { padding: "0.5rem" }, children: visibleNodes.map((bn) => {
+              /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { style: { padding: "0.5rem" }, children: visibleNodes.map((bn) => {
                 const selected = multiMode ? multiSelected.some((r) => r.id === bn.recurso.id) : false;
-                return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+                return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
                   "div",
                   {
                     onClick: () => handleItemClick(bn),
@@ -809,8 +851,8 @@ var BranchDropDisplay = ({
                       e.currentTarget.style.background = selected ? "#e9ecef" : "transparent";
                     },
                     children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: bn.recurso.nome }),
-                      selected && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fa2.FaCheck, {})
+                      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("span", { children: bn.recurso.nome }),
+                      selected && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_fa2.FaCheck, {})
                     ]
                   },
                   bn.recurso.id
@@ -830,7 +872,7 @@ var import_react2 = require("react");
 var import_gr3 = require("react-icons/gr");
 var import_teraprox_ui_kit5 = require("teraprox-ui-kit");
 var import_teraprox_core_sdk2 = require("teraprox-core-sdk");
-var import_jsx_runtime10 = require("react/jsx-runtime");
+var import_jsx_runtime11 = require("react/jsx-runtime");
 var FindRecursoByTagField = ({
   callback,
   vm: vmProp,
@@ -855,7 +897,7 @@ var FindRecursoByTagField = ({
     }
   };
   const confirmRecursoSelectionButton = () => {
-    return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       "div",
       {
         className: "hoverable-div",
@@ -871,7 +913,7 @@ var FindRecursoByTagField = ({
           display: "flex",
           alignItems: "center"
         },
-        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
           import_gr3.GrCheckmark,
           {
             size: 25,
@@ -881,7 +923,7 @@ var FindRecursoByTagField = ({
       }
     );
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
     import_teraprox_ui_kit5.AutoComplete,
     {
       sortKey: "id",
@@ -890,7 +932,7 @@ var FindRecursoByTagField = ({
       displayKey: "descricao",
       title: "Selecione ou Digite a TAG",
       actionButton: confirmRecursoSelectionButton,
-      actionButton2: () => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      actionButton2: () => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
         import_teraprox_ui_kit5.QrCodeScanButton,
         {
           callback: (description) => findRecursoByTagDescriptionHandler(description)
@@ -906,7 +948,7 @@ var FindRecursoByTagField = ({
 };
 
 // src/recurso/RecursoDisplayer.tsx
-var import_jsx_runtime11 = require("react/jsx-runtime");
+var import_jsx_runtime12 = require("react/jsx-runtime");
 var RecursoDisplayer = ({
   selectedList = [],
   onSaveRecurso,
@@ -926,11 +968,11 @@ var RecursoDisplayer = ({
       (err) => console.warn("[RecursoDisplayer] loadInitialBranches failed:", err)
     );
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { style: { width: "100%", padding: 0 }, className: "recurso-displayer-generic", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "d-flex justify-content-between align-items-center mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("label", { className: "me-2", children: "Selecionar Recurso Por:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-        import_react_bootstrap5.Button,
+  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { style: { width: "100%", padding: 0 }, className: "recurso-displayer-generic", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { className: "d-flex justify-content-between align-items-center mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("label", { className: "me-2", children: "Selecionar Recurso Por:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        import_react_bootstrap6.Button,
         {
           size: "sm",
           onClick: () => setSelectorDisplay("branch"),
@@ -939,8 +981,8 @@ var RecursoDisplayer = ({
           children: "Arvore"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
-        import_react_bootstrap5.Button,
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        import_react_bootstrap6.Button,
         {
           size: "sm",
           onClick: () => setSelectorDisplay("TAG"),
@@ -949,7 +991,7 @@ var RecursoDisplayer = ({
         }
       )
     ] }) }),
-    selectorDisplay === "branch" && vm.branches.map((branch, i) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+    selectorDisplay === "branch" && vm.branches.map((branch, i) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
       BranchDropDisplay_default,
       {
         branch,
@@ -967,7 +1009,7 @@ var RecursoDisplayer = ({
       },
       branch.id || i
     )),
-    selectorDisplay === "TAG" && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+    selectorDisplay === "TAG" && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
       FindRecursoByTagField,
       {
         vm: findVm,
@@ -980,17 +1022,17 @@ var RecursoDisplayer = ({
 };
 
 // src/tarefa/TarefaCard.tsx
-var import_react_bootstrap7 = require("react-bootstrap");
+var import_react_bootstrap8 = require("react-bootstrap");
 var import_fa62 = require("react-icons/fa6");
 
 // src/tarefa/UnidadeMaterialPicker.tsx
 var import_react4 = require("react");
-var import_react_bootstrap6 = require("react-bootstrap");
+var import_react_bootstrap7 = require("react-bootstrap");
 var import_md2 = require("react-icons/md");
 var import_ri = require("react-icons/ri");
 var import_ti = require("react-icons/ti");
 var import_teraprox_ui_kit6 = require("teraprox-ui-kit");
-var import_jsx_runtime12 = require("react/jsx-runtime");
+var import_jsx_runtime13 = require("react/jsx-runtime");
 var removeAt = (arr, idx) => {
   if (!Array.isArray(arr)) return [];
   const copy = [...arr];
@@ -1080,7 +1122,7 @@ var UnidadeMaterialPicker = ({
     if (formatationFunc) return formatationFunc(pi);
     return `${optionDisplayKey && pi[optionDisplayKey] || pi.id || index}`;
   };
-  const renderTooltip = (props) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_react_bootstrap6.Tooltip, { id: "button-tooltip", ...props, children: "Remover todas as opcoes" });
+  const renderTooltip = (props) => /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Tooltip, { id: "button-tooltip", ...props, children: "Remover todas as opcoes" });
   const onDeleteConfirmHandler = () => {
     const { pi, index } = optionIndexToDelete;
     const removedOptions = removeAt(optionsPicked, index);
@@ -1107,22 +1149,22 @@ var UnidadeMaterialPicker = ({
     setEditingIndex(null);
     setView(true);
   };
-  const renderOps = () => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("h4", { children: [
+  const renderOps = () => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("h4", { children: [
       optionDisplayName,
-      clearPickerOptions && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-        import_react_bootstrap6.OverlayTrigger,
+      clearPickerOptions && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+        import_react_bootstrap7.OverlayTrigger,
         {
           placement: "right",
           delay: { show: 250, hide: 250 },
           overlay: renderTooltip,
-          children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_react_bootstrap6.Button, { variant: "warning", children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_ri.RiDeleteBin5Line, { onClick: () => clearPickerOptions() }) })
+          children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Button, { variant: "warning", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_ri.RiDeleteBin5Line, { onClick: () => clearPickerOptions() }) })
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_react_bootstrap6.ListGroup, { numbered: true, id: "pickerOps", children: optionsPicked.map((pi, index) => {
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.ListGroup, { numbered: true, id: "pickerOps", children: optionsPicked.map((pi, index) => {
       if (optionComponent) {
-        return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
           "div",
           {
             style: {
@@ -1134,7 +1176,7 @@ var UnidadeMaterialPicker = ({
               payload: pi,
               index,
               onClickOp: (input) => onOptionEditClickHandler(input || pi, index),
-              deleteButton: () => onOptionDelete ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+              deleteButton: () => onOptionDelete ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                 import_ti.TiDeleteOutline,
                 {
                   style: { marginLeft: 8 },
@@ -1146,8 +1188,8 @@ var UnidadeMaterialPicker = ({
           index
         );
       }
-      return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(
-        import_react_bootstrap6.ListGroup.Item,
+      return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+        import_react_bootstrap7.ListGroup.Item,
         {
           disabled: pi == null ? void 0 : pi.removed,
           style: {
@@ -1158,8 +1200,8 @@ var UnidadeMaterialPicker = ({
           },
           action: true,
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { onClick: () => onOptionEditClickHandler(pi, index), children: getDisplayValueHandler(pi, index) }),
-            onOptionDelete && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { onClick: () => onOptionEditClickHandler(pi, index), children: getDisplayValueHandler(pi, index) }),
+            onOptionDelete && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
               import_ti.TiDeleteOutline,
               {
                 style: {
@@ -1174,8 +1216,8 @@ var UnidadeMaterialPicker = ({
         index
       );
     }) }),
-    !singlePick && !readOnlyMode && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { style: { textAlign: "center", padding: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-      import_react_bootstrap6.Button,
+    !singlePick && !readOnlyMode && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { textAlign: "center", padding: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      import_react_bootstrap7.Button,
       {
         className: "pickerButton",
         onClick: () => {
@@ -1189,8 +1231,8 @@ var UnidadeMaterialPicker = ({
   const buildCloseDisplay = () => {
     var _a, _b;
     if (!hideOptions) {
-      return ((_a = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _a : 0) === 0 ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-        import_react_bootstrap6.Button,
+      return ((_a = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _a : 0) === 0 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+        import_react_bootstrap7.Button,
         {
           disabled: readOnlyMode,
           className: "pickerButton",
@@ -1200,7 +1242,7 @@ var UnidadeMaterialPicker = ({
           },
           children: displayButtonName
         }
-      ) : ((_b = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _b : 0) > 0 && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+      ) : ((_b = optionsPicked == null ? void 0 : optionsPicked.length) != null ? _b : 0) > 0 && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
         "div",
         {
           style: {
@@ -1212,8 +1254,8 @@ var UnidadeMaterialPicker = ({
         }
       );
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-      import_react_bootstrap6.Button,
+    return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      import_react_bootstrap7.Button,
       {
         className: "pickerButton",
         onClick: () => {
@@ -1229,8 +1271,8 @@ var UnidadeMaterialPicker = ({
     setEditingIndex(null);
     setView(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_jsx_runtime12.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       import_teraprox_ui_kit6.DeleteConfirm,
       {
         dialogText: deleteDiaologText,
@@ -1241,7 +1283,7 @@ var UnidadeMaterialPicker = ({
         show: deleteConfirm
       }
     ),
-    view ? buildCloseDisplay() : /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+    view ? buildCloseDisplay() : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
       "div",
       {
         style: {
@@ -1253,17 +1295,17 @@ var UnidadeMaterialPicker = ({
           borderRadius: 4,
           borderColor: "gray"
         },
-        children: /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)("div", { style: { padding: 8 }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { padding: 8 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             "div",
             {
               onClick: () => closePickerHandler(),
               style: { float: "right" },
-              children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(import_md2.MdClose, {})
+              children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_md2.MdClose, {})
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("h3", { children: displayName }),
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h3", { children: displayName }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             import_teraprox_ui_kit6.UnidadeMaterialForm,
             {
               value: outOption,
@@ -1274,7 +1316,7 @@ var UnidadeMaterialPicker = ({
               loadUnidadesFunc
             }
           ),
-          editingIndex == null && showOpsWhenEdit && /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
+          editingIndex == null && showOpsWhenEdit && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
             "div",
             {
               style: {
@@ -1285,16 +1327,16 @@ var UnidadeMaterialPicker = ({
               children: !hideOptions && renderOps()
             }
           ),
-          editingIndex != null && onOptionEditClick ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-            import_react_bootstrap6.Button,
+          editingIndex != null && onOptionEditClick ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+            import_react_bootstrap7.Button,
             {
               style: { display: readOnlyMode ? "none" : "" },
               variant: "warning",
               onClick: saveEditOption,
               children: "Salvar Edicao"
             }
-          ) }) : /* @__PURE__ */ (0, import_jsx_runtime12.jsx)("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-            import_react_bootstrap6.Button,
+          ) }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { textAlign: "center", marginBottom: 8 }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+            import_react_bootstrap7.Button,
             {
               style: { display: readOnlyMode ? "none" : "" },
               onClick: () => salvarPicker(outOption),
@@ -1308,7 +1350,7 @@ var UnidadeMaterialPicker = ({
 };
 
 // src/tarefa/TarefaCard.tsx
-var import_jsx_runtime13 = require("react/jsx-runtime");
+var import_jsx_runtime14 = require("react/jsx-runtime");
 var TarefaCard = ({
   tarefa,
   posindex,
@@ -1331,24 +1373,24 @@ var TarefaCard = ({
   const unidadeDisplay = (unidade) => `${unidade} `;
   const conditionalActionButton = () => {
     if (tarefa.status !== "PENDENTE") {
-      return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Button, { disabled: true, variant: "secondary", children: "Tarefa Conclu\xEDda" });
+      return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Button, { disabled: true, variant: "secondary", children: "Tarefa Conclu\xEDda" });
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Button, { variant: "danger", onClick: () => remove(), children: "Remover" });
+    return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Button, { variant: "danger", onClick: () => remove(), children: "Remover" });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.Card, { style: { margin: 12 }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Card.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "d-flex justify-content-between align-items-center gap-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: `Ordem: ${ordem}` }),
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.Card, { style: { margin: 12 }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Card.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "d-flex justify-content-between align-items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("strong", { children: `Ordem: ${ordem}` }),
       !onlyView && conditionalActionButton()
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Card.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "A realizar:" }),
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Card.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup.Item, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("strong", { children: "A realizar:" }),
         " ",
         `${(tarefa == null ? void 0 : tarefa.modelIdentifier) ? tarefa == null ? void 0 : tarefa.modelIdentifier : (_b = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _b.nome} - ${(_c = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _c.descricao}`
       ] }),
-      tarefa.unidadesMateriais && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "Material Nescessario:" }),
-        tarefa.unidadesMateriais && tarefa.status !== "ENCERRADO" ? !readOnlyMode && !onlyView && /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      tarefa.unidadesMateriais && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup.Item, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("strong", { children: "Material Nescessario:" }),
+        tarefa.unidadesMateriais && tarefa.status !== "ENCERRADO" ? !readOnlyMode && !onlyView && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
           UnidadeMaterialPicker,
           {
             onBuild: (setView) => setView(true),
@@ -1370,18 +1412,18 @@ var TarefaCard = ({
             ]),
             ...unidadeMaterialPickerProps
           }
-        ) : /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.ListGroup, { as: "ol", numbered: true, children: tarefa.unidadesMateriais && tarefa.unidadesMateriais.map((uM, idx) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
+        ) : /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.ListGroup, { as: "ol", numbered: true, children: tarefa.unidadesMateriais && tarefa.unidadesMateriais.map((uM, idx) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup.Item, { children: [
           materialDisplay(uM.nomeMaterial),
           uM.quantidade,
           unidadeDisplay(uM.labelUnidade)
         ] }, idx)) })
       ] }),
-      tarefa.inspecoes && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "Inspe\xE7\xF5es:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.ListGroup, { as: "ol", numbered: true, children: tarefa.inspecoes && renderInspecoes ? renderInspecoes(tarefa.inspecoes) : null })
+      tarefa.inspecoes && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup.Item, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("strong", { children: "Inspe\xE7\xF5es:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.ListGroup, { as: "ol", numbered: true, children: tarefa.inspecoes && renderInspecoes ? renderInspecoes(tarefa.inspecoes) : null })
       ] }),
-      ((_e = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _e.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_fa62.FaRegCommentDots, { size: 20 }),
+      ((_e = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _e.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.ListGroup.Item, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_fa62.FaRegCommentDots, { size: 20 }),
         " ",
         tarefa.tarefaJustificativas[tarefa.tarefaJustificativas.length - 1].descricao
       ] })
@@ -1391,10 +1433,10 @@ var TarefaCard = ({
 
 // src/tarefa/TarefaItem.tsx
 var import_react5 = require("react");
-var import_react_bootstrap8 = require("react-bootstrap");
+var import_react_bootstrap9 = require("react-bootstrap");
 var import_fa3 = require("react-icons/fa");
 var import_teraprox_ui_kit7 = require("teraprox-ui-kit");
-var import_jsx_runtime14 = require("react/jsx-runtime");
+var import_jsx_runtime15 = require("react/jsx-runtime");
 var TarefaItem = (props) => {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i;
   const {
@@ -1452,9 +1494,9 @@ var TarefaItem = (props) => {
   };
   const conditionalMaterialUtilizadoFieldRender = (tUM, i) => {
     if (saving) {
-      return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "w-100", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Spinner, { animation: "border" }) });
+      return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "w-100", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.Spinner, { animation: "border" }) });
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
       import_teraprox_ui_kit7.FormField,
       {
         styleObj: { fontSize: "1.2rem" },
@@ -1469,27 +1511,27 @@ var TarefaItem = (props) => {
       }
     );
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_jsx_runtime14.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.Card, { className: "shadow-sm", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "tarefa-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "tarefa-title-line", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("strong", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_react_bootstrap9.Card, { className: "shadow-sm", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-title-line", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("strong", { children: [
               tarefaForm.sequencia,
               "."
             ] }),
             renderEditableDescricao({
               initialValue: tarefaForm.descricao,
               onHide: (descricao) => onDescricaoUpdate(descricao),
-              renderFallback: (setActive, setOldValue) => /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "editable-text-container", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+              renderFallback: (setActive, setOldValue) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "editable-text-container", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                   import_teraprox_ui_kit7.TextWithMore,
                   {
                     text: tarefaForm.descricao,
                     maxLength: 25
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_teraprox_ui_kit7.GenericDisplay, { children: !readOnly && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.GenericDisplay, { children: !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
                   import_fa3.FaRegEdit,
                   {
                     onClick: () => {
@@ -1502,14 +1544,14 @@ var TarefaItem = (props) => {
               ] })
             })
           ] }),
-          ((_a = tarefaForm.acao) == null ? void 0 : _a.nome) && /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "tarefa-acao-line", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_fa3.FaWrench, {}),
+          ((_a = tarefaForm.acao) == null ? void 0 : _a.nome) && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-acao-line", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_fa3.FaWrench, {}),
             " ",
             tarefaForm.acao.nome
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { className: "d-flex gap-3 align-items-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "d-flex gap-3 align-items-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
             import_fa3.FaComments,
             {
               title: "Observa\xE7\xF5es",
@@ -1519,7 +1561,7 @@ var TarefaItem = (props) => {
             }
           ),
           renderIconWithBadge({
-            icon: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            icon: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
               import_fa3.FaClipboardList,
               {
                 title: "Inspe\xE7\xF5es",
@@ -1531,7 +1573,7 @@ var TarefaItem = (props) => {
             content: (_c = (_b = tarefaForm == null ? void 0 : tarefaForm.inspecoes) == null ? void 0 : _b.length) != null ? _c : 0
           }),
           renderIconWithBadge({
-            icon: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            icon: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
               import_fa3.FaCubes,
               {
                 title: "Materiais",
@@ -1548,7 +1590,7 @@ var TarefaItem = (props) => {
             filesData: anexos
           })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
           import_teraprox_ui_kit7.StatusBadge,
           {
             status: tarefaForm.status,
@@ -1559,9 +1601,9 @@ var TarefaItem = (props) => {
           }
         ) })
       ] }),
-      ((_f = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _f.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_react_bootstrap8.Card.Footer, { children: (_g = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _g.map((tum, i) => {
+      ((_f = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _f.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.Card.Footer, { children: (_g = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _g.map((tum, i) => {
         var _a2, _b2;
-        return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+        return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
           "div",
           {
             style: {
@@ -1572,9 +1614,9 @@ var TarefaItem = (props) => {
               opacity: 0.7
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { style: { textAlign: "center" }, children: i + 1 }),
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { style: { textAlign: "center" }, children: i + 1 }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { children: [
                 tum.quantidade,
                 " ",
                 (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.labelUnidade
@@ -1591,7 +1633,7 @@ var TarefaItem = (props) => {
       close: () => setShowObs(false),
       saveCallback: onSaveObservacao
     }),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
       import_teraprox_ui_kit7.ResponsiveContainer,
       {
         title: "Inspe\xE7\xF5es",
@@ -1604,7 +1646,7 @@ var TarefaItem = (props) => {
             isMobile,
             updateInspecaoCallback: onUpdateInspecaoField
           }),
-          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
             import_teraprox_ui_kit7.ResponsiveContainer,
             {
               setShow: handleClose,
@@ -1619,21 +1661,21 @@ var TarefaItem = (props) => {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
       import_teraprox_ui_kit7.ResponsiveContainer,
       {
         title: "Materiais",
         show: showMat,
         setShow: setShowMat,
         children: [
-          !isMobile ? /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(import_react_bootstrap8.Table, { bordered: true, size: "sm", className: "mt-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("tr", { style: { textAlign: "center" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("th", { children: "N\u02DA" }),
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("th", { children: "Material" }),
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("th", { children: "Planejada" }),
-              /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("th", { children: "Utilizada" })
+          !isMobile ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_react_bootstrap9.Table, { bordered: true, size: "sm", className: "mt-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("tr", { style: { textAlign: "center" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "N\u02DA" }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Material" }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Planejada" }),
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Utilizada" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
               "tbody",
               {
                 style: {
@@ -1643,22 +1685,22 @@ var TarefaItem = (props) => {
                 },
                 children: (_h = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _h.map((tum, i) => {
                   var _a2, _b2, _c2;
-                  return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("tr", { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("td", { children: i + 1 }),
-                    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("td", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)("td", { children: [
+                  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("tr", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: i + 1 }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("td", { children: [
                       (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.quantidade,
                       " ",
                       (_c2 = tum.unidadeMaterial) == null ? void 0 : _c2.labelUnidade
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("td", { children: conditionalMaterialUtilizadoFieldRender(tum, i) })
+                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: conditionalMaterialUtilizadoFieldRender(tum, i) })
                   ] }, tum.id);
                 })
               }
             )
           ] }) : (_i = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _i.map((tum, i) => {
             var _a2, _b2, _c2, _d2;
-            return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)("div", { className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
+            return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
               import_teraprox_ui_kit7.ExpandableCard,
               {
                 items: [
@@ -1678,7 +1720,7 @@ var TarefaItem = (props) => {
               }
             ) }, (_a2 = tum.id) != null ? _a2 : i);
           }),
-          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => renderNovaUnidadeMaterialForm({
+          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => renderNovaUnidadeMaterialForm({
             onSaveClick: (form) => onAddUnidadeMaterial(form, handleClose),
             handleClose,
             value: unidadeMaterialFormValue,
@@ -1692,10 +1734,10 @@ var TarefaItem = (props) => {
 
 // src/mantenedor/MantenedorPicker.tsx
 var import_react6 = __toESM(require("react"));
-var import_react_bootstrap9 = require("react-bootstrap");
+var import_react_bootstrap10 = require("react-bootstrap");
 var import_gr4 = require("react-icons/gr");
 var import_teraprox_ui_kit8 = require("teraprox-ui-kit");
-var import_jsx_runtime15 = require("react/jsx-runtime");
+var import_jsx_runtime16 = require("react/jsx-runtime");
 var MantenedorPicker = ({
   viewModel,
   currentOsId,
@@ -1722,8 +1764,8 @@ var MantenedorPicker = ({
       viewModel.search(item.nomeUsuario);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { onMouseLeave: () => setHideOps(true), className, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { onMouseLeave: () => setHideOps(true), className, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
       import_teraprox_ui_kit8.FormField,
       {
         label,
@@ -1745,28 +1787,28 @@ var MantenedorPicker = ({
         }
       }
     ),
-    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ListGroup, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ListGroup.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
+    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.ListGroup, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.ListGroup.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
       const isBusyOther = m._busy && m.osId !== currentOsId;
       const isBusyHere = m._busy && m.osId === currentOsId;
-      return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-        import_react_bootstrap9.ListGroup.Item,
+      return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+        import_react_bootstrap10.ListGroup.Item,
         {
           action: true,
           onClick: () => handleClick(m),
           className: `mantenedor-option ${isBusyOther ? "busy" : ""} ${isBusyHere ? "current-os" : ""}`,
-          children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("li", { className: "d-flex align-items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: m.nomeUsuario }),
-            isBusyHere && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "current-os-indicator", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_gr4.GrCheckmark, { size: 18 }),
+          children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("li", { className: "d-flex align-items-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { children: m.nomeUsuario }),
+            isBusyHere && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "current-os-indicator", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_gr4.GrCheckmark, { size: 18 }),
               " Trabalhando nesta OS"
             ] }),
-            isBusyOther && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
+            isBusyOther && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
           ] })
         },
         m.id
       );
     }) }),
-    viewModel.pendingConfirm && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+    viewModel.pendingConfirm && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
       import_teraprox_ui_kit8.ApproveAndReproveButtons,
       {
         headerText: `Deseja desalocar ${viewModel.pendingConfirm.nomeUsuario} da OS-${viewModel.pendingConfirm.osId} para uma nova aloca\xE7\xE3o?`,
@@ -1793,6 +1835,7 @@ var MantenedorPicker = ({
   MantenedorRender,
   MantenedorRenderCompact,
   ManutentorCard,
+  ManutentorCardCompact,
   ManutentoresDisplay,
   MetricasDisplay,
   RecursoDisplayer,
