@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
@@ -22,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AnexoManager: () => AnexoManager,
   ClickToWriteField: () => ClickToWriteField,
+  ColorPicker: () => ColorPicker,
   CombineModeToggle: () => CombineModeToggle,
   ContadorPicker: () => ContadorPicker,
   FormModal: () => FormModal,
@@ -995,10 +1006,89 @@ var CombineModeToggle = ({
     }
   );
 };
+
+// src/color-picker/ColorPicker.tsx
+var import_react2 = __toESM(require("react"));
+var import_jsx_runtime7 = require("react/jsx-runtime");
+var PRESET_COLORS = [
+  "#e74c3c",
+  // vermelho
+  "#e67e22",
+  // laranja
+  "#f1c40f",
+  // amarelo
+  "#2ecc71",
+  // verde
+  "#1abc9c",
+  // turquesa
+  "#3498db",
+  // azul
+  "#9b59b6",
+  // roxo
+  "#34495e",
+  // cinza escuro
+  "#ecf0f1",
+  // cinza claro
+  "#ffffff"
+  // branco
+];
+function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label = "Cor" }) {
+  const [value, setValue] = import_react2.default.useState(defaultColor);
+  const handleChange = (hex) => {
+    setValue(hex);
+    setCor(hex);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "color-picker-container mb-3", children: [
+    label && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "form-label fw-semibold", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "d-flex align-items-center gap-2 flex-wrap", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+        "input",
+        {
+          type: "color",
+          className: "form-control form-control-color",
+          style: { width: "48px", height: "38px", padding: "2px", cursor: disabled ? "not-allowed" : "pointer" },
+          value,
+          onChange: (e) => handleChange(e.target.value),
+          disabled,
+          title: "Escolher cor personalizada"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "d-flex gap-1 flex-wrap", children: PRESET_COLORS.map((color) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+        "button",
+        {
+          type: "button",
+          title: color,
+          disabled,
+          onClick: () => handleChange(color),
+          style: {
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            background: color,
+            border: value === color ? "3px solid #333" : "2px solid #ccc",
+            cursor: disabled ? "not-allowed" : "pointer",
+            flexShrink: 0,
+            transition: "border 0.15s"
+          }
+        },
+        color
+      )) }),
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+        "span",
+        {
+          className: "badge rounded-pill text-dark border",
+          style: { background: value, minWidth: "80px", fontSize: "0.75rem", letterSpacing: "0.05em" },
+          children: value.toUpperCase()
+        }
+      )
+    ] })
+  ] });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AnexoManager,
   ClickToWriteField,
+  ColorPicker,
   CombineModeToggle,
   ContadorPicker,
   FormModal,

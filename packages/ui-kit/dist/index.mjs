@@ -14,21 +14,20 @@ var AddButton = ({ callback, hiddenBool, size }) => /* @__PURE__ */ jsx(
 var AddButton_default = AddButton;
 
 // src/buttons/DeleteButton.tsx
-import { Button as Button2 } from "react-bootstrap";
 import { jsx as jsx2 } from "react/jsx-runtime";
 var DeleteButton = ({ title, onDeleteClick }) => {
-  return /* @__PURE__ */ jsx2(Button2, { variant: "danger", onClick: () => onDeleteClick(), children: title });
+  return /* @__PURE__ */ jsx2("button", { className: "btn btn-danger", onClick: () => onDeleteClick(), children: title });
 };
 var DeleteButton_default = DeleteButton;
 
 // src/buttons/ActionButtons.tsx
 import { useState as useState2, useRef } from "react";
-import { Button as Button4, Form as Form2, ProgressBar } from "react-bootstrap";
+import { Button as Button3, Form as Form2, ProgressBar } from "react-bootstrap";
 import { FiSave, FiTrash2, FiRotateCcw, FiCopy, FiChevronLeft } from "react-icons/fi";
 
 // src/forms/DeleteConfirm.tsx
 import { useState } from "react";
-import { Button as Button3, Modal, Form } from "react-bootstrap";
+import { Button as Button2, Modal, Form } from "react-bootstrap";
 import { jsx as jsx3, jsxs } from "react/jsx-runtime";
 var DeleteConfirm = ({
   show,
@@ -70,9 +69,9 @@ var DeleteConfirm = ({
       ] })
     ] }) }),
     /* @__PURE__ */ jsxs(Modal.Footer, { children: [
-      /* @__PURE__ */ jsx3(Button3, { variant: "secondary", onClick: () => onHide(false), children: "Cancelar" }),
+      /* @__PURE__ */ jsx3(Button2, { variant: "secondary", onClick: () => onHide(false), children: "Cancelar" }),
       /* @__PURE__ */ jsx3(
-        Button3,
+        Button2,
         {
           variant: "danger",
           disabled: !isConfirmEnabled(),
@@ -139,7 +138,7 @@ var ActionButtons = ({
     if (useDelayedDelete) {
       return /* @__PURE__ */ jsxs2("div", { style: { position: "relative", display: "inline-block", margin: 2 }, children: [
         /* @__PURE__ */ jsxs2(
-          Button4,
+          Button3,
           {
             variant: "outline-danger",
             onMouseDown: startHold,
@@ -173,7 +172,7 @@ var ActionButtons = ({
       ] });
     }
     return /* @__PURE__ */ jsxs2(
-      Button4,
+      Button3,
       {
         variant: "danger",
         onClick: () => setShowConfirm(true),
@@ -198,20 +197,20 @@ var ActionButtons = ({
       }
     ),
     /* @__PURE__ */ jsxs2(Form2.Group, { className: "d-flex flex-wrap align-items-center mt-3 gap-1", children: [
-      onBack && /* @__PURE__ */ jsxs2(Button4, { variant: "outline-secondary", onClick: onBack, disabled, style: { margin: 2 }, children: [
+      onBack && /* @__PURE__ */ jsxs2(Button3, { variant: "outline-secondary", onClick: onBack, disabled, style: { margin: 2 }, children: [
         /* @__PURE__ */ jsx4(FiChevronLeft, { className: "me-2" }),
         backLabel
       ] }),
-      isEditing && onCancelEdit && /* @__PURE__ */ jsxs2(Button4, { variant: "warning", onClick: onCancelEdit, disabled, style: { margin: 2 }, children: [
+      isEditing && onCancelEdit && /* @__PURE__ */ jsxs2(Button3, { variant: "warning", onClick: onCancelEdit, disabled, style: { margin: 2 }, children: [
         /* @__PURE__ */ jsx4(FiRotateCcw, { className: "me-2" }),
         cancelEditLabel
       ] }),
       /* @__PURE__ */ jsx4(PermissionWrapper, { children: renderDeleteButton() }),
-      onSave && /* @__PURE__ */ jsxs2(Button4, { variant: saveVariant, onClick: onSave, disabled, style: { margin: 2 }, children: [
+      onSave && /* @__PURE__ */ jsxs2(Button3, { variant: saveVariant, onClick: onSave, disabled, style: { margin: 2 }, children: [
         /* @__PURE__ */ jsx4(FiSave, { className: "me-2" }),
         saveLabel
       ] }),
-      isEditing && onCopy && /* @__PURE__ */ jsxs2(Button4, { variant: "outline-primary", onClick: onCopy, disabled, style: { margin: 2 }, children: [
+      isEditing && onCopy && /* @__PURE__ */ jsxs2(Button3, { variant: "outline-primary", onClick: onCopy, disabled, style: { margin: 2 }, children: [
         /* @__PURE__ */ jsx4(FiCopy, { className: "me-2" }),
         copyLabel
       ] })
@@ -221,7 +220,7 @@ var ActionButtons = ({
 
 // src/buttons/ApproveAndReproveButtons.tsx
 import { useEffect } from "react";
-import { Button as Button5 } from "react-bootstrap";
+import { Button as Button4 } from "react-bootstrap";
 import { GrCheckmark, GrClose } from "react-icons/gr";
 import { jsx as jsx5, jsxs as jsxs3 } from "react/jsx-runtime";
 var ApproveAndReproveButtons = ({
@@ -245,14 +244,14 @@ var ApproveAndReproveButtons = ({
   return /* @__PURE__ */ jsxs3("div", { children: [
     /* @__PURE__ */ jsx5("strong", { children: headerText }),
     /* @__PURE__ */ jsx5("br", {}),
-    /* @__PURE__ */ jsx5(Button5, { onClick: approveCallback, variant: "success", className: "me-1", children: approveText ? approveText : /* @__PURE__ */ jsx5(GrCheckmark, { size: buttonSize }) }),
-    /* @__PURE__ */ jsx5(Button5, { onClick: reproveCallback, variant: "danger", children: repproveText ? repproveText : /* @__PURE__ */ jsx5(GrClose, { size: buttonSize }) })
+    /* @__PURE__ */ jsx5(Button4, { onClick: approveCallback, variant: "success", className: "me-1", children: approveText ? approveText : /* @__PURE__ */ jsx5(GrCheckmark, { size: buttonSize }) }),
+    /* @__PURE__ */ jsx5(Button4, { onClick: reproveCallback, variant: "danger", children: repproveText ? repproveText : /* @__PURE__ */ jsx5(GrClose, { size: buttonSize }) })
   ] });
 };
 
 // src/buttons/AsyncButton.tsx
 import { useState as useState3, useRef as useRef2 } from "react";
-import { Button as Button6 } from "react-bootstrap";
+import { Button as Button5 } from "react-bootstrap";
 
 // src/progress/LoadingProgress.tsx
 import { Spinner } from "react-bootstrap";
@@ -295,7 +294,7 @@ var AsyncButton = ({
 }) => {
   const { loading, execute } = useAsyncAction();
   return /* @__PURE__ */ jsx7(
-    Button6,
+    Button5,
     {
       ...buttonProps,
       onClick: () => execute(onClick),
@@ -327,7 +326,7 @@ var BonusButton = ({
 };
 
 // src/buttons/ButtonWithDropdown.tsx
-import { Button as Button7, ButtonGroup, Dropdown } from "react-bootstrap";
+import { Button as Button6, ButtonGroup, Dropdown } from "react-bootstrap";
 import { jsx as jsx9, jsxs as jsxs4 } from "react/jsx-runtime";
 var ButtonWithDropdown = ({
   title,
@@ -345,7 +344,7 @@ var ButtonWithDropdown = ({
       style: { flex: 1, minWidth: 0 },
       children: [
         /* @__PURE__ */ jsx9(
-          Button7,
+          Button6,
           {
             variant,
             onClick: onClickButton,
@@ -419,7 +418,7 @@ var CheckBox = ({
 
 // src/buttons/Generic3DotMenu.tsx
 import { useState as useState4 } from "react";
-import { Button as Button8, Modal as Modal2 } from "react-bootstrap";
+import { Button as Button7, Modal as Modal2 } from "react-bootstrap";
 import { CiMenuKebab } from "react-icons/ci";
 import { Fragment as Fragment2, jsx as jsx11, jsxs as jsxs6 } from "react/jsx-runtime";
 var MenuEvent = class {
@@ -467,7 +466,7 @@ var Generic3DotMenu = ({
         Object.keys(groupedEvents).map((section, sectionIndex) => /* @__PURE__ */ jsxs6("div", { className: "mb-4", children: [
           /* @__PURE__ */ jsx11("h6", { className: "border-bottom pb-2 mb-3", children: section !== "default" ? section : "Op\xE7\xF5es Principais" }),
           /* @__PURE__ */ jsx11("div", { className: "d-grid gap-2", children: groupedEvents[section].map((event, index) => /* @__PURE__ */ jsx11(
-            Button8,
+            Button7,
             {
               variant: event.variant || "primary",
               onClick: () => {
@@ -480,13 +479,13 @@ var Generic3DotMenu = ({
           )) })
         ] }, sectionIndex))
       ] }),
-      /* @__PURE__ */ jsx11(Modal2.Footer, { children: /* @__PURE__ */ jsx11(Button8, { variant: "secondary", onClick: handleClose, children: "Fechar" }) })
+      /* @__PURE__ */ jsx11(Modal2.Footer, { children: /* @__PURE__ */ jsx11(Button7, { variant: "secondary", onClick: handleClose, children: "Fechar" }) })
     ] })
   ] });
 };
 
 // src/buttons/LoadingButton.tsx
-import { Button as Button9, Spinner as Spinner2 } from "react-bootstrap";
+import { Button as Button8, Spinner as Spinner2 } from "react-bootstrap";
 import { jsx as jsx12, jsxs as jsxs7 } from "react/jsx-runtime";
 var LoadingButton = ({
   onClick,
@@ -501,7 +500,7 @@ var LoadingButton = ({
   ...props
 }) => {
   return /* @__PURE__ */ jsx12(
-    Button9,
+    Button8,
     {
       variant,
       size,
@@ -532,7 +531,7 @@ var LoadingButton = ({
 };
 
 // src/buttons/NavigateButton.tsx
-import { Button as Button10 } from "react-bootstrap";
+import { Button as Button9 } from "react-bootstrap";
 import { jsx as jsx13 } from "react/jsx-runtime";
 var NavigateButton = ({
   displayName,
@@ -552,7 +551,7 @@ var NavigateButton = ({
     navigator2(path, config, pageName);
   };
   return /* @__PURE__ */ jsx13(
-    Button10,
+    Button9,
     {
       style,
       variant,
@@ -1253,7 +1252,7 @@ var StatusPills = ({
 
 // src/filters/PeriodSelector.tsx
 import { useState as useState9 } from "react";
-import { Card as Card2, Form as Form5, Button as Button11 } from "react-bootstrap";
+import { Card as Card2, Form as Form5, Button as Button10 } from "react-bootstrap";
 import { FaCalendarAlt, FaChevronUp, FaHistory } from "react-icons/fa";
 import dayjs3 from "dayjs";
 import { jsx as jsx28, jsxs as jsxs20 } from "react/jsx-runtime";
@@ -1296,7 +1295,7 @@ var PeriodSelector = ({
           /* @__PURE__ */ jsx28("small", { className: "text-muted fw-bold text-uppercase", style: { fontSize: "0.65rem" }, children: "Atalhos" })
         ] }),
         presets.map((p) => /* @__PURE__ */ jsx28(
-          Button11,
+          Button10,
           {
             variant: "outline-primary",
             className: "preset-btn",
@@ -1339,7 +1338,7 @@ var PeriodSelector = ({
         ] })
       ] }),
       /* @__PURE__ */ jsx28("div", { className: "mt-3 d-flex justify-content-end", children: /* @__PURE__ */ jsx28(
-        Button11,
+        Button10,
         {
           variant: "primary",
           size: "sm",
@@ -1353,7 +1352,7 @@ var PeriodSelector = ({
 
 // src/filters/AdvancedFilterBar.tsx
 import { useState as useState10 } from "react";
-import { Collapse, Button as Button12 } from "react-bootstrap";
+import { Collapse, Button as Button11 } from "react-bootstrap";
 import { FiFilter, FiChevronDown, FiChevronUp, FiTrash2 as FiTrash22 } from "react-icons/fi";
 import { jsx as jsx29, jsxs as jsxs21 } from "react/jsx-runtime";
 var AdvancedFilterBar = ({
@@ -1388,7 +1387,7 @@ var AdvancedFilterBar = ({
       /* @__PURE__ */ jsx29("div", { className: "filter-grid", children }),
       (onClearAll || activeFiltersCount > 0) && /* @__PURE__ */ jsxs21("div", { className: "filter-actions", children: [
         onClearAll && /* @__PURE__ */ jsxs21(
-          Button12,
+          Button11,
           {
             variant: "link",
             className: "text-danger text-decoration-none btn-sm d-flex align-items-center",
@@ -1403,7 +1402,7 @@ var AdvancedFilterBar = ({
           }
         ),
         /* @__PURE__ */ jsx29(
-          Button12,
+          Button11,
           {
             variant: "primary",
             size: "sm",
@@ -1418,7 +1417,7 @@ var AdvancedFilterBar = ({
 
 // src/filters/UnifiedPeriodSelector.tsx
 import { useCallback, useEffect as useEffect4, useMemo as useMemo2, useState as useState11 } from "react";
-import { Button as Button13, Card as Card3, Col as Col3, Form as Form6, Row as Row3 } from "react-bootstrap";
+import { Button as Button12, Card as Card3, Col as Col3, Form as Form6, Row as Row3 } from "react-bootstrap";
 import {
   FaCalendarAlt as FaCalendarAlt2,
   FaChevronLeft,
@@ -1660,7 +1659,7 @@ var UnifiedPeriodSelector = ({
       ] }),
       /* @__PURE__ */ jsxs22("div", { className: "d-flex align-items-center gap-1", children: [
         (dataInicio || dataFim) && /* @__PURE__ */ jsx30(
-          Button13,
+          Button12,
           {
             variant: "link",
             size: "sm",
@@ -1672,7 +1671,7 @@ var UnifiedPeriodSelector = ({
           }
         ),
         compact && /* @__PURE__ */ jsx30(
-          Button13,
+          Button12,
           {
             variant: "link",
             size: "sm",
@@ -1698,7 +1697,7 @@ var UnifiedPeriodSelector = ({
     )) }),
     /* @__PURE__ */ jsxs22("div", { className: "ups-content", children: [
       activeTab === "quick" && /* @__PURE__ */ jsx30("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ jsx30(
-        Button13,
+        Button12,
         {
           size: "sm",
           variant: activePresetKey === p.key ? "primary" : "outline-secondary",
@@ -1712,7 +1711,7 @@ var UnifiedPeriodSelector = ({
       activeTab === "month" && /* @__PURE__ */ jsxs22("div", { className: "ups-month-section", children: [
         /* @__PURE__ */ jsxs22("div", { className: "ups-year-nav", children: [
           /* @__PURE__ */ jsx30(
-            Button13,
+            Button12,
             {
               variant: "outline-secondary",
               size: "sm",
@@ -1724,7 +1723,7 @@ var UnifiedPeriodSelector = ({
           ),
           /* @__PURE__ */ jsx30("span", { className: "ups-year-label", children: selectedYear }),
           /* @__PURE__ */ jsx30(
-            Button13,
+            Button12,
             {
               variant: "outline-secondary",
               size: "sm",
@@ -1789,7 +1788,7 @@ var UnifiedPeriodSelector = ({
           ] }) })
         ] }),
         /* @__PURE__ */ jsx30("div", { className: "d-flex justify-content-end mt-2", children: /* @__PURE__ */ jsx30(
-          Button13,
+          Button12,
           {
             variant: "primary",
             size: "sm",
@@ -1806,7 +1805,7 @@ var UnifiedPeriodSelector = ({
 // src/forms/MailSender.tsx
 import { useState as useState12 } from "react";
 import {
-  Button as Button14,
+  Button as Button13,
   Card as Card4,
   Col as Col4,
   Form as Form7,
@@ -1916,7 +1915,7 @@ var MailSender = ({
     if (renderTrigger) {
       return renderTrigger({ onClick: handleOpen, loading });
     }
-    return /* @__PURE__ */ jsx31(Button14, { disabled: loading, className: "w-100", onClick: handleOpen, children: loading ? "Carregando..." : "Enviar por E-mail" });
+    return /* @__PURE__ */ jsx31(Button13, { disabled: loading, className: "w-100", onClick: handleOpen, children: loading ? "Carregando..." : "Enviar por E-mail" });
   }
   return /* @__PURE__ */ jsxs23(
     "div",
@@ -1950,7 +1949,7 @@ var MailSender = ({
               ] }),
               /* @__PURE__ */ jsxs23("div", { className: "d-flex gap-2", children: [
                 /* @__PURE__ */ jsx31(
-                  Button14,
+                  Button13,
                   {
                     variant: "light",
                     onClick: sendEmail,
@@ -1971,7 +1970,7 @@ var MailSender = ({
                   }
                 ),
                 /* @__PURE__ */ jsx31(
-                  Button14,
+                  Button13,
                   {
                     variant: "outline-light",
                     onClick: () => setOpened(false),
@@ -2004,7 +2003,7 @@ var MailSender = ({
                 ] })
               ] }),
               /* @__PURE__ */ jsx31(Col4, { md: 6, className: "text-end", children: /* @__PURE__ */ jsx31(
-                Button14,
+                Button13,
                 {
                   variant: addingEmail ? "outline-secondary" : "outline-primary",
                   size: "sm",
@@ -2055,7 +2054,7 @@ var MailSender = ({
                       /* @__PURE__ */ jsx31(Form7.Control.Feedback, { type: "invalid", children: emailError })
                     ] }),
                     /* @__PURE__ */ jsx31(Col4, { md: 4, children: /* @__PURE__ */ jsxs23(
-                      Button14,
+                      Button13,
                       {
                         variant: "success",
                         onClick: handleEmailAdd,
@@ -2098,7 +2097,7 @@ var MailSender = ({
                   /* @__PURE__ */ jsx31(FiUser, { size: 12, className: "me-2", color: "#1976d2" }),
                   /* @__PURE__ */ jsx31("span", { children: email.email || email }),
                   /* @__PURE__ */ jsx31(
-                    Button14,
+                    Button13,
                     {
                       variant: "link",
                       size: "sm",
@@ -2408,7 +2407,7 @@ var AutoComplete = ({
 
 // src/forms/GenericForm.tsx
 import { useState as useState14 } from "react";
-import { Button as Button15, Form as Form9 } from "react-bootstrap";
+import { Button as Button14, Form as Form9 } from "react-bootstrap";
 import { jsx as jsx33, jsxs as jsxs25 } from "react/jsx-runtime";
 var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
   const [formValues, setFormValues] = useState14({});
@@ -2508,7 +2507,7 @@ var GenericForm = ({ fields, onSubmit, renderCustomSelect }) => {
   };
   return /* @__PURE__ */ jsxs25(Form9, { onSubmit: handleSubmit, children: [
     fields.map((field) => renderField(field)),
-    /* @__PURE__ */ jsx33("div", { className: "d-grid", children: /* @__PURE__ */ jsx33(Button15, { variant: "primary", type: "submit", children: "Salvar" }) })
+    /* @__PURE__ */ jsx33("div", { className: "d-grid", children: /* @__PURE__ */ jsx33(Button14, { variant: "primary", type: "submit", children: "Salvar" }) })
   ] });
 };
 var GenericForm_default = GenericForm;
@@ -2698,7 +2697,7 @@ var FormField = ({
 
 // src/forms/ClickToWriteField.tsx
 import { useState as useState16, useEffect as useEffect7, useRef as useRef4 } from "react";
-import { Button as Button16 } from "react-bootstrap";
+import { Button as Button15 } from "react-bootstrap";
 import { jsx as jsx36, jsxs as jsxs28 } from "react/jsx-runtime";
 var ClickToWriteField = ({
   buttonDisplay,
@@ -2748,7 +2747,7 @@ var ClickToWriteField = ({
   };
   return /* @__PURE__ */ jsxs28("div", { style: { display: "flex", width: "100%", margin: 0, padding: 0 }, children: [
     !showClick && /* @__PURE__ */ jsx36(
-      Button16,
+      Button15,
       {
         style: { flexGrow: 1 },
         onClick: handleShowClick,
@@ -2767,7 +2766,7 @@ var ClickToWriteField = ({
         onValueUpdate: onFieldValueUpdate,
         onBlur: () => setShowClick(false),
         actionClick: () => enableFieldActionButton ? /* @__PURE__ */ jsx36(
-          Button16,
+          Button15,
           {
             ...fieldActionButtonProps,
             onClick: () => fieldActionButtonCallback(inputRef),
@@ -3023,7 +3022,7 @@ var SectorSelector = ({
 };
 
 // src/forms/UnidadeMaterialForm.tsx
-import { Button as Button17 } from "react-bootstrap";
+import { Button as Button16 } from "react-bootstrap";
 import { jsx as jsx41, jsxs as jsxs32 } from "react/jsx-runtime";
 var UnidadeMaterialForm = ({
   value,
@@ -3041,8 +3040,8 @@ var UnidadeMaterialForm = ({
   className = ""
 }) => {
   var _a, _b, _c;
-  const renderNewMaterialButton = () => /* @__PURE__ */ jsx41(Button17, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
-  const renderNewUnidadeButton = () => /* @__PURE__ */ jsx41(Button17, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
+  const renderNewMaterialButton = () => /* @__PURE__ */ jsx41(Button16, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
+  const renderNewUnidadeButton = () => /* @__PURE__ */ jsx41(Button16, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
   return /* @__PURE__ */ jsxs32("div", { className: `unidade-material-form ${className}`, children: [
     !hideMaterial && /* @__PURE__ */ jsx41(
       AutoComplete,
@@ -3114,7 +3113,7 @@ var IconLabelList = ({ items, className = "" }) => {
 
 // src/icons/NotificationItem.tsx
 import { useState as useState18 } from "react";
-import { Modal as Modal4, Button as Button18, OverlayTrigger, Tooltip as Tooltip3 } from "react-bootstrap";
+import { Modal as Modal4, Button as Button17, OverlayTrigger, Tooltip as Tooltip3 } from "react-bootstrap";
 import { FiClock, FiCheck, FiTrash2 as FiTrash23 } from "react-icons/fi";
 import dayjs5 from "dayjs";
 import { Fragment as Fragment11, jsx as jsx44, jsxs as jsxs34 } from "react/jsx-runtime";
@@ -3221,8 +3220,8 @@ var NotificationItem = ({
             /* @__PURE__ */ jsx44("div", { className: "notification-modal-message", children: /* @__PURE__ */ jsx44("p", { className: "mb-0", children: content || emptyContentLabel }) })
           ] }) }),
           /* @__PURE__ */ jsxs34(Modal4.Footer, { className: "notification-modal-footer", children: [
-            /* @__PURE__ */ jsx44(Button18, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-            status === "unread" && /* @__PURE__ */ jsx44(Button18, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
+            /* @__PURE__ */ jsx44(Button17, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+            status === "unread" && /* @__PURE__ */ jsx44(Button17, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
           ] })
         ]
       }
@@ -3301,7 +3300,7 @@ var NotificationBell = ({
 };
 
 // src/modals/ModalBasicTemplate.tsx
-import { Modal as Modal5, Button as Button19 } from "react-bootstrap";
+import { Modal as Modal5, Button as Button18 } from "react-bootstrap";
 import { jsx as jsx46, jsxs as jsxs36 } from "react/jsx-runtime";
 var ModalBasicTemplate = ({
   show,
@@ -3329,7 +3328,7 @@ var ModalBasicTemplate = ({
         /* @__PURE__ */ jsx46(Modal5.Body, { style: bodyStyle, children: renderPart(body) }),
         footer && /* @__PURE__ */ jsxs36(Modal5.Footer, { children: [
           renderPart(footer),
-          !footer && /* @__PURE__ */ jsx46(Button19, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
+          !footer && /* @__PURE__ */ jsx46(Button18, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
         ] })
       ]
     }
@@ -3339,7 +3338,7 @@ var ModalBasicTemplate_default = ModalBasicTemplate;
 
 // src/modals/SelectDateModal.tsx
 import { useState as useState19 } from "react";
-import { Modal as Modal6, Button as Button20, Form as Form15 } from "react-bootstrap";
+import { Modal as Modal6, Button as Button19, Form as Form15 } from "react-bootstrap";
 import dayjs6 from "dayjs";
 import { jsx as jsx47, jsxs as jsxs37 } from "react/jsx-runtime";
 var SelectDateModal = ({
@@ -3373,15 +3372,15 @@ var SelectDateModal = ({
       )
     ] }) }),
     /* @__PURE__ */ jsxs37(Modal6.Footer, { children: [
-      /* @__PURE__ */ jsx47(Button20, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
-      /* @__PURE__ */ jsx47(Button20, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
+      /* @__PURE__ */ jsx47(Button19, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
+      /* @__PURE__ */ jsx47(Button19, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
     ] })
   ] });
 };
 
 // src/modals/JustificativaModal.tsx
 import { useState as useState20, useEffect as useEffect9 } from "react";
-import { Modal as Modal7, Button as Button21, Form as Form16, ListGroup as ListGroup3, Badge as Badge4, OverlayTrigger as OverlayTrigger2, Tooltip as Tooltip4 } from "react-bootstrap";
+import { Modal as Modal7, Button as Button20, Form as Form16, ListGroup as ListGroup3, Badge as Badge4, OverlayTrigger as OverlayTrigger2, Tooltip as Tooltip4 } from "react-bootstrap";
 import { FaTrashAlt, FaUndo } from "react-icons/fa";
 import dayjs7 from "dayjs";
 import { jsx as jsx48, jsxs as jsxs38 } from "react/jsx-runtime";
@@ -3449,7 +3448,7 @@ var JustificativaModal = ({
             }
           )
         ] }),
-        /* @__PURE__ */ jsx48("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ jsx48(Button21, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
+        /* @__PURE__ */ jsx48("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ jsx48(Button20, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
       ] }),
       /* @__PURE__ */ jsx48(ListGroup3, { className: "border-0", children: localJustificativas.map((j) => {
         var _a, _b, _c;
@@ -3510,13 +3509,13 @@ var JustificativaModal = ({
         );
       }) })
     ] }),
-    /* @__PURE__ */ jsx48(Modal7.Footer, { children: /* @__PURE__ */ jsx48(Button21, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
+    /* @__PURE__ */ jsx48(Modal7.Footer, { children: /* @__PURE__ */ jsx48(Button20, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
   ] });
 };
 
 // src/modals/ImageViewModal.tsx
 import { useState as useState21, useEffect as useEffect10 } from "react";
-import { Button as Button22 } from "react-bootstrap";
+import { Button as Button21 } from "react-bootstrap";
 import { jsx as jsx49, jsxs as jsxs39 } from "react/jsx-runtime";
 var ImageViewModal = ({
   show,
@@ -3552,7 +3551,7 @@ var ImageViewModal = ({
   const renderImageSelector = () => {
     if (imagesData.length <= 1) return null;
     return /* @__PURE__ */ jsx49("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ jsx49(
-      Button22,
+      Button21,
       {
         variant: selectedImageKey === img.key ? "primary" : "outline-secondary",
         size: "sm",
@@ -3590,7 +3589,7 @@ var ImageViewModal = ({
           "Enviado por: ",
           /* @__PURE__ */ jsx49("strong", { children: currentAuthor })
         ] }),
-        /* @__PURE__ */ jsx49(Button22, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
+        /* @__PURE__ */ jsx49(Button21, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
       ] })
     }
   );
@@ -3746,7 +3745,7 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
 
 // src/tables/ReusableTableWithModal.tsx
 import { useState as useState24, useEffect as useEffect12 } from "react";
-import { Table, Button as Button23, Modal as Modal8 } from "react-bootstrap";
+import { Table, Button as Button22, Modal as Modal8 } from "react-bootstrap";
 import { Fragment as Fragment12, jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
 var ReusableTableWithModal = ({
   fetchDataCallback,
@@ -3805,9 +3804,9 @@ var ReusableTableWithModal = ({
       /* @__PURE__ */ jsx52(Modal8.Header, { closeButton: true, children: /* @__PURE__ */ jsx52(Modal8.Title, { children: "Detalhes" }) }),
       /* @__PURE__ */ jsx52(Modal8.Body, { children: selectedItem && /* @__PURE__ */ jsx52("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
       /* @__PURE__ */ jsxs42(Modal8.Footer, { children: [
-        /* @__PURE__ */ jsx52(Button23, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+        /* @__PURE__ */ jsx52(Button22, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
         modalButtonCallback && /* @__PURE__ */ jsx52(
-          Button23,
+          Button22,
           {
             variant: "primary",
             onClick: () => {
@@ -3824,7 +3823,7 @@ var ReusableTableWithModal = ({
 
 // src/text/TextWithMore.tsx
 import { useState as useState25 } from "react";
-import { Button as Button24 } from "react-bootstrap";
+import { Button as Button23 } from "react-bootstrap";
 import { Fragment as Fragment13, jsx as jsx53, jsxs as jsxs43 } from "react/jsx-runtime";
 var TextWithMore = ({
   text = "Carregando...",
@@ -3841,7 +3840,7 @@ var TextWithMore = ({
   return /* @__PURE__ */ jsxs43(Fragment13, { children: [
     /* @__PURE__ */ jsx53("span", { className: "text-with-more-content", children: displayText }),
     isTruncated && /* @__PURE__ */ jsx53(
-      Button24,
+      Button23,
       {
         variant: "link",
         className: "p-0 ms-2",

@@ -974,9 +974,88 @@ var CombineModeToggle = ({
     }
   );
 };
+
+// src/color-picker/ColorPicker.tsx
+import React2 from "react";
+import { jsx as jsx7, jsxs as jsxs7 } from "react/jsx-runtime";
+var PRESET_COLORS = [
+  "#e74c3c",
+  // vermelho
+  "#e67e22",
+  // laranja
+  "#f1c40f",
+  // amarelo
+  "#2ecc71",
+  // verde
+  "#1abc9c",
+  // turquesa
+  "#3498db",
+  // azul
+  "#9b59b6",
+  // roxo
+  "#34495e",
+  // cinza escuro
+  "#ecf0f1",
+  // cinza claro
+  "#ffffff"
+  // branco
+];
+function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label = "Cor" }) {
+  const [value, setValue] = React2.useState(defaultColor);
+  const handleChange = (hex) => {
+    setValue(hex);
+    setCor(hex);
+  };
+  return /* @__PURE__ */ jsxs7("div", { className: "color-picker-container mb-3", children: [
+    label && /* @__PURE__ */ jsx7("label", { className: "form-label fw-semibold", children: label }),
+    /* @__PURE__ */ jsxs7("div", { className: "d-flex align-items-center gap-2 flex-wrap", children: [
+      /* @__PURE__ */ jsx7(
+        "input",
+        {
+          type: "color",
+          className: "form-control form-control-color",
+          style: { width: "48px", height: "38px", padding: "2px", cursor: disabled ? "not-allowed" : "pointer" },
+          value,
+          onChange: (e) => handleChange(e.target.value),
+          disabled,
+          title: "Escolher cor personalizada"
+        }
+      ),
+      /* @__PURE__ */ jsx7("div", { className: "d-flex gap-1 flex-wrap", children: PRESET_COLORS.map((color) => /* @__PURE__ */ jsx7(
+        "button",
+        {
+          type: "button",
+          title: color,
+          disabled,
+          onClick: () => handleChange(color),
+          style: {
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            background: color,
+            border: value === color ? "3px solid #333" : "2px solid #ccc",
+            cursor: disabled ? "not-allowed" : "pointer",
+            flexShrink: 0,
+            transition: "border 0.15s"
+          }
+        },
+        color
+      )) }),
+      /* @__PURE__ */ jsx7(
+        "span",
+        {
+          className: "badge rounded-pill text-dark border",
+          style: { background: value, minWidth: "80px", fontSize: "0.75rem", letterSpacing: "0.05em" },
+          children: value.toUpperCase()
+        }
+      )
+    ] })
+  ] });
+}
 export {
   AnexoManager,
   ClickToWriteField,
+  ColorPicker,
   CombineModeToggle,
   ContadorPicker,
   FormModal,

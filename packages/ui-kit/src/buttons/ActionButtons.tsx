@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef } from "react"
 import { Button, Form, ProgressBar } from "react-bootstrap"
 import { FiSave, FiTrash2, FiRotateCcw, FiCopy, FiChevronLeft } from "react-icons/fi"

@@ -235,4 +235,12 @@ interface CombineModeToggleProps {
 }
 declare const CombineModeToggle: React.FC<CombineModeToggleProps>;
 
-export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, type RecorrenciaEscala, type RecorrenciaValue };
+interface ColorPickerProps {
+    defaultColor?: string;
+    setCor: (hex: string) => void;
+    disabled?: boolean;
+    label?: string;
+}
+declare function ColorPicker({ defaultColor, setCor, disabled, label }: ColorPickerProps): react_jsx_runtime.JSX.Element;
+
+export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, ColorPicker, type ColorPickerProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, type RecorrenciaEscala, type RecorrenciaValue };

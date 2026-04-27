@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from 'react-bootstrap'
+
 
 interface DeleteButtonProps {
   title: string
@@ -8,9 +8,9 @@ interface DeleteButtonProps {
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({ title, onDeleteClick }) => {
   return (
-    <Button variant="danger" onClick={() => onDeleteClick()}>
+    <button className="btn btn-danger" onClick={() => onDeleteClick()}>
       {title}
-    </Button>
+    </button>
   )
 }
 
