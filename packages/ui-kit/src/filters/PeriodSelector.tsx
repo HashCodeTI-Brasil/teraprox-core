@@ -73,25 +73,28 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
       {isExpanded && (
         <div className="expanded-content">
           {onPresetSelect && (
-            <div className="presets-container">
-              <div className="d-flex align-items-center mb-1 w-100">
+            <>
+              <div className="d-flex align-items-center mb-2">
                 <FaHistory size={12} className="me-1 text-muted" />
                 <small className="text-muted fw-bold text-uppercase" style={{ fontSize: '0.65rem' }}>Atalhos</small>
               </div>
-              {presets.map((p) => (
-                <Button
-                  key={p.key}
-                  variant="outline-primary"
-                  className="preset-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onPresetSelect(p.key)
-                  }}
-                >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
+              <div className="presets-container">
+                {presets.map((p) => (
+                  <Button
+                    key={p.key}
+                    variant="outline-primary"
+                    className="preset-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onPresetSelect(p.key)
+                      setIsExpanded(false)
+                    }}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+            </>
           )}
 
           <div className="date-inputs-grid">

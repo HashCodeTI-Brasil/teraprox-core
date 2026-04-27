@@ -1375,12 +1375,12 @@ var PeriodSelector = ({
       /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "period-icon-btn", children: isExpanded ? /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_fa3.FaChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("span", { className: "small text-muted", children: "Editar" }) })
     ] }),
     isExpanded && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "expanded-content", children: [
-      onPresetSelect && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "presets-container", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "d-flex align-items-center mb-1 w-100", children: [
+      onPresetSelect && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_jsx_runtime28.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "d-flex align-items-center mb-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(import_fa3.FaHistory, { size: 12, className: "me-1 text-muted" }),
           /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("small", { className: "text-muted fw-bold text-uppercase", style: { fontSize: "0.65rem" }, children: "Atalhos" })
         ] }),
-        presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "presets-container", children: presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
           import_react_bootstrap17.Button,
           {
             variant: "outline-primary",
@@ -1388,11 +1388,12 @@ var PeriodSelector = ({
             onClick: (e) => {
               e.stopPropagation();
               onPresetSelect(p.key);
+              setIsExpanded(false);
             },
             children: p.label
           },
           p.key
-        ))
+        )) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "date-inputs-grid", children: [
         /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(import_react_bootstrap17.Form.Group, { children: [

@@ -46,13 +46,17 @@ export const ManutentorCard: React.FC<ManutentorCardProps> = ({
   loadMetrics = null,
 }) => {
   const hasMetrics = mantenedor.metricas
-  const statusIndicator = (color: string) => ({
-    backgroundColor: color,
-    borderRadius: '50%',
-    width: '12px',
-    height: '12px',
-    marginRight: '10px',
-  })
+  
+  const getStatusColor = (type: string) => {
+    switch(type) {
+      case 'executing': return '#10b981' // emerald-500
+      case 'pending': return '#f59e0b'   // amber-500
+      case 'concluded': return '#94a3b8' // slate-400
+      case 'busy': return '#ef4444'      // red-500
+      case 'available': return '#10b981' // emerald-500
+      default: return '#cbd5e1'
+    }
+  }
 
   const handleStatusClick = (ordens: any[]) => {
     onStatusClick && onStatusClick(ordens)
@@ -60,117 +64,103 @@ export const ManutentorCard: React.FC<ManutentorCardProps> = ({
 
   return (
     <Col key={mantenedor.id}>
-      <Card className="mantenedor-card">
-        <Card.Body className="d-flex align-items-center">
-          <div className="mantenedor-info">
-            <Card.Title
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              {mantenedor?.nomeUsuario}
-              {loadMetrics && (
-                <GrLineChart
-                  className="zoom-container"
-                  title="Ver Metricas"
-                  onClick={() => loadMetrics(mantenedor)}
-                  size={20}
-                />
-              )}
-            </Card.Title>
-            <Card.Text>ID: {mantenedor.id}</Card.Text>
-            {hasMetrics && <Card.Text>{mantenedor.turno?.nome}</Card.Text>}
-
-            <div className="status-list">
-              {mantenedor.executing && (
-                <div
-                  className="clickable-status d-flex align-items-center mb-2"
-                  onClick={() => handleStatusClick(mantenedor.executing!)}
-                >
-                  <div
-                    className="status-indicator"
-                    style={statusIndicator('green')}
-                  />
-                  <span className="status-text">
-                    Executando: {mantenedor.executing.length}
-                  </span>
-                </div>
-              )}
-              {mantenedor.pending && (
-                <div
-                  className="clickable-status d-flex align-items-center mb-2"
-                  onClick={() => handleStatusClick(mantenedor.pending!)}
-                >
-                  <div
-                    className="status-indicator"
-                    style={statusIndicator('#ffc107')}
-                  />
-                  <span className="status-text">
-                    Pendentes: {mantenedor.pending.length}
-                  </span>
-                </div>
-              )}
-              {mantenedor.concluded && (
-                <div
-                  className="clickable-status d-flex align-items-center mb-2"
-                  onClick={() => handleStatusClick(mantenedor.concluded!)}
-                >
-                  <div
-                    className="status-indicator"
-                    style={statusIndicator('#ccc')}
-                  />
-                  <span className="status-text">
-                    Concluídas: {mantenedor.concluded.length}
-                  </span>
-                </div>
-              )}
+      <Card className="mantenedor-card border-0 shadow-sm overflow-hidden">
+        <Card.Body className="p-3">
+          <div className="d-flex justify-content-between align-items-start mb-2">
+            <div className="mantenedor-info flex-grow-1">
+              <h6 className="mb-0 fw-bold text-dark" style={{ fontSize: '0.95rem' }}>
+                {mantenedor?.nomeUsuario}
+              </h6>
+              <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                ID: {mantenedor.id} {mantenedor.setor && `· ${mantenedor.setor}`}
+              </div>
             </div>
+            {loadMetrics && (
+              <Button 
+                variant="link" 
+                className="p-0 text-muted" 
+                onClick={() => loadMetrics(mantenedor)}
+                title="Ver Métricas"
+              >
+                <GrLineChart size={16} />
+              </Button>
+            )}
+          </div>
 
-            {showBusyStatus && (
-              <div className="d-flex align-items-center status-container">
-                <div
-                  className="status-indicator"
-                  style={statusIndicator(mantenedor._busy ? 'red' : 'green')}
-                />
-
-                {mantenedor._busy ? (
-                  <>
-                    <span className="status-text">{`Alocado em OS-${mantenedor.osId}`}</span>
-                    <Button
-                      variant="link"
-                      className="navigate-button"
-                      onClick={() =>
-                        viewDetailsCallback &&
-                        viewDetailsCallback({ ...mantenedor, index })
-                      }
-                    >
-                      <FaArrowRightToBracket size={20} />
-                    </Button>
-                  </>
-                ) : (
-                  <span className="status-text">Disponível</span>
-                )}
+          <div className="status-list d-flex gap-2 mb-3">
+            {mantenedor.executing?.length > 0 && (
+              <div 
+                className="d-flex align-items-center gap-1 badge bg-light text-success border border-success-subtle"
+                style={{ cursor: 'pointer', fontSize: '0.7rem' }}
+                onClick={() => handleStatusClick(mantenedor.executing!)}
+              >
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: getStatusColor('executing') }} />
+                {mantenedor.executing.length} Ex.
               </div>
             )}
-            {onRemoveCallback && (
-              <div
-                onClick={() => onRemoveCallback({ ...mantenedor, index })}
-                className="remove-text"
+            {mantenedor.pending?.length > 0 && (
+              <div 
+                className="d-flex align-items-center gap-1 badge bg-light text-warning border border-warning-subtle"
+                style={{ cursor: 'pointer', fontSize: '0.7rem' }}
+                onClick={() => handleStatusClick(mantenedor.pending!)}
               >
-                remover
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: getStatusColor('pending') }} />
+                {mantenedor.pending.length} Pend.
               </div>
             )}
           </div>
+
+          {showBusyStatus && (
+            <div className="mt-auto pt-2 border-top">
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center gap-2">
+                  <div 
+                    style={{ 
+                      width: 8, 
+                      height: 8, 
+                      borderRadius: '50%', 
+                      background: getStatusColor(mantenedor._busy ? 'busy' : 'available'),
+                      boxShadow: mantenedor._busy ? '0 0 4px #ef4444' : 'none'
+                    }} 
+                  />
+                  <span className="fw-semibold" style={{ fontSize: '0.8rem', color: mantenedor._busy ? '#ef4444' : '#10b981' }}>
+                    {mantenedor._busy ? `Ocupado (OS-${mantenedor.osId})` : 'Disponível'}
+                  </span>
+                </div>
+                {mantenedor._busy && viewDetailsCallback && (
+                  <Button
+                    variant="link"
+                    className="p-0 text-primary"
+                    onClick={() => viewDetailsCallback({ ...mantenedor, index })}
+                  >
+                    <FaArrowRightToBracket size={14} />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {onRemoveCallback && (
+            <div className="mt-2 text-end">
+              <span 
+                onClick={() => onRemoveCallback({ ...mantenedor, index })}
+                className="text-danger small cursor-pointer"
+                style={{ fontSize: '0.7rem', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                remover
+              </span>
+            </div>
+          )}
         </Card.Body>
 
-        <Card.Footer>
-          <MetricasDisplay
-            metricas={hasMetrics ? mantenedor.metricas.horas : '-'}
-            wrenchTime={hasMetrics ? mantenedor.metricas.wrenchTime : '-'}
-          />
-        </Card.Footer>
+        {hasMetrics && (
+          <Card.Footer className="bg-light border-0 p-2">
+            <MetricasDisplay
+              metricas={mantenedor.metricas.horas || '-'}
+              wrenchTime={mantenedor.metricas.wrenchTime || '-'}
+            />
+          </Card.Footer>
+        )}
       </Card>
     </Col>
   )
