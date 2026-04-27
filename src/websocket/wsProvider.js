@@ -225,7 +225,6 @@ export default function WebProviderComponent({ children }) {
                     if (!alreadyWaiting) {
                         dispatch(setNeedUserLogin(true))
                         toast.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true })
-                        dispatch(logOut())
                     }
 
                     // Rejeita o request. O route guard (isAuth=false) redireciona para /Login.

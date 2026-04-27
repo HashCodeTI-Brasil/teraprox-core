@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useMemo } from "react";
 import { useStore } from "react-redux";
-import { logOut, setToken } from "../../Reducers/default-reducers/globalConfigReducer";
+import { setNeedUserLogin, setToken } from "../../Reducers/default-reducers/globalConfigReducer";
 import { setGlobalError } from "../../Reducers/default-reducers/globalErrorReducer";
 import { getTenantFromHostname } from "../../utils/tenantResolver.js";
 
@@ -64,7 +64,7 @@ export const useWebInterface = ({ context, baseEndPoint, toast, wsEvent }) => {
                     const isStillAuth = store.getState().global.isAuth;
                     if (isStillAuth) {
                         toast?.addToast("Sessão expirada, faça login novamente.", { appearance: "warning", autoDismiss: true });
-                        store.dispatch(logOut());
+                        store.dispatch(setNeedUserLogin(true));
                     }
                     return Promise.reject({});
                 }

@@ -128,22 +128,48 @@ module.exports = {
                 teraprox_app_ordem_de_correcao: promiseRemote('teraprox_app_ordem_de_correcao', REMOTE_ORDEM_CORRECAO_URL),
                 teraprox_app_plano_de_controle: promiseRemote('teraprox_app_plano_de_controle', REMOTE_PLANO_CONTROLE_URL),
             },
+            // ─── Shared scope ────────────────────────────────────────────
+            // Host (teraprox-core) eagerly carrega a instância singleton de
+            // cada pacote compartilhado. Remotes (SGM-OS, SGM-SS, ...) declaram
+            // o mesmo conjunto com eager:false e reutilizam as instâncias do host.
+            // requiredVersion é derivado do package.json para garantir
+            // compatibilidade (Module Federation usa semver-check).
             shared: {
+                // ─── Core SDK + UI kits (singletons cross-remote) ────────
                 'teraprox-core-sdk': {
                     singleton: true,
-                    requiredVersion: false,
+                    requiredVersion: '^0.3.0',
                     eager: true,
                 },
                 'teraprox-ui-kit': {
                     singleton: true,
-                    requiredVersion: false,
+                    requiredVersion: '^0.2.0',
+                    eager: true,
+                },
+                '@teraprox/ui-kit-core': {
+                    singleton: true,
+                    requiredVersion: '^0.1.0',
+                    eager: true,
+                },
+                '@teraprox/ui-kit-sgm': {
+                    singleton: true,
+                    requiredVersion: '^0.1.0',
+                    eager: true,
+                },
+                // ─── React runtime (explicit versions) ───────────────────
+                react: {
+                    singleton: true,
+                    requiredVersion: deps.react || '^18.2.0',
+                    eager: true,
+                },
+                'react-dom': {
+                    singleton: true,
+                    requiredVersion: deps['react-dom'] || '^18.2.0',
                     eager: true,
                 },
                 ...(() => {
                     const shared = {};
                     [
-                        'react',
-                        'react-dom',
                         'react-redux',
                         'react-router-dom',
                         '@reduxjs/toolkit',
@@ -159,7 +185,7 @@ module.exports = {
                         if (deps[pkg]) {
                             shared[pkg] = {
                                 singleton: true,
-                                requiredVersion: false,
+                                requiredVersion: deps[pkg],
                                 eager: true,
                             };
                         }

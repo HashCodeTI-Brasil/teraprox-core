@@ -74,6 +74,134 @@
   object-fit: cover;
   border: 1px solid #e2e8f0;
 }
+.anexo-file-thumb--lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+}
+
+/* Persistido: botão de miniatura (alinhado ao tamanho do ícone) */
+.anexo-persist-thumb-wrap {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 10px;
+  line-height: 0;
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+.anexo-persist-thumb-wrap:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transform: scale(1.02);
+}
+.anexo-persist-thumb-wrap:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+.anexo-persist-thumb-skel {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background-size: 200% 100%;
+  animation: anexo-shimmer 1.2s ease-in-out infinite;
+}
+@keyframes anexo-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.anexo-file-name--link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: #2563eb;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.anexo-file-name--link:hover { text-decoration: underline; }
+.anexo-file-name--link:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Lightbox (pré-visualização sem sair da página) */
+.anexo-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+.anexo-lightbox-panel {
+  position: relative;
+  max-width: min(96vw, 1200px);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.anexo-lightbox-close {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transition: background 0.15s, color 0.15s;
+}
+.anexo-lightbox-close:hover { background: #f1f5f9; color: #0f172a; }
+.anexo-lightbox-title {
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(90vw, 1000px);
+  padding-right: 44px;
+  margin: 0;
+}
+.anexo-lightbox-img-wrap {
+  max-height: calc(92vh - 48px);
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #0f172a;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+.anexo-lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: min(80vh, 900px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
 
 /* Info */
 .anexo-file-info { flex: 1; min-width: 0; }

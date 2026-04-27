@@ -22,7 +22,7 @@ import NotificationBell from '../Notifications/NotificationBell';
  * Os dropdowns são agrupados por título da seção. Se dois remotes declaram
  * a mesma seção (ex: "Cadastros"), os itens são mesclados automaticamente.
  */
-const MenuBar = ({ menuSections = [] }) => {
+const MenuBar = ({ menuSections = [], menuTree = null }) => {
     const { handleLogout, notificationSocket } = useWebProvider()
     const global = useSelector(state => state.global) || {}
     const socket = global.socketConnection
@@ -34,8 +34,42 @@ const MenuBar = ({ menuSections = [] }) => {
     const [expandedMenu, setExpandedMenu] = useState(null)
     const drawerRef = useRef(null)
 
-    // Agrupa seções com mesmo título (ex: "Cadastros" do SGP + SGM → um dropdown só)
+    // Agrupa seções com mesmo título (ex: "Cadastros" do SGP + SGM → um dropdown só).
+    // Quando o host fornece `menuTree` (manifest-driven grouping), usa hierarquia
+    // declarativa; caso contrário cai no merge legacy por título de section.
     const groupedMenus = useMemo(() => {
+        if (Array.isArray(menuTree) && menuTree.length > 0) {
+            // Converte MenuTreeNode[] -> { title, icon, subsections: [{title, items}] }
+            // - children kind='section' -> subsection
+            // - children kind='item' -> agrupa em pseudo-section sem título
+            return menuTree.map((node) => {
+                const subsections = [];
+                let looseItems = null;
+                for (const child of node.children || []) {
+                    if (child.kind === 'section') {
+                        subsections.push({
+                            title: child.label,
+                            icon: child.icon,
+                            items: (child.items || []).map((it) => ({
+                                routePath: it.routePath || it.path,
+                                label: it.label,
+                            })),
+                        });
+                    } else if (child.kind === 'item') {
+                        if (!looseItems) {
+                            looseItems = { title: node.label, icon: node.icon, items: [] };
+                            subsections.push(looseItems);
+                        }
+                        looseItems.items.push({
+                            routePath: child.item.routePath || child.item.path,
+                            label: child.item.label,
+                        });
+                    }
+                }
+                return { title: node.label, icon: node.icon, subsections };
+            });
+        }
+
         const map = new Map();
         for (const section of menuSections) {
             const key = section.title;
@@ -45,7 +79,7 @@ const MenuBar = ({ menuSections = [] }) => {
             map.get(key).subsections.push(section);
         }
         return Array.from(map.values());
-    }, [menuSections]);
+    }, [menuSections, menuTree]);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768)

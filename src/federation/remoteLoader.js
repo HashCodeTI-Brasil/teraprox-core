@@ -11,6 +11,7 @@
  *   — ZERO alteração em rotas, registry ou useRemoteInfra.
  */
 import { lazy } from 'react';
+import { groupMenuSections } from 'teraprox-core-sdk';
 
 // ---------------------------------------------------------------------------
 // 1. Remote registry — ÚNICA configuração manual no Core
@@ -146,6 +147,7 @@ export async function loadRemoteManifests() {
     const allRoutes = [];
     const menuSections = [];
     const componentRegistry = {};
+    const manifests = [];
 
     const results = await Promise.allSettled(
         REMOTE_CONFIGS.map(async (cfg) => {
@@ -170,9 +172,13 @@ export async function loadRemoteManifests() {
         const { manifest } = result.value;
         const remoteName = manifest.name;
 
+        // Manifesto bruto preservado — usado por groupMenuSections() para hierarquia
+        const enrichedSections = [];
+
         // Menu items → rotas + registry
         for (const section of manifest.menuSections || []) {
             const menuItems = [];
+            const enrichedItems = [];
 
             for (const item of section.items || []) {
                 const moduleName = item.module.startsWith('./') ? item.module : `./${item.module}`;
@@ -189,6 +195,8 @@ export async function loadRemoteManifests() {
                 };
                 allRoutes.push(route);
                 menuItems.push(route);
+                // groupMenuSections recebe item enriquecido com routePath p/ MenuBar usar diretamente
+                enrichedItems.push({ ...item, routePath: item.path });
 
                 componentRegistry[modulePath] = loadRemoteComponent(remoteName, moduleName);
             }
@@ -198,7 +206,17 @@ export async function loadRemoteManifests() {
                 icon: section.icon,
                 items: menuItems,
             });
+
+            enrichedSections.push({
+                ...section,
+                items: enrichedItems,
+            });
         }
+
+        manifests.push({
+            ...manifest,
+            menuSections: enrichedSections,
+        });
 
         // Form routes → rotas + registry (sem menu)
         for (const form of manifest.formRoutes || []) {
@@ -216,7 +234,9 @@ export async function loadRemoteManifests() {
         }
     }
 
-    _cachedResult = { allRoutes, menuSections, componentRegistry };
+    const menuTree = groupMenuSections(manifests);
+
+    _cachedResult = { allRoutes, menuSections, menuTree, componentRegistry };
     return _cachedResult;
 }
 

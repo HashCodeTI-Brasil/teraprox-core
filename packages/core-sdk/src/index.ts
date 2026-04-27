@@ -38,6 +38,16 @@ export { useAnexoUpload } from './hooks/useAnexoUpload'
 export { useFormStorage } from './hooks/useFormStorage'
 export { useSmartSearch } from './hooks/useSmartSearch'
 export { useValidation } from './hooks/useValidation'
+export { useTimeFormat, secondsToHms, hmsToSeconds } from './hooks/useTimeFormat'
+export type { TimeFormatApi } from './hooks/useTimeFormat'
+export {
+  useFilterCombineMode,
+  FILTER_COMBINE_MODES,
+} from './hooks/useFilterCombineMode'
+export type {
+  FilterCombineMode,
+  FilterCombineModeApi,
+} from './hooks/useFilterCombineMode'
 
 // Modules removed to ui-kit
 
@@ -68,6 +78,20 @@ export type {
   JustificativaAdapterOptions,
   IAnexoManagerViewModel,
   UseAnexoManagerViewModelOptions,
+  IRecorrenciaViewModel,
+  RecorrenciaValue,
+  RecorrenciaValidationResult,
+  RecorrenciaEscala,
+  RecorrenciaSliceState,
+  IContadorViewModel,
+  ContadorValue,
+  ContadorValidationResult,
+  ContadorBoundRule,
+  ContadorSliceState,
+  IMantenedorPickerViewModel,
+  MantenedorOption,
+  MantenedorPickerSliceState,
+  MantenedorPickerSlot,
 } from './viewmodels'
 export {
   useUnidadeMaterialViewModel,
@@ -95,6 +119,35 @@ export {
   useFindRecursoByTagViewModel,
   useJustificativaModalViewModel,
   useAnexoManagerViewModel,
+  useRecorrenciaViewModel,
+  recorrenciaReducer,
+  setRecorrenciaValor,
+  setRecorrenciaEscala,
+  setRecorrenciaDataInicio,
+  populateRecorrencia,
+  clearRecorrencia,
+  selectRecorrencia,
+  RECORRENCIA_DEFAULT_KEY,
+  useContadorViewModel,
+  contadorReducer,
+  setContadorValor,
+  setContadorUnidade,
+  setContadorParametro,
+  addContadorLimite,
+  removeContadorLimiteAt,
+  updateContadorLimiteAt,
+  populateContador,
+  clearContador,
+  selectContador,
+  CONTADOR_DEFAULT_KEY,
+  useMantenedorPickerViewModel,
+  mantenedorPickerReducer,
+  setMantenedorOptions,
+  setMantenedorSearchTerm,
+  setMantenedorLoading,
+  setMantenedorError,
+  setMantenedorPendingConfirm,
+  clearMantenedorSlot,
 } from './viewmodels'
 
 // Reducers (existentes)
@@ -145,3 +198,5 @@ export { StandaloneProvider } from './federation/StandaloneProvider'
 export { DevAutoLogin } from './federation/DevAutoLogin'
 export type { RemoteManifest, RemoteMenuSection, RemoteMenuItem, RemoteFormRoute, RemoteReducerMap, DefaultReducerKeys, ReducerDep } from './federation/types'
 export type { ReducersBundle, ReducersBundleConfig } from './federation/createReducersBundle'
+export { groupMenuSections } from './federation/groupMenuSections'
+export type { MenuTreeNode, MenuTreeChild } from './federation/groupMenuSections'

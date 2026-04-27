@@ -13,3 +13,5 @@ export type {
   DefaultReducerKeys,
   ReducerDep,
 } from './federation/types'
+export { groupMenuSections } from './federation/groupMenuSections'
+export type { MenuTreeNode, MenuTreeChild } from './federation/groupMenuSections'

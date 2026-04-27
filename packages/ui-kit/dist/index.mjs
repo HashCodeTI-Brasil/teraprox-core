@@ -2175,7 +2175,7 @@ var MailSender = ({
 // src/forms/AutoComplete.tsx
 import { useEffect as useEffect5, useMemo as useMemo3, useState as useState13 } from "react";
 import { FloatingLabel, Form as Form8, InputGroup as InputGroup3, ListGroup as ListGroup2, Spinner as Spinner5 } from "react-bootstrap";
-import { jsx as jsx32, jsxs as jsxs24 } from "react/jsx-runtime";
+import { Fragment as Fragment8, jsx as jsx32, jsxs as jsxs24 } from "react/jsx-runtime";
 var AutoComplete = ({
   className,
   ops = [],
@@ -2208,7 +2208,8 @@ var AutoComplete = ({
   minChars = 0,
   maxItems,
   showListOnFocus = true,
-  lazyLoad = false
+  lazyLoad = false,
+  labelPosition = "top"
 }) => {
   const [liItem, setListItem] = useState13([]);
   const [options, setOptions] = useState13([]);
@@ -2330,26 +2331,44 @@ var AutoComplete = ({
       },
       onMouseLeave: () => setHide(true),
       children: [
-        !hideComponent && /* @__PURE__ */ jsxs24(InputGroup3, { children: [
-          /* @__PURE__ */ jsx32(FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ jsx32(
-            Form8.Control,
-            {
-              autoFocus: autoFocusConfig,
-              disabled: disableComponent || disableSelect,
-              placeholder: placeH,
-              autoComplete: "off",
-              value: input,
-              onClickCapture: () => {
-                const canOpen = showListOnFocus && input.length >= minChars;
-                setHide(!canOpen);
-              },
-              onChange: (e) => onFieldUpdate(e.currentTarget.value),
-              type: "text"
-            }
-          ) }),
-          loading && /* @__PURE__ */ jsx32(InputGroup3.Text, { children: /* @__PURE__ */ jsx32(Spinner5, { animation: "border", size: "sm" }) }),
-          !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
-          !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
+        !hideComponent && /* @__PURE__ */ jsxs24(Fragment8, { children: [
+          labelPosition === "top" && title && /* @__PURE__ */ jsx32(Form8.Label, { className: "fw-semibold small mb-1", children: title }),
+          /* @__PURE__ */ jsxs24(InputGroup3, { children: [
+            labelPosition === "floating" ? /* @__PURE__ */ jsx32(FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ jsx32(
+              Form8.Control,
+              {
+                autoFocus: autoFocusConfig,
+                disabled: disableComponent || disableSelect,
+                placeholder: placeH,
+                autoComplete: "off",
+                value: input,
+                onClickCapture: () => {
+                  const canOpen = showListOnFocus && input.length >= minChars;
+                  setHide(!canOpen);
+                },
+                onChange: (e) => onFieldUpdate(e.currentTarget.value),
+                type: "text"
+              }
+            ) }) : /* @__PURE__ */ jsx32(
+              Form8.Control,
+              {
+                autoFocus: autoFocusConfig,
+                disabled: disableComponent || disableSelect,
+                placeholder: placeH || title,
+                autoComplete: "off",
+                value: input,
+                onClickCapture: () => {
+                  const canOpen = showListOnFocus && input.length >= minChars;
+                  setHide(!canOpen);
+                },
+                onChange: (e) => onFieldUpdate(e.currentTarget.value),
+                type: "text"
+              }
+            ),
+            loading && /* @__PURE__ */ jsx32(InputGroup3.Text, { children: /* @__PURE__ */ jsx32(Spinner5, { animation: "border", size: "sm" }) }),
+            !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
+            !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
+          ] })
         ] }),
         /* @__PURE__ */ jsx32(
           ListGroup2,
@@ -2497,7 +2516,7 @@ var GenericForm_default = GenericForm;
 // src/forms/GenericSelect.tsx
 import { useEffect as useEffect6, useState as useState15 } from "react";
 import { Form as Form10, InputGroup as InputGroup4 } from "react-bootstrap";
-import { Fragment as Fragment8, jsx as jsx34, jsxs as jsxs26 } from "react/jsx-runtime";
+import { Fragment as Fragment9, jsx as jsx34, jsxs as jsxs26 } from "react/jsx-runtime";
 var GenericSelectOps = class {
   constructor(noLabel, title, onChange, ops, selection, returnType, displayType, filter, filterField, valueType, loadFunc, loadCondition, actionClick, locked) {
     this.noLabel = noLabel;
@@ -2583,7 +2602,7 @@ var GenericSelect = ({
     }
   );
   if (actionClick) {
-    return /* @__PURE__ */ jsxs26(Fragment8, { children: [
+    return /* @__PURE__ */ jsxs26(Fragment9, { children: [
       /* @__PURE__ */ jsx34(Form10.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
       /* @__PURE__ */ jsxs26(InputGroup4, { children: [
         selectContent,
@@ -2591,7 +2610,7 @@ var GenericSelect = ({
       ] })
     ] });
   }
-  return /* @__PURE__ */ jsxs26(Fragment8, { children: [
+  return /* @__PURE__ */ jsxs26(Fragment9, { children: [
     /* @__PURE__ */ jsx34(Form10.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
     selectContent
   ] });
@@ -2606,6 +2625,7 @@ var FormField = ({
   onValueUpdate,
   onBlur,
   label,
+  labelPosition = "top",
   ty,
   actionClick,
   actionClick2,
@@ -2654,6 +2674,7 @@ var FormField = ({
     return /* @__PURE__ */ jsx35(Form11.Control, { ...fieldProps });
   };
   if (hide) return null;
+  const useFloating = labelPosition === "floating" && !asTextArea;
   return /* @__PURE__ */ jsxs27(
     Form11.Group,
     {
@@ -2661,9 +2682,11 @@ var FormField = ({
       onMouseLeave: onMouseLv,
       onKeyDown: onKeyDownHandler,
       style: { marginTop: 4, marginBottom: 4, width: "100%" },
+      controlId: !useFloating ? controlId : void 0,
       children: [
+        !useFloating && label && /* @__PURE__ */ jsx35(Form11.Label, { className: "fw-semibold small mb-1", children: label }),
         /* @__PURE__ */ jsxs27(InputGroup5, { children: [
-          asTextArea ? renderField() : /* @__PURE__ */ jsx35(FloatingLabel2, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }),
+          useFloating ? /* @__PURE__ */ jsx35(FloatingLabel2, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }) : renderField(),
           actionClick && actionClick(),
           actionClick2 && actionClick2()
         ] }),
@@ -2763,9 +2786,17 @@ import { jsx as jsx37, jsxs as jsxs29 } from "react/jsx-runtime";
 var ColorPicker = ({
   selectedColor,
   onColorChange,
+  defaultColor,
+  setCor,
   presetColors = ["#ff0000", "#ffd700", "#008000", "#0000ff", "#800080"],
   title = "Cor de Identifica\xE7\xE3o"
 }) => {
+  var _a, _b;
+  const safeSelectedColor = (_b = (_a = selectedColor != null ? selectedColor : defaultColor) != null ? _a : presetColors[0]) != null ? _b : "#000000";
+  const handleColorChange = (color) => {
+    onColorChange == null ? void 0 : onColorChange(color);
+    setCor == null ? void 0 : setCor(color);
+  };
   return /* @__PURE__ */ jsxs29(
     Card5,
     {
@@ -2785,7 +2816,7 @@ var ColorPicker = ({
                 style: {
                   width: "40px",
                   height: "40px",
-                  backgroundColor: selectedColor,
+                  backgroundColor: safeSelectedColor,
                   cursor: "pointer",
                   border: "2px solid #dee2e6"
                 },
@@ -2801,8 +2832,8 @@ var ColorPicker = ({
               {
                 type: "color",
                 id: "color-input-hidden",
-                value: selectedColor,
-                onChange: (e) => onColorChange(e.target.value),
+                value: safeSelectedColor,
+                onChange: (e) => handleColorChange(e.target.value),
                 className: "form-control-color-lg",
                 style: { width: "100%", height: "40px", cursor: "pointer" }
               }
@@ -2817,9 +2848,9 @@ var ColorPicker = ({
                 height: "28px",
                 backgroundColor: cor,
                 cursor: "pointer",
-                border: cor.toLowerCase() === selectedColor.toLowerCase() ? "2px solid #0d6efd" : "1px solid #dee2e6"
+                border: cor.toLowerCase() === safeSelectedColor.toLowerCase() ? "2px solid #0d6efd" : "1px solid #dee2e6"
               },
-              onClick: () => onColorChange(cor)
+              onClick: () => handleColorChange(cor)
             }
           ) }, cor)) })
         ] })
@@ -2857,7 +2888,7 @@ var Switch = ({
 import { useCallback as useCallback2 } from "react";
 import { useDropzone } from "react-dropzone";
 import { FiUploadCloud, FiCheckCircle } from "react-icons/fi";
-import { Fragment as Fragment9, jsx as jsx39, jsxs as jsxs30 } from "react/jsx-runtime";
+import { Fragment as Fragment10, jsx as jsx39, jsxs as jsxs30 } from "react/jsx-runtime";
 var UploadArea = ({
   onFilePut,
   anexo,
@@ -2891,10 +2922,10 @@ var UploadArea = ({
         /* @__PURE__ */ jsx39("input", { ...getInputProps() }),
         /* @__PURE__ */ jsxs30("div", { className: "upload-content", children: [
           /* @__PURE__ */ jsx39("span", { className: "upload-icon", children: hasAnexo ? /* @__PURE__ */ jsx39(FiCheckCircle, { size: 24 }) : /* @__PURE__ */ jsx39(FiUploadCloud, { size: 24 }) }),
-          hasAnexo ? /* @__PURE__ */ jsxs30(Fragment9, { children: [
+          hasAnexo ? /* @__PURE__ */ jsxs30(Fragment10, { children: [
             /* @__PURE__ */ jsx39("p", { className: "upload-link", children: "Arquivo anexado" }),
             /* @__PURE__ */ jsx39("p", { className: "upload-info", children: anexo == null ? void 0 : anexo.name })
-          ] }) : /* @__PURE__ */ jsxs30(Fragment9, { children: [
+          ] }) : /* @__PURE__ */ jsxs30(Fragment10, { children: [
             /* @__PURE__ */ jsxs30("p", { children: [
               /* @__PURE__ */ jsx39("span", { className: "upload-link", children: "Adicione" }),
               " ou arraste arquivos aqui"
@@ -2916,252 +2947,10 @@ var UploadArea = ({
   );
 };
 
-// src/forms/AnexoManager.tsx
-import { useCallback as useCallback3, useEffect as useEffect8, useMemo as useMemo5, useState as useState17 } from "react";
-import { useDropzone as useDropzone2 } from "react-dropzone";
+// src/index.ts
 import {
-  FiUploadCloud as FiUploadCloud2,
-  FiTrash2 as FiTrash23,
-  FiDownload,
-  FiRefreshCw,
-  FiFile,
-  FiImage,
-  FiFilm,
-  FiMusic
-} from "react-icons/fi";
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFileCsv, FaFileArchive } from "react-icons/fa";
-import { Fragment as Fragment10, jsx as jsx40, jsxs as jsxs31 } from "react/jsx-runtime";
-var UNIVERSAL_ACCEPT = {
-  "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"],
-  "application/pdf": [".pdf"],
-  "application/msword": [".doc"],
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-  "application/vnd.ms-excel": [".xls"],
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-  "text/csv": [".csv"],
-  "video/*": [".mp4", ".webm", ".avi", ".mov", ".mkv"],
-  "audio/*": [".mp3", ".wav", ".ogg", ".aac", ".m4a"],
-  "application/zip": [".zip", ".rar", ".7z", ".tar.gz"],
-  "text/plain": [".txt", ".log"]
-};
-function formatFileSize(bytes) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-function getFileCategory(tipo, nome) {
-  var _a;
-  const ext = ((_a = nome.split(".").pop()) == null ? void 0 : _a.toLowerCase()) || "";
-  if (tipo.startsWith("image/")) return "img";
-  if (tipo === "application/pdf" || ext === "pdf") return "pdf";
-  if (tipo.includes("word") || ext === "doc" || ext === "docx") return "doc";
-  if (tipo.includes("excel") || tipo.includes("spreadsheet") || ext === "xls" || ext === "xlsx") return "xls";
-  if (ext === "csv" || tipo === "text/csv") return "csv";
-  if (tipo.startsWith("video/")) return "vid";
-  if (tipo.startsWith("audio/")) return "aud";
-  if (tipo.includes("zip") || tipo.includes("rar") || ext === "zip" || ext === "rar" || ext === "7z") return "zip";
-  return "generic";
-}
-function FileIcon({ category }) {
-  switch (category) {
-    case "pdf":
-      return /* @__PURE__ */ jsx40(FaFilePdf, {});
-    case "doc":
-      return /* @__PURE__ */ jsx40(FaFileWord, {});
-    case "xls":
-      return /* @__PURE__ */ jsx40(FaFileExcel, {});
-    case "csv":
-      return /* @__PURE__ */ jsx40(FaFileCsv, {});
-    case "img":
-      return /* @__PURE__ */ jsx40(FiImage, {});
-    case "vid":
-      return /* @__PURE__ */ jsx40(FiFilm, {});
-    case "aud":
-      return /* @__PURE__ */ jsx40(FiMusic, {});
-    case "zip":
-      return /* @__PURE__ */ jsx40(FaFileArchive, {});
-    default:
-      return /* @__PURE__ */ jsx40(FiFile, {});
-  }
-}
-var AnexoManager = ({
-  persistidos = [],
-  locais = [],
-  onAddFiles,
-  onRemoveLocal,
-  onRemovePersistido,
-  onDownload,
-  onRetry,
-  loading = false,
-  readonly = false,
-  maxFileSize = 50 * 1024 * 1024,
-  maxFiles = 10,
-  dropzoneLabel
-}) => {
-  const [thumbUrls, setThumbUrls] = useState17({});
-  const [unavailableIds, setUnavailableIds] = useState17(/* @__PURE__ */ new Set());
-  const handleDownload = useCallback3(async (anexo) => {
-    if (!onDownload) return;
-    const url = anexo.url || anexo.signedUrl;
-    if (url) {
-      try {
-        const res = await fetch(url, { method: "HEAD", mode: "cors" });
-        if (res.ok) {
-          onDownload(anexo);
-          return;
-        }
-      } catch (e) {
-      }
-      setUnavailableIds((prev) => new Set(prev).add(anexo.id));
-      return;
-    }
-    onDownload(anexo);
-  }, [onDownload]);
-  useEffect8(() => {
-    const newUrls = {};
-    locais.forEach((a) => {
-      if (a.tipo.startsWith("image/") && !thumbUrls[a.localId]) {
-        newUrls[a.localId] = URL.createObjectURL(a.file);
-      }
-    });
-    if (Object.keys(newUrls).length) {
-      setThumbUrls((prev) => ({ ...prev, ...newUrls }));
-    }
-    return () => {
-      Object.values(newUrls).forEach(URL.revokeObjectURL);
-    };
-  }, [locais]);
-  const onDrop = useCallback3(
-    (acceptedFiles) => {
-      if (onAddFiles) onAddFiles(acceptedFiles);
-    },
-    [onAddFiles]
-  );
-  const { getRootProps, getInputProps, isDragActive } = useDropzone2({
-    onDrop,
-    maxSize: maxFileSize,
-    maxFiles,
-    accept: UNIVERSAL_ACCEPT,
-    disabled: readonly
-  });
-  const allExtensions = useMemo5(
-    () => Object.values(UNIVERSAL_ACCEPT).flat().map((e) => e.replace(".", "").toUpperCase()),
-    []
-  );
-  const totalCount = persistidos.length + locais.length;
-  return /* @__PURE__ */ jsxs31("div", { className: "anexo-manager", children: [
-    !readonly && /* @__PURE__ */ jsxs31(
-      "div",
-      {
-        ...getRootProps(),
-        className: `anexo-dropzone ${isDragActive ? "anexo-drag-active" : ""}`,
-        children: [
-          /* @__PURE__ */ jsx40("input", { ...getInputProps() }),
-          /* @__PURE__ */ jsxs31("div", { className: "anexo-dropzone-inner", children: [
-            /* @__PURE__ */ jsx40(FiUploadCloud2, { className: "anexo-dropzone-icon" }),
-            /* @__PURE__ */ jsx40("p", { className: "anexo-dropzone-text", children: dropzoneLabel || /* @__PURE__ */ jsxs31(Fragment10, { children: [
-              /* @__PURE__ */ jsx40("strong", { children: "Clique para selecionar" }),
-              " ou arraste arquivos aqui"
-            ] }) }),
-            /* @__PURE__ */ jsxs31("p", { className: "anexo-dropzone-hint", children: [
-              "M\xE1x. ",
-              formatFileSize(maxFileSize),
-              " por arquivo \xB7 At\xE9 ",
-              maxFiles,
-              " arquivos"
-            ] })
-          ] })
-        ]
-      }
-    ),
-    (totalCount > 0 || loading) && /* @__PURE__ */ jsxs31("div", { className: "anexo-file-list", children: [
-      loading && /* @__PURE__ */ jsx40("div", { className: "anexo-empty", children: "Carregando anexos..." }),
-      persistidos.map((anexo) => {
-        const cat = getFileCategory(anexo.tipo || "", anexo.nome);
-        const isUnavailable = anexo.unavailable || unavailableIds.has(anexo.id);
-        return /* @__PURE__ */ jsxs31("div", { className: `anexo-file-item ${isUnavailable ? "anexo-file-unavailable" : ""}`, children: [
-          /* @__PURE__ */ jsx40("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ jsx40(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ jsxs31("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ jsx40("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ jsxs31("div", { className: "anexo-file-meta", children: [
-              isUnavailable && /* @__PURE__ */ jsx40("span", { className: "anexo-status-error", children: "Anexo indisponivel" }),
-              !isUnavailable && anexo.tamanho ? /* @__PURE__ */ jsx40("span", { children: formatFileSize(anexo.tamanho) }) : null,
-              anexo.createdAt && /* @__PURE__ */ jsx40("span", { children: new Date(anexo.createdAt).toLocaleDateString("pt-BR") })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs31("div", { className: "anexo-file-actions", children: [
-            onDownload && !isUnavailable && /* @__PURE__ */ jsx40(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-download",
-                title: "Download",
-                onClick: () => handleDownload(anexo),
-                children: /* @__PURE__ */ jsx40(FiDownload, {})
-              }
-            ),
-            !readonly && onRemovePersistido && /* @__PURE__ */ jsx40(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-danger",
-                title: "Remover",
-                onClick: () => onRemovePersistido(anexo.id),
-                children: /* @__PURE__ */ jsx40(FiTrash23, {})
-              }
-            )
-          ] })
-        ] }, `p-${anexo.id}`);
-      }),
-      locais.map((anexo) => {
-        const cat = getFileCategory(anexo.tipo, anexo.nome);
-        const isImg = anexo.tipo.startsWith("image/");
-        return /* @__PURE__ */ jsxs31("div", { className: "anexo-file-item", children: [
-          isImg && thumbUrls[anexo.localId] ? /* @__PURE__ */ jsx40("img", { src: thumbUrls[anexo.localId], alt: "", className: "anexo-file-thumb" }) : /* @__PURE__ */ jsx40("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ jsx40(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ jsxs31("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ jsx40("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ jsxs31("div", { className: "anexo-file-meta", children: [
-              /* @__PURE__ */ jsx40("span", { children: formatFileSize(anexo.tamanho) }),
-              anexo.status === "uploading" && /* @__PURE__ */ jsx40("span", { className: "anexo-status-uploading", children: "Enviando..." }),
-              anexo.status === "error" && /* @__PURE__ */ jsx40("span", { className: "anexo-status-error", children: anexo.errorMessage || "Erro" })
-            ] }),
-            (anexo.status === "uploading" || anexo.status === "done") && /* @__PURE__ */ jsx40("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ jsx40(
-              "div",
-              {
-                className: `anexo-progress-fill ${anexo.status === "done" ? "anexo-progress-done" : ""}`,
-                style: { width: `${anexo.progress}%` }
-              }
-            ) }),
-            anexo.status === "error" && /* @__PURE__ */ jsx40("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ jsx40("div", { className: "anexo-progress-fill anexo-progress-error", style: { width: "100%" } }) })
-          ] }),
-          /* @__PURE__ */ jsxs31("div", { className: "anexo-file-actions", children: [
-            anexo.status === "error" && onRetry && /* @__PURE__ */ jsx40(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action",
-                title: "Tentar novamente",
-                onClick: () => onRetry(anexo.localId),
-                children: /* @__PURE__ */ jsx40(FiRefreshCw, {})
-              }
-            ),
-            (anexo.status === "pending" || anexo.status === "error") && onRemoveLocal && /* @__PURE__ */ jsx40(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-danger",
-                title: "Remover",
-                onClick: () => onRemoveLocal(anexo.localId),
-                children: /* @__PURE__ */ jsx40(FiTrash23, {})
-              }
-            )
-          ] })
-        ] }, `l-${anexo.localId}`);
-      })
-    ] }),
-    !loading && totalCount === 0 && readonly && /* @__PURE__ */ jsx40("div", { className: "anexo-empty", children: "Nenhum anexo encontrado." })
-  ] });
-};
+  AnexoManager
+} from "@teraprox/ui-kit-core";
 
 // src/forms/FindRecursoByTagField.tsx
 import {
@@ -3170,10 +2959,10 @@ import {
 } from "@teraprox/ui-kit-sgm";
 
 // src/forms/SectorSelector.tsx
-import { useState as useState18, useEffect as useEffect9 } from "react";
+import { useState as useState17, useEffect as useEffect8 } from "react";
 import { Form as Form14 } from "react-bootstrap";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
-import { jsx as jsx41, jsxs as jsxs32 } from "react/jsx-runtime";
+import { jsx as jsx40, jsxs as jsxs31 } from "react/jsx-runtime";
 var SectorSelector = ({
   setores,
   onSectorSelect,
@@ -3183,9 +2972,9 @@ var SectorSelector = ({
   defaultSectorName = false,
   allowAll = false
 }) => {
-  const [expanded, setExpanded] = useState18(false);
-  const [selectedSector, setSelectedSector] = useState18(null);
-  useEffect9(() => {
+  const [expanded, setExpanded] = useState17(false);
+  const [selectedSector, setSelectedSector] = useState17(null);
+  useEffect8(() => {
     if (defaultSectorName && setores.length > 0) {
       const setor = setores.find((s) => s.nome === defaultSectorName);
       if (setor && setor.id !== (selectedSector == null ? void 0 : selectedSector.id)) {
@@ -3205,19 +2994,19 @@ var SectorSelector = ({
   };
   if (hideComponent) return null;
   const setorOptions = allowAll ? [{ id: "all", nome: "Todos" }, ...setores] : [...setores];
-  return /* @__PURE__ */ jsxs32(Form14.Floating, { className: "sector-selector-floating", children: [
-    /* @__PURE__ */ jsxs32("div", { className: "custom-select-container", onClick: toggleExpand, children: [
-      /* @__PURE__ */ jsx41("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
-      /* @__PURE__ */ jsx41("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ jsx41(BsChevronUp, {}) : /* @__PURE__ */ jsx41(BsChevronDown, {}) })
+  return /* @__PURE__ */ jsxs31(Form14.Floating, { className: "sector-selector-floating", children: [
+    /* @__PURE__ */ jsxs31("div", { className: "custom-select-container", onClick: toggleExpand, children: [
+      /* @__PURE__ */ jsx40("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
+      /* @__PURE__ */ jsx40("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ jsx40(BsChevronUp, {}) : /* @__PURE__ */ jsx40(BsChevronDown, {}) })
     ] }),
-    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ jsx41("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
-    expanded && /* @__PURE__ */ jsxs32(
+    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ jsx40("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
+    expanded && /* @__PURE__ */ jsxs31(
       "div",
       {
         className: "custom-dropdown-menu",
         onMouseLeave: () => setExpanded(false),
         children: [
-          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ jsx41(
+          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ jsx40(
             "div",
             {
               className: `dropdown-option ${setor.nome === (selectedSector == null ? void 0 : selectedSector.nome) ? "selected-option" : ""}`,
@@ -3226,7 +3015,7 @@ var SectorSelector = ({
             },
             idx
           )),
-          setores.length === 0 && /* @__PURE__ */ jsx41("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
+          setores.length === 0 && /* @__PURE__ */ jsx40("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
         ]
       }
     )
@@ -3235,7 +3024,7 @@ var SectorSelector = ({
 
 // src/forms/UnidadeMaterialForm.tsx
 import { Button as Button17 } from "react-bootstrap";
-import { jsx as jsx42, jsxs as jsxs33 } from "react/jsx-runtime";
+import { jsx as jsx41, jsxs as jsxs32 } from "react/jsx-runtime";
 var UnidadeMaterialForm = ({
   value,
   onMaterialSelected,
@@ -3252,10 +3041,10 @@ var UnidadeMaterialForm = ({
   className = ""
 }) => {
   var _a, _b, _c;
-  const renderNewMaterialButton = () => /* @__PURE__ */ jsx42(Button17, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
-  const renderNewUnidadeButton = () => /* @__PURE__ */ jsx42(Button17, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
-  return /* @__PURE__ */ jsxs33("div", { className: `unidade-material-form ${className}`, children: [
-    !hideMaterial && /* @__PURE__ */ jsx42(
+  const renderNewMaterialButton = () => /* @__PURE__ */ jsx41(Button17, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
+  const renderNewUnidadeButton = () => /* @__PURE__ */ jsx41(Button17, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
+  return /* @__PURE__ */ jsxs32("div", { className: `unidade-material-form ${className}`, children: [
+    !hideMaterial && /* @__PURE__ */ jsx41(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3267,7 +3056,7 @@ var UnidadeMaterialForm = ({
         actionButton: onNavigateToCreateMaterial ? renderNewMaterialButton : void 0
       }
     ),
-    !hideQuantidade && /* @__PURE__ */ jsx42(
+    !hideQuantidade && /* @__PURE__ */ jsx41(
       FormField,
       {
         label: "Quantidade",
@@ -3276,7 +3065,7 @@ var UnidadeMaterialForm = ({
         ty: "number"
       }
     ),
-    !hideUnidade && /* @__PURE__ */ jsx42(
+    !hideUnidade && /* @__PURE__ */ jsx41(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3292,7 +3081,7 @@ var UnidadeMaterialForm = ({
 };
 
 // src/icons/IconLabelItem.tsx
-import { jsx as jsx43, jsxs as jsxs34 } from "react/jsx-runtime";
+import { jsx as jsx42, jsxs as jsxs33 } from "react/jsx-runtime";
 var IconLabelItem = ({
   icon,
   label,
@@ -3301,16 +3090,16 @@ var IconLabelItem = ({
   onClick,
   style
 }) => {
-  return /* @__PURE__ */ jsxs34("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
+  return /* @__PURE__ */ jsxs33("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
     icon,
-    /* @__PURE__ */ jsx43("span", { className: labelClassName, children: label })
+    /* @__PURE__ */ jsx42("span", { className: labelClassName, children: label })
   ] });
 };
 
 // src/icons/IconLabelList.tsx
-import { jsx as jsx44 } from "react/jsx-runtime";
+import { jsx as jsx43 } from "react/jsx-runtime";
 var IconLabelList = ({ items, className = "" }) => {
-  return /* @__PURE__ */ jsx44("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ jsx44(
+  return /* @__PURE__ */ jsx43("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ jsx43(
     IconLabelItem,
     {
       labelClassName: "icon-label",
@@ -3324,18 +3113,18 @@ var IconLabelList = ({ items, className = "" }) => {
 };
 
 // src/icons/NotificationItem.tsx
-import { useState as useState19 } from "react";
+import { useState as useState18 } from "react";
 import { Modal as Modal4, Button as Button18, OverlayTrigger, Tooltip as Tooltip3 } from "react-bootstrap";
-import { FiClock, FiCheck, FiTrash2 as FiTrash24 } from "react-icons/fi";
+import { FiClock, FiCheck, FiTrash2 as FiTrash23 } from "react-icons/fi";
 import dayjs5 from "dayjs";
-import { Fragment as Fragment11, jsx as jsx45, jsxs as jsxs35 } from "react/jsx-runtime";
+import { Fragment as Fragment11, jsx as jsx44, jsxs as jsxs34 } from "react/jsx-runtime";
 var NotificationItem = ({
   notification,
   onRead,
   onDismiss,
   emptyContentLabel = "Sem conte\xFAdo adicional dispon\xEDvel."
 }) => {
-  const [showModal, setShowModal] = useState19(false);
+  const [showModal, setShowModal] = useState18(false);
   const { context, contextId, content, status, createdAt, readAt } = notification;
   const handleOpenModal = (e) => {
     e.stopPropagation();
@@ -3351,49 +3140,49 @@ var NotificationItem = ({
     onDismiss(notification);
   };
   const displayTitle = contextId ? `${context} - ${contextId}` : context || "Notifica\xE7\xE3o";
-  return /* @__PURE__ */ jsxs35(Fragment11, { children: [
-    /* @__PURE__ */ jsxs35(
+  return /* @__PURE__ */ jsxs34(Fragment11, { children: [
+    /* @__PURE__ */ jsxs34(
       "div",
       {
         className: `notification-item-modern ${status === "unread" ? "unread" : ""}`,
         onClick: handleOpenModal,
         children: [
-          /* @__PURE__ */ jsx45("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ jsx45(FiClock, { size: 14 }) : /* @__PURE__ */ jsx45(FiCheck, { size: 14 }) }),
-          /* @__PURE__ */ jsxs35("div", { className: "notification-main-content", children: [
-            /* @__PURE__ */ jsx45("div", { className: "notification-header-row", children: /* @__PURE__ */ jsxs35("div", { className: "notification-title-modern", children: [
-              /* @__PURE__ */ jsx45("span", { className: "notification-context", children: context }),
-              contextId && /* @__PURE__ */ jsxs35(Fragment11, { children: [
-                /* @__PURE__ */ jsx45("span", { className: "notification-separator", children: "/" }),
-                /* @__PURE__ */ jsx45("span", { className: "notification-context-id", children: contextId })
+          /* @__PURE__ */ jsx44("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ jsx44(FiClock, { size: 14 }) : /* @__PURE__ */ jsx44(FiCheck, { size: 14 }) }),
+          /* @__PURE__ */ jsxs34("div", { className: "notification-main-content", children: [
+            /* @__PURE__ */ jsx44("div", { className: "notification-header-row", children: /* @__PURE__ */ jsxs34("div", { className: "notification-title-modern", children: [
+              /* @__PURE__ */ jsx44("span", { className: "notification-context", children: context }),
+              contextId && /* @__PURE__ */ jsxs34(Fragment11, { children: [
+                /* @__PURE__ */ jsx44("span", { className: "notification-separator", children: "/" }),
+                /* @__PURE__ */ jsx44("span", { className: "notification-context-id", children: contextId })
               ] })
             ] }) }),
-            /* @__PURE__ */ jsx45("div", { className: "notification-preview", children: /* @__PURE__ */ jsx45("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
-            /* @__PURE__ */ jsxs35("div", { className: "notification-meta", children: [
-              /* @__PURE__ */ jsxs35("div", { className: "notification-timestamp", children: [
-                /* @__PURE__ */ jsx45(FiClock, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ jsx45("small", { children: dayjs5(createdAt).format("DD/MM/YYYY HH:mm") })
+            /* @__PURE__ */ jsx44("div", { className: "notification-preview", children: /* @__PURE__ */ jsx44("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
+            /* @__PURE__ */ jsxs34("div", { className: "notification-meta", children: [
+              /* @__PURE__ */ jsxs34("div", { className: "notification-timestamp", children: [
+                /* @__PURE__ */ jsx44(FiClock, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ jsx44("small", { children: dayjs5(createdAt).format("DD/MM/YYYY HH:mm") })
               ] }),
-              readAt && /* @__PURE__ */ jsxs35("div", { className: "notification-read-time", children: [
-                /* @__PURE__ */ jsx45(FiCheck, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ jsxs35("small", { children: [
+              readAt && /* @__PURE__ */ jsxs34("div", { className: "notification-read-time", children: [
+                /* @__PURE__ */ jsx44(FiCheck, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ jsxs34("small", { children: [
                   "Lida em ",
                   dayjs5(readAt).format("DD/MM HH:mm")
                 ] })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ jsx45("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ jsx45(
+          /* @__PURE__ */ jsx44("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ jsx44(
             OverlayTrigger,
             {
               placement: "top",
-              overlay: /* @__PURE__ */ jsx45(Tooltip3, { children: "Descartar" }),
-              children: /* @__PURE__ */ jsx45(
+              overlay: /* @__PURE__ */ jsx44(Tooltip3, { children: "Descartar" }),
+              children: /* @__PURE__ */ jsx44(
                 "button",
                 {
                   className: "notification-action-btn notification-dismiss-btn",
                   onClick: handleDismiss,
                   "aria-label": "Descartar notifica\xE7\xE3o",
-                  children: /* @__PURE__ */ jsx45(FiTrash24, { size: 14 })
+                  children: /* @__PURE__ */ jsx44(FiTrash23, { size: 14 })
                 }
               )
             }
@@ -3401,7 +3190,7 @@ var NotificationItem = ({
         ]
       }
     ),
-    /* @__PURE__ */ jsxs35(
+    /* @__PURE__ */ jsxs34(
       Modal4,
       {
         show: showModal,
@@ -3409,31 +3198,31 @@ var NotificationItem = ({
         centered: true,
         className: "notification-modal",
         children: [
-          /* @__PURE__ */ jsx45(Modal4.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ jsx45(Modal4.Title, { className: "notification-modal-title", children: /* @__PURE__ */ jsxs35("div", { className: "d-flex align-items-center", children: [
-            status === "unread" ? /* @__PURE__ */ jsx45(FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ jsx45(FiCheck, { className: "me-2 text-success" }),
+          /* @__PURE__ */ jsx44(Modal4.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ jsx44(Modal4.Title, { className: "notification-modal-title", children: /* @__PURE__ */ jsxs34("div", { className: "d-flex align-items-center", children: [
+            status === "unread" ? /* @__PURE__ */ jsx44(FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ jsx44(FiCheck, { className: "me-2 text-success" }),
             "Detalhes da Notifica\xE7\xE3o"
           ] }) }) }),
-          /* @__PURE__ */ jsx45(Modal4.Body, { className: "notification-modal-body", children: /* @__PURE__ */ jsxs35("div", { className: "notification-modal-content", children: [
-            /* @__PURE__ */ jsxs35("div", { className: "notification-modal-meta", children: [
-              /* @__PURE__ */ jsx45("h6", { className: "notification-modal-source", children: displayTitle }),
-              /* @__PURE__ */ jsxs35("div", { className: "notification-modal-timestamps", children: [
-                /* @__PURE__ */ jsxs35("small", { className: "text-muted", children: [
-                  /* @__PURE__ */ jsx45(FiClock, { size: 12, className: "me-1" }),
+          /* @__PURE__ */ jsx44(Modal4.Body, { className: "notification-modal-body", children: /* @__PURE__ */ jsxs34("div", { className: "notification-modal-content", children: [
+            /* @__PURE__ */ jsxs34("div", { className: "notification-modal-meta", children: [
+              /* @__PURE__ */ jsx44("h6", { className: "notification-modal-source", children: displayTitle }),
+              /* @__PURE__ */ jsxs34("div", { className: "notification-modal-timestamps", children: [
+                /* @__PURE__ */ jsxs34("small", { className: "text-muted", children: [
+                  /* @__PURE__ */ jsx44(FiClock, { size: 12, className: "me-1" }),
                   "Criada em ",
                   dayjs5(createdAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] }),
-                readAt && /* @__PURE__ */ jsxs35("small", { className: "text-muted ms-3", children: [
-                  /* @__PURE__ */ jsx45(FiCheck, { size: 12, className: "me-1" }),
+                readAt && /* @__PURE__ */ jsxs34("small", { className: "text-muted ms-3", children: [
+                  /* @__PURE__ */ jsx44(FiCheck, { size: 12, className: "me-1" }),
                   "Lida em ",
                   dayjs5(readAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] })
               ] })
             ] }),
-            /* @__PURE__ */ jsx45("div", { className: "notification-modal-message", children: /* @__PURE__ */ jsx45("p", { className: "mb-0", children: content || emptyContentLabel }) })
+            /* @__PURE__ */ jsx44("div", { className: "notification-modal-message", children: /* @__PURE__ */ jsx44("p", { className: "mb-0", children: content || emptyContentLabel }) })
           ] }) }),
-          /* @__PURE__ */ jsxs35(Modal4.Footer, { className: "notification-modal-footer", children: [
-            /* @__PURE__ */ jsx45(Button18, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-            status === "unread" && /* @__PURE__ */ jsx45(Button18, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
+          /* @__PURE__ */ jsxs34(Modal4.Footer, { className: "notification-modal-footer", children: [
+            /* @__PURE__ */ jsx44(Button18, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+            status === "unread" && /* @__PURE__ */ jsx44(Button18, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
           ] })
         ]
       }
@@ -3444,7 +3233,7 @@ var NotificationItem = ({
 // src/icons/NotificationBell.tsx
 import { Dropdown as Dropdown2, Badge as Badge3 } from "react-bootstrap";
 import { FiBell } from "react-icons/fi";
-import { jsx as jsx46, jsxs as jsxs36 } from "react/jsx-runtime";
+import { jsx as jsx45, jsxs as jsxs35 } from "react/jsx-runtime";
 var NotificationBell = ({
   notifications,
   onItemRead,
@@ -3454,10 +3243,10 @@ var NotificationBell = ({
   className = ""
 }) => {
   const unreadCount = notifications.filter((n) => n.status === "unread").length;
-  return /* @__PURE__ */ jsxs36(Dropdown2, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
-    /* @__PURE__ */ jsxs36(Dropdown2.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
-      /* @__PURE__ */ jsx46(FiBell, { size }),
-      unreadCount > 0 && /* @__PURE__ */ jsx46(
+  return /* @__PURE__ */ jsxs35(Dropdown2, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
+    /* @__PURE__ */ jsxs35(Dropdown2.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
+      /* @__PURE__ */ jsx45(FiBell, { size }),
+      unreadCount > 0 && /* @__PURE__ */ jsx45(
         Badge3,
         {
           pill: true,
@@ -3468,15 +3257,15 @@ var NotificationBell = ({
         }
       )
     ] }),
-    /* @__PURE__ */ jsxs36(
+    /* @__PURE__ */ jsxs35(
       Dropdown2.Menu,
       {
         className: "shadow-lg border-0",
         style: { width: "320px", padding: 0, maxHeight: "500px", overflowY: "auto" },
         children: [
-          /* @__PURE__ */ jsxs36("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
-            /* @__PURE__ */ jsx46("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
-            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ jsx46(
+          /* @__PURE__ */ jsxs35("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
+            /* @__PURE__ */ jsx45("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
+            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ jsx45(
               "button",
               {
                 className: "btn btn-link btn-sm p-0 text-decoration-none",
@@ -3488,7 +3277,7 @@ var NotificationBell = ({
               }
             )
           ] }),
-          /* @__PURE__ */ jsx46("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ jsx46(
+          /* @__PURE__ */ jsx45("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ jsx45(
             NotificationItem,
             {
               notification: n,
@@ -3496,11 +3285,11 @@ var NotificationBell = ({
               onDismiss: onItemDismiss
             },
             n.id
-          )) : /* @__PURE__ */ jsxs36("div", { className: "p-4 text-center text-muted", children: [
-            /* @__PURE__ */ jsx46(FiBell, { size: 24, className: "mb-2 opacity-25" }),
-            /* @__PURE__ */ jsx46("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
+          )) : /* @__PURE__ */ jsxs35("div", { className: "p-4 text-center text-muted", children: [
+            /* @__PURE__ */ jsx45(FiBell, { size: 24, className: "mb-2 opacity-25" }),
+            /* @__PURE__ */ jsx45("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
           ] }) }),
-          notifications.length > 0 && /* @__PURE__ */ jsx46("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ jsxs36("small", { className: "text-muted", children: [
+          notifications.length > 0 && /* @__PURE__ */ jsx45("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ jsxs35("small", { className: "text-muted", children: [
             "Total: ",
             notifications.length,
             " notifica\xE7\xF5es"
@@ -3513,7 +3302,7 @@ var NotificationBell = ({
 
 // src/modals/ModalBasicTemplate.tsx
 import { Modal as Modal5, Button as Button19 } from "react-bootstrap";
-import { jsx as jsx47, jsxs as jsxs37 } from "react/jsx-runtime";
+import { jsx as jsx46, jsxs as jsxs36 } from "react/jsx-runtime";
 var ModalBasicTemplate = ({
   show,
   closeFunc,
@@ -3527,7 +3316,7 @@ var ModalBasicTemplate = ({
     if (typeof part === "function") return part();
     return part;
   };
-  return /* @__PURE__ */ jsxs37(
+  return /* @__PURE__ */ jsxs36(
     Modal5,
     {
       show,
@@ -3536,11 +3325,11 @@ var ModalBasicTemplate = ({
       style: dialogStyle,
       ...modalProps,
       children: [
-        header && /* @__PURE__ */ jsx47(Modal5.Header, { closeButton: true, children: /* @__PURE__ */ jsx47(Modal5.Title, { children: renderPart(header) }) }),
-        /* @__PURE__ */ jsx47(Modal5.Body, { style: bodyStyle, children: renderPart(body) }),
-        footer && /* @__PURE__ */ jsxs37(Modal5.Footer, { children: [
+        header && /* @__PURE__ */ jsx46(Modal5.Header, { closeButton: true, children: /* @__PURE__ */ jsx46(Modal5.Title, { children: renderPart(header) }) }),
+        /* @__PURE__ */ jsx46(Modal5.Body, { style: bodyStyle, children: renderPart(body) }),
+        footer && /* @__PURE__ */ jsxs36(Modal5.Footer, { children: [
           renderPart(footer),
-          !footer && /* @__PURE__ */ jsx47(Button19, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
+          !footer && /* @__PURE__ */ jsx46(Button19, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
         ] })
       ]
     }
@@ -3549,10 +3338,10 @@ var ModalBasicTemplate = ({
 var ModalBasicTemplate_default = ModalBasicTemplate;
 
 // src/modals/SelectDateModal.tsx
-import { useState as useState20 } from "react";
+import { useState as useState19 } from "react";
 import { Modal as Modal6, Button as Button20, Form as Form15 } from "react-bootstrap";
 import dayjs6 from "dayjs";
-import { jsx as jsx48, jsxs as jsxs38 } from "react/jsx-runtime";
+import { jsx as jsx47, jsxs as jsxs37 } from "react/jsx-runtime";
 var SelectDateModal = ({
   show,
   onClose,
@@ -3562,18 +3351,18 @@ var SelectDateModal = ({
   initialDate,
   allowFuture = true
 }) => {
-  const [selectedDate, setSelectedDate] = useState20(
+  const [selectedDate, setSelectedDate] = useState19(
     initialDate || dayjs6().format("YYYY-MM-DDTHH:mm")
   );
   const handleConfirm = () => {
     onSelect(selectedDate);
     onClose();
   };
-  return /* @__PURE__ */ jsxs38(Modal6, { show, onHide: onClose, centered: true, size: "sm", children: [
-    /* @__PURE__ */ jsx48(Modal6.Header, { closeButton: true, children: /* @__PURE__ */ jsx48(Modal6.Title, { children: title }) }),
-    /* @__PURE__ */ jsx48(Modal6.Body, { children: /* @__PURE__ */ jsxs38(Form15.Group, { children: [
-      /* @__PURE__ */ jsx48(Form15.Label, { children: label }),
-      /* @__PURE__ */ jsx48(
+  return /* @__PURE__ */ jsxs37(Modal6, { show, onHide: onClose, centered: true, size: "sm", children: [
+    /* @__PURE__ */ jsx47(Modal6.Header, { closeButton: true, children: /* @__PURE__ */ jsx47(Modal6.Title, { children: title }) }),
+    /* @__PURE__ */ jsx47(Modal6.Body, { children: /* @__PURE__ */ jsxs37(Form15.Group, { children: [
+      /* @__PURE__ */ jsx47(Form15.Label, { children: label }),
+      /* @__PURE__ */ jsx47(
         Form15.Control,
         {
           type: "datetime-local",
@@ -3583,19 +3372,19 @@ var SelectDateModal = ({
         }
       )
     ] }) }),
-    /* @__PURE__ */ jsxs38(Modal6.Footer, { children: [
-      /* @__PURE__ */ jsx48(Button20, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
-      /* @__PURE__ */ jsx48(Button20, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
+    /* @__PURE__ */ jsxs37(Modal6.Footer, { children: [
+      /* @__PURE__ */ jsx47(Button20, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
+      /* @__PURE__ */ jsx47(Button20, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
     ] })
   ] });
 };
 
 // src/modals/JustificativaModal.tsx
-import { useState as useState21, useEffect as useEffect10 } from "react";
+import { useState as useState20, useEffect as useEffect9 } from "react";
 import { Modal as Modal7, Button as Button21, Form as Form16, ListGroup as ListGroup3, Badge as Badge4, OverlayTrigger as OverlayTrigger2, Tooltip as Tooltip4 } from "react-bootstrap";
 import { FaTrashAlt, FaUndo } from "react-icons/fa";
 import dayjs7 from "dayjs";
-import { jsx as jsx49, jsxs as jsxs39 } from "react/jsx-runtime";
+import { jsx as jsx48, jsxs as jsxs38 } from "react/jsx-runtime";
 var JustificativaModal = ({
   show,
   onClose,
@@ -3604,10 +3393,10 @@ var JustificativaModal = ({
   currentUserName,
   onUpdateJustificativas
 }) => {
-  const [localJustificativas, setLocalJustificativas] = useState21(initialJustificativas);
-  const [novaDescricao, setNovaDescricao] = useState21("");
-  const [editandoId, setEditandoId] = useState21(null);
-  useEffect10(() => {
+  const [localJustificativas, setLocalJustificativas] = useState20(initialJustificativas);
+  const [novaDescricao, setNovaDescricao] = useState20("");
+  const [editandoId, setEditandoId] = useState20(null);
+  useEffect9(() => {
     setLocalJustificativas(initialJustificativas);
   }, [initialJustificativas]);
   const handleAddOrEdit = async () => {
@@ -3643,13 +3432,13 @@ var JustificativaModal = ({
     await onUpdateJustificativas(updated);
     setLocalJustificativas(updated);
   };
-  return /* @__PURE__ */ jsxs39(Modal7, { show, onHide: onClose, centered: true, size: "lg", children: [
-    /* @__PURE__ */ jsx49(Modal7.Header, { closeButton: true, children: /* @__PURE__ */ jsx49(Modal7.Title, { children: "Justificativas / Coment\xE1rios" }) }),
-    /* @__PURE__ */ jsxs39(Modal7.Body, { children: [
-      /* @__PURE__ */ jsxs39(Form16, { className: "mb-4", children: [
-        /* @__PURE__ */ jsxs39(Form16.Group, { controlId: "justificativaInput", className: "mb-2", children: [
-          /* @__PURE__ */ jsx49(Form16.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
-          /* @__PURE__ */ jsx49(
+  return /* @__PURE__ */ jsxs38(Modal7, { show, onHide: onClose, centered: true, size: "lg", children: [
+    /* @__PURE__ */ jsx48(Modal7.Header, { closeButton: true, children: /* @__PURE__ */ jsx48(Modal7.Title, { children: "Justificativas / Coment\xE1rios" }) }),
+    /* @__PURE__ */ jsxs38(Modal7.Body, { children: [
+      /* @__PURE__ */ jsxs38(Form16, { className: "mb-4", children: [
+        /* @__PURE__ */ jsxs38(Form16.Group, { controlId: "justificativaInput", className: "mb-2", children: [
+          /* @__PURE__ */ jsx48(Form16.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
+          /* @__PURE__ */ jsx48(
             Form16.Control,
             {
               as: "textarea",
@@ -3660,12 +3449,12 @@ var JustificativaModal = ({
             }
           )
         ] }),
-        /* @__PURE__ */ jsx49("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ jsx49(Button21, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
+        /* @__PURE__ */ jsx48("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ jsx48(Button21, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
       ] }),
-      /* @__PURE__ */ jsx49(ListGroup3, { className: "border-0", children: localJustificativas.map((j) => {
+      /* @__PURE__ */ jsx48(ListGroup3, { className: "border-0", children: localJustificativas.map((j) => {
         var _a, _b, _c;
         const isMe = ((_a = j.user) == null ? void 0 : _a.userId) === currentUserId;
-        return /* @__PURE__ */ jsxs39(
+        return /* @__PURE__ */ jsxs38(
           ListGroup3.Item,
           {
             className: "border-0 px-0",
@@ -3677,11 +3466,11 @@ var JustificativaModal = ({
               backgroundColor: "transparent"
             },
             children: [
-              /* @__PURE__ */ jsxs39("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
-                /* @__PURE__ */ jsx49("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
-                /* @__PURE__ */ jsx49(Badge4, { bg: "secondary", style: { fontSize: "0.65rem" }, children: dayjs7(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
+              /* @__PURE__ */ jsxs38("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
+                /* @__PURE__ */ jsx48("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
+                /* @__PURE__ */ jsx48(Badge4, { bg: "secondary", style: { fontSize: "0.65rem" }, children: dayjs7(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
               ] }),
-              /* @__PURE__ */ jsx49(
+              /* @__PURE__ */ jsx48(
                 "div",
                 {
                   onClick: () => !j.removed && isMe && (setNovaDescricao(j.descricao), setEditandoId(j.id)),
@@ -3700,14 +3489,14 @@ var JustificativaModal = ({
                   children: j.descricao
                 }
               ),
-              isMe && /* @__PURE__ */ jsx49("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ jsx49(OverlayTrigger2, { placement: "top", overlay: /* @__PURE__ */ jsx49(Tooltip4, { children: "Desfazer" }), children: /* @__PURE__ */ jsx49(
+              isMe && /* @__PURE__ */ jsx48("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ jsx48(OverlayTrigger2, { placement: "top", overlay: /* @__PURE__ */ jsx48(Tooltip4, { children: "Desfazer" }), children: /* @__PURE__ */ jsx48(
                 FaUndo,
                 {
                   onClick: () => handleUndoRemove(j.id),
                   className: "text-success cursor-pointer",
                   size: 14
                 }
-              ) }) : /* @__PURE__ */ jsx49(OverlayTrigger2, { placement: "top", overlay: /* @__PURE__ */ jsx49(Tooltip4, { children: "Remover" }), children: /* @__PURE__ */ jsx49(
+              ) }) : /* @__PURE__ */ jsx48(OverlayTrigger2, { placement: "top", overlay: /* @__PURE__ */ jsx48(Tooltip4, { children: "Remover" }), children: /* @__PURE__ */ jsx48(
                 FaTrashAlt,
                 {
                   onClick: () => handleRemove(j.id),
@@ -3721,14 +3510,14 @@ var JustificativaModal = ({
         );
       }) })
     ] }),
-    /* @__PURE__ */ jsx49(Modal7.Footer, { children: /* @__PURE__ */ jsx49(Button21, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
+    /* @__PURE__ */ jsx48(Modal7.Footer, { children: /* @__PURE__ */ jsx48(Button21, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
   ] });
 };
 
 // src/modals/ImageViewModal.tsx
-import { useState as useState22, useEffect as useEffect11 } from "react";
+import { useState as useState21, useEffect as useEffect10 } from "react";
 import { Button as Button22 } from "react-bootstrap";
-import { jsx as jsx50, jsxs as jsxs40 } from "react/jsx-runtime";
+import { jsx as jsx49, jsxs as jsxs39 } from "react/jsx-runtime";
 var ImageViewModal = ({
   show,
   onHide,
@@ -3737,10 +3526,10 @@ var ImageViewModal = ({
   imageAltText = "Visualiza\xE7\xE3o de imagem",
   resolveImageUrl
 }) => {
-  const [selectedImageKey, setSelectedImageKey] = useState22(null);
-  const [imageSrc, setImageSrc] = useState22(null);
-  const [currentAuthor, setCurrentAuthor] = useState22("Desconhecido");
-  useEffect11(() => {
+  const [selectedImageKey, setSelectedImageKey] = useState21(null);
+  const [imageSrc, setImageSrc] = useState21(null);
+  const [currentAuthor, setCurrentAuthor] = useState21("Desconhecido");
+  useEffect10(() => {
     if (show && initialImageData) {
       setSelectedImageKey(initialImageData.key);
       setCurrentAuthor(initialImageData.author || "Desconhecido");
@@ -3749,7 +3538,7 @@ var ImageViewModal = ({
       setCurrentAuthor(imagesData[0].author || "Desconhecido");
     }
   }, [show, initialImageData]);
-  useEffect11(() => {
+  useEffect10(() => {
     if (show && selectedImageKey) {
       setImageSrc(null);
       const file = imagesData.find((f) => f.key === selectedImageKey);
@@ -3762,7 +3551,7 @@ var ImageViewModal = ({
   }, [show, selectedImageKey]);
   const renderImageSelector = () => {
     if (imagesData.length <= 1) return null;
-    return /* @__PURE__ */ jsx50("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ jsx50(
+    return /* @__PURE__ */ jsx49("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ jsx49(
       Button22,
       {
         variant: selectedImageKey === img.key ? "primary" : "outline-secondary",
@@ -3776,9 +3565,9 @@ var ImageViewModal = ({
       idx
     )) });
   };
-  const body = /* @__PURE__ */ jsxs40("div", { className: "text-center", children: [
+  const body = /* @__PURE__ */ jsxs39("div", { className: "text-center", children: [
     renderImageSelector(),
-    imageSrc ? /* @__PURE__ */ jsx50(
+    imageSrc ? /* @__PURE__ */ jsx49(
       "img",
       {
         src: imageSrc,
@@ -3786,9 +3575,9 @@ var ImageViewModal = ({
         className: "img-fluid rounded shadow-sm",
         style: { maxHeight: "75vh", objectFit: "contain" }
       }
-    ) : /* @__PURE__ */ jsx50("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
+    ) : /* @__PURE__ */ jsx49("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
   ] });
-  return /* @__PURE__ */ jsx50(
+  return /* @__PURE__ */ jsx49(
     ModalBasicTemplate_default,
     {
       header: "Visualiza\xE7\xE3o de Imagem",
@@ -3796,12 +3585,12 @@ var ImageViewModal = ({
       show,
       body,
       props: { size: "lg" },
-      footer: () => /* @__PURE__ */ jsxs40("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
-        /* @__PURE__ */ jsxs40("small", { className: "text-muted", children: [
+      footer: () => /* @__PURE__ */ jsxs39("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
+        /* @__PURE__ */ jsxs39("small", { className: "text-muted", children: [
           "Enviado por: ",
-          /* @__PURE__ */ jsx50("strong", { children: currentAuthor })
+          /* @__PURE__ */ jsx49("strong", { children: currentAuthor })
         ] }),
-        /* @__PURE__ */ jsx50(Button22, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
+        /* @__PURE__ */ jsx49(Button22, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
       ] })
     }
   );
@@ -3809,14 +3598,14 @@ var ImageViewModal = ({
 
 // src/qr/QrReader.tsx
 import QrScanner from "qr-scanner";
-import { useEffect as useEffect12, useRef as useRef5, useState as useState23 } from "react";
-import { jsx as jsx51, jsxs as jsxs41 } from "react/jsx-runtime";
+import { useEffect as useEffect11, useRef as useRef5, useState as useState22 } from "react";
+import { jsx as jsx50, jsxs as jsxs40 } from "react/jsx-runtime";
 var QrReader = ({ callback }) => {
   const scanner = useRef5(null);
   const videoEl = useRef5(null);
   const qrBoxEl = useRef5(null);
-  const [qrOn, setQrOn] = useState23(true);
-  const [scannedResult, setScannedResult] = useState23("");
+  const [qrOn, setQrOn] = useState22(true);
+  const [scannedResult, setScannedResult] = useState22("");
   const onScanSuccess = (result) => {
     setScannedResult(result.data);
     callback(result.data);
@@ -3826,7 +3615,7 @@ var QrReader = ({ callback }) => {
       console.error("QR Scanner Error:", err);
     }
   };
-  useEffect12(() => {
+  useEffect11(() => {
     if (videoEl.current && !scanner.current) {
       scanner.current = new QrScanner(videoEl.current, onScanSuccess, {
         onDecodeError: onScanFail,
@@ -3848,17 +3637,17 @@ var QrReader = ({ callback }) => {
       }
     };
   }, []);
-  useEffect12(() => {
+  useEffect11(() => {
     if (!qrOn) {
       alert(
         "C\xE2mera est\xE1 bloqueada ou inacess\xEDvel. Por favor, habilite a c\xE2mera nas permiss\xF5es do seu navegador e recarregue a p\xE1gina."
       );
     }
   }, [qrOn]);
-  return /* @__PURE__ */ jsxs41("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx51("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
-    /* @__PURE__ */ jsx51("div", { ref: qrBoxEl, className: "qr-box" }),
-    scannedResult && /* @__PURE__ */ jsxs41(
+  return /* @__PURE__ */ jsxs40("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
+    /* @__PURE__ */ jsx50("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
+    /* @__PURE__ */ jsx50("div", { ref: qrBoxEl, className: "qr-box" }),
+    scannedResult && /* @__PURE__ */ jsxs40(
       "div",
       {
         style: {
@@ -3882,15 +3671,15 @@ var QrReader = ({ callback }) => {
 };
 
 // src/qr/QrCodeScanButton.tsx
-import { useState as useState24 } from "react";
+import { useState as useState23 } from "react";
 import { BsQrCode } from "react-icons/bs";
-import { jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
+import { jsx as jsx51, jsxs as jsxs41 } from "react/jsx-runtime";
 var QrCodeScanButton = ({ callback, size = 25 }) => {
-  const [showQr, setShowQr] = useState24(false);
+  const [showQr, setShowQr] = useState23(false);
   const toggleQr = () => {
     setShowQr((prev) => !prev);
   };
-  return /* @__PURE__ */ jsxs42(
+  return /* @__PURE__ */ jsxs41(
     "div",
     {
       className: "hoverable-div",
@@ -3908,8 +3697,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
       },
       onClick: toggleQr,
       children: [
-        /* @__PURE__ */ jsx52(BsQrCode, { size }),
-        showQr && /* @__PURE__ */ jsx52(
+        /* @__PURE__ */ jsx51(BsQrCode, { size }),
+        showQr && /* @__PURE__ */ jsx51(
           "div",
           {
             style: {
@@ -3927,8 +3716,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
               padding: "20px"
             },
             onClick: (e) => e.stopPropagation(),
-            children: /* @__PURE__ */ jsxs42("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
-              /* @__PURE__ */ jsx52(
+            children: /* @__PURE__ */ jsxs41("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
+              /* @__PURE__ */ jsx51(
                 "div",
                 {
                   onClick: toggleQr,
@@ -3936,8 +3725,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
                   children: "\xD7"
                 }
               ),
-              /* @__PURE__ */ jsx52("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
-              /* @__PURE__ */ jsx52(
+              /* @__PURE__ */ jsx51("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
+              /* @__PURE__ */ jsx51(
                 QrReader,
                 {
                   callback: (v) => {
@@ -3946,7 +3735,7 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
                   }
                 }
               ),
-              /* @__PURE__ */ jsx52("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
+              /* @__PURE__ */ jsx51("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
             ] })
           }
         )
@@ -3956,9 +3745,9 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
 };
 
 // src/tables/ReusableTableWithModal.tsx
-import { useState as useState25, useEffect as useEffect13 } from "react";
+import { useState as useState24, useEffect as useEffect12 } from "react";
 import { Table, Button as Button23, Modal as Modal8 } from "react-bootstrap";
-import { Fragment as Fragment12, jsx as jsx53, jsxs as jsxs43 } from "react/jsx-runtime";
+import { Fragment as Fragment12, jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
 var ReusableTableWithModal = ({
   fetchDataCallback,
   modalButtonCallback,
@@ -3968,11 +3757,11 @@ var ReusableTableWithModal = ({
   confirmLabel = "Aceitar",
   onFetchData
 }) => {
-  const [data, setData] = useState25([]);
-  const [selectedItem, setSelectedItem] = useState25(null);
-  const [showModal, setShowModal] = useState25(false);
-  const [loading, setLoading] = useState25(false);
-  const [tableDataRows, setTableDataRows] = useState25([]);
+  const [data, setData] = useState24([]);
+  const [selectedItem, setSelectedItem] = useState24(null);
+  const [showModal, setShowModal] = useState24(false);
+  const [loading, setLoading] = useState24(false);
+  const [tableDataRows, setTableDataRows] = useState24([]);
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -3988,7 +3777,7 @@ var ReusableTableWithModal = ({
       setLoading(false);
     }
   };
-  useEffect13(() => {
+  useEffect12(() => {
     fetchData();
   }, []);
   const handleRowClick = (td) => {
@@ -3999,25 +3788,25 @@ var ReusableTableWithModal = ({
     setShowModal(false);
     setSelectedItem(null);
   };
-  return /* @__PURE__ */ jsxs43(Fragment12, { children: [
-    /* @__PURE__ */ jsxs43(Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
-      /* @__PURE__ */ jsx53("thead", { children: /* @__PURE__ */ jsx53("tr", { children: headers.map((col, index) => /* @__PURE__ */ jsx53("th", { children: col }, index)) }) }),
-      /* @__PURE__ */ jsx53("tbody", { children: loading ? /* @__PURE__ */ jsx53("tr", { children: /* @__PURE__ */ jsx53("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ jsx53(
+  return /* @__PURE__ */ jsxs42(Fragment12, { children: [
+    /* @__PURE__ */ jsxs42(Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
+      /* @__PURE__ */ jsx52("thead", { children: /* @__PURE__ */ jsx52("tr", { children: headers.map((col, index) => /* @__PURE__ */ jsx52("th", { children: col }, index)) }) }),
+      /* @__PURE__ */ jsx52("tbody", { children: loading ? /* @__PURE__ */ jsx52("tr", { children: /* @__PURE__ */ jsx52("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ jsx52(
         "tr",
         {
           onClick: () => handleRowClick(td),
           style: { cursor: "pointer" },
-          children: td.columns.map((col, colIndex) => /* @__PURE__ */ jsx53("td", { children: col || "N/A" }, colIndex))
+          children: td.columns.map((col, colIndex) => /* @__PURE__ */ jsx52("td", { children: col || "N/A" }, colIndex))
         },
         index
-      )) : /* @__PURE__ */ jsx53("tr", { children: /* @__PURE__ */ jsx53("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
+      )) : /* @__PURE__ */ jsx52("tr", { children: /* @__PURE__ */ jsx52("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
     ] }),
-    /* @__PURE__ */ jsxs43(Modal8, { show: showModal, onHide: handleCloseModal, centered: true, children: [
-      /* @__PURE__ */ jsx53(Modal8.Header, { closeButton: true, children: /* @__PURE__ */ jsx53(Modal8.Title, { children: "Detalhes" }) }),
-      /* @__PURE__ */ jsx53(Modal8.Body, { children: selectedItem && /* @__PURE__ */ jsx53("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
-      /* @__PURE__ */ jsxs43(Modal8.Footer, { children: [
-        /* @__PURE__ */ jsx53(Button23, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-        modalButtonCallback && /* @__PURE__ */ jsx53(
+    /* @__PURE__ */ jsxs42(Modal8, { show: showModal, onHide: handleCloseModal, centered: true, children: [
+      /* @__PURE__ */ jsx52(Modal8.Header, { closeButton: true, children: /* @__PURE__ */ jsx52(Modal8.Title, { children: "Detalhes" }) }),
+      /* @__PURE__ */ jsx52(Modal8.Body, { children: selectedItem && /* @__PURE__ */ jsx52("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
+      /* @__PURE__ */ jsxs42(Modal8.Footer, { children: [
+        /* @__PURE__ */ jsx52(Button23, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+        modalButtonCallback && /* @__PURE__ */ jsx52(
           Button23,
           {
             variant: "primary",
@@ -4034,24 +3823,24 @@ var ReusableTableWithModal = ({
 };
 
 // src/text/TextWithMore.tsx
-import { useState as useState26 } from "react";
+import { useState as useState25 } from "react";
 import { Button as Button24 } from "react-bootstrap";
-import { Fragment as Fragment13, jsx as jsx54, jsxs as jsxs44 } from "react/jsx-runtime";
+import { Fragment as Fragment13, jsx as jsx53, jsxs as jsxs43 } from "react/jsx-runtime";
 var TextWithMore = ({
   text = "Carregando...",
   maxLength,
   moreLabel = "ver mais",
   lessLabel = "ver menos"
 }) => {
-  const [expanded, setExpanded] = useState26(false);
+  const [expanded, setExpanded] = useState25(false);
   const handleToggleExpand = () => {
     setExpanded(!expanded);
   };
   const isTruncated = text.length > maxLength;
   const displayText = isTruncated && !expanded ? text.slice(0, maxLength) + "\u2026" : text;
-  return /* @__PURE__ */ jsxs44(Fragment13, { children: [
-    /* @__PURE__ */ jsx54("span", { className: "text-with-more-content", children: displayText }),
-    isTruncated && /* @__PURE__ */ jsx54(
+  return /* @__PURE__ */ jsxs43(Fragment13, { children: [
+    /* @__PURE__ */ jsx53("span", { className: "text-with-more-content", children: displayText }),
+    isTruncated && /* @__PURE__ */ jsx53(
       Button24,
       {
         variant: "link",
@@ -4063,6 +3852,16 @@ var TextWithMore = ({
     )
   ] });
 };
+
+// src/index.ts
+import {
+  CalculoCorrecao,
+  CalculadoraCorrecaoModal,
+  UnidadeMaterialCard,
+  TarefaUnidadeForm,
+  FrequenciaFormV2,
+  CampoDeVerificacaoV2
+} from "@teraprox/ui-kit-sgp";
 export {
   ActionButtons,
   AddButton_default as AddButton,
@@ -4074,6 +3873,9 @@ export {
   BonusButton,
   BranchDropDisplay,
   ButtonWithDropdown,
+  CalculadoraCorrecaoModal,
+  CalculoCorrecao,
+  CampoDeVerificacaoV2,
   CheckBox,
   ClickToWriteField,
   ColorPicker,
@@ -4083,6 +3885,7 @@ export {
   ExpandableCard,
   FindRecursoByTagField,
   FormField,
+  FrequenciaFormV2,
   Generic3DotMenu,
   GenericChart,
   GenericDisplay_default as GenericDisplay,
@@ -4117,8 +3920,10 @@ export {
   StatusPills,
   Switch,
   SwitchOnClick,
+  TarefaUnidadeForm,
   TextWithMore,
   TimerDisplay,
+  UnidadeMaterialCard,
   UnidadeMaterialForm,
   UnifiedPeriodSelector,
   UploadArea,

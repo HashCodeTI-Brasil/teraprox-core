@@ -33,13 +33,16 @@ __export(index_exports, {
   ActionButtons: () => ActionButtons,
   AddButton: () => AddButton_default,
   AdvancedFilterBar: () => AdvancedFilterBar,
-  AnexoManager: () => AnexoManager,
+  AnexoManager: () => import_ui_kit_core.AnexoManager,
   ApproveAndReproveButtons: () => ApproveAndReproveButtons,
   AsyncButton: () => AsyncButton,
   AutoComplete: () => AutoComplete,
   BonusButton: () => BonusButton,
   BranchDropDisplay: () => import_ui_kit_sgm.BranchDropDisplay,
   ButtonWithDropdown: () => ButtonWithDropdown,
+  CalculadoraCorrecaoModal: () => import_ui_kit_sgp.CalculadoraCorrecaoModal,
+  CalculoCorrecao: () => import_ui_kit_sgp.CalculoCorrecao,
+  CampoDeVerificacaoV2: () => import_ui_kit_sgp.CampoDeVerificacaoV2,
   CheckBox: () => CheckBox,
   ClickToWriteField: () => ClickToWriteField,
   ColorPicker: () => ColorPicker,
@@ -49,6 +52,7 @@ __export(index_exports, {
   ExpandableCard: () => ExpandableCard,
   FindRecursoByTagField: () => import_ui_kit_sgm3.FindRecursoByTagField,
   FormField: () => FormField,
+  FrequenciaFormV2: () => import_ui_kit_sgp.FrequenciaFormV2,
   Generic3DotMenu: () => Generic3DotMenu,
   GenericChart: () => GenericChart,
   GenericDisplay: () => GenericDisplay_default,
@@ -83,8 +87,10 @@ __export(index_exports, {
   StatusPills: () => StatusPills,
   Switch: () => Switch,
   SwitchOnClick: () => SwitchOnClick,
+  TarefaUnidadeForm: () => import_ui_kit_sgp.TarefaUnidadeForm,
   TextWithMore: () => TextWithMore,
   TimerDisplay: () => TimerDisplay,
+  UnidadeMaterialCard: () => import_ui_kit_sgp.UnidadeMaterialCard,
   UnidadeMaterialForm: () => UnidadeMaterialForm,
   UnifiedPeriodSelector: () => UnifiedPeriodSelector,
   UploadArea: () => UploadArea,
@@ -2273,7 +2279,8 @@ var AutoComplete = ({
   minChars = 0,
   maxItems,
   showListOnFocus = true,
-  lazyLoad = false
+  lazyLoad = false,
+  labelPosition = "top"
 }) => {
   const [liItem, setListItem] = (0, import_react15.useState)([]);
   const [options, setOptions] = (0, import_react15.useState)([]);
@@ -2395,26 +2402,44 @@ var AutoComplete = ({
       },
       onMouseLeave: () => setHide(true),
       children: [
-        !hideComponent && /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_react_bootstrap22.InputGroup, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
-            import_react_bootstrap22.Form.Control,
-            {
-              autoFocus: autoFocusConfig,
-              disabled: disableComponent || disableSelect,
-              placeholder: placeH,
-              autoComplete: "off",
-              value: input,
-              onClickCapture: () => {
-                const canOpen = showListOnFocus && input.length >= minChars;
-                setHide(!canOpen);
-              },
-              onChange: (e) => onFieldUpdate(e.currentTarget.value),
-              type: "text"
-            }
-          ) }),
-          loading && /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.InputGroup.Text, { children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.Spinner, { animation: "border", size: "sm" }) }),
-          !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
-          !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
+        !hideComponent && /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_jsx_runtime32.Fragment, { children: [
+          labelPosition === "top" && title && /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.Form.Label, { className: "fw-semibold small mb-1", children: title }),
+          /* @__PURE__ */ (0, import_jsx_runtime32.jsxs)(import_react_bootstrap22.InputGroup, { children: [
+            labelPosition === "floating" ? /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
+              import_react_bootstrap22.Form.Control,
+              {
+                autoFocus: autoFocusConfig,
+                disabled: disableComponent || disableSelect,
+                placeholder: placeH,
+                autoComplete: "off",
+                value: input,
+                onClickCapture: () => {
+                  const canOpen = showListOnFocus && input.length >= minChars;
+                  setHide(!canOpen);
+                },
+                onChange: (e) => onFieldUpdate(e.currentTarget.value),
+                type: "text"
+              }
+            ) }) : /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
+              import_react_bootstrap22.Form.Control,
+              {
+                autoFocus: autoFocusConfig,
+                disabled: disableComponent || disableSelect,
+                placeholder: placeH || title,
+                autoComplete: "off",
+                value: input,
+                onClickCapture: () => {
+                  const canOpen = showListOnFocus && input.length >= minChars;
+                  setHide(!canOpen);
+                },
+                onChange: (e) => onFieldUpdate(e.currentTarget.value),
+                type: "text"
+              }
+            ),
+            loading && /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.InputGroup.Text, { children: /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(import_react_bootstrap22.Spinner, { animation: "border", size: "sm" }) }),
+            !disableComponent && (actionButton == null ? void 0 : actionButton(() => setInput(""))),
+            !disableComponent && (actionButton2 == null ? void 0 : actionButton2(input))
+          ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime32.jsx)(
           import_react_bootstrap22.ListGroup,
@@ -2671,6 +2696,7 @@ var FormField = ({
   onValueUpdate,
   onBlur,
   label,
+  labelPosition = "top",
   ty,
   actionClick,
   actionClick2,
@@ -2719,6 +2745,7 @@ var FormField = ({
     return /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.Form.Control, { ...fieldProps });
   };
   if (hide) return null;
+  const useFloating = labelPosition === "floating" && !asTextArea;
   return /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(
     import_react_bootstrap25.Form.Group,
     {
@@ -2726,9 +2753,11 @@ var FormField = ({
       onMouseLeave: onMouseLv,
       onKeyDown: onKeyDownHandler,
       style: { marginTop: 4, marginBottom: 4, width: "100%" },
+      controlId: !useFloating ? controlId : void 0,
       children: [
+        !useFloating && label && /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.Form.Label, { className: "fw-semibold small mb-1", children: label }),
         /* @__PURE__ */ (0, import_jsx_runtime35.jsxs)(import_react_bootstrap25.InputGroup, { children: [
-          asTextArea ? renderField() : /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.FloatingLabel, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }),
+          useFloating ? /* @__PURE__ */ (0, import_jsx_runtime35.jsx)(import_react_bootstrap25.FloatingLabel, { style: { zIndex: 0, flex: 1 }, label, controlId: controlId || "floatingInput", children: renderField() }) : renderField(),
           actionClick && actionClick(),
           actionClick2 && actionClick2()
         ] }),
@@ -2828,9 +2857,17 @@ var import_jsx_runtime37 = require("react/jsx-runtime");
 var ColorPicker = ({
   selectedColor,
   onColorChange,
+  defaultColor,
+  setCor,
   presetColors = ["#ff0000", "#ffd700", "#008000", "#0000ff", "#800080"],
   title = "Cor de Identifica\xE7\xE3o"
 }) => {
+  var _a, _b;
+  const safeSelectedColor = (_b = (_a = selectedColor != null ? selectedColor : defaultColor) != null ? _a : presetColors[0]) != null ? _b : "#000000";
+  const handleColorChange = (color) => {
+    onColorChange == null ? void 0 : onColorChange(color);
+    setCor == null ? void 0 : setCor(color);
+  };
   return /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
     import_react_bootstrap27.Card,
     {
@@ -2850,7 +2887,7 @@ var ColorPicker = ({
                 style: {
                   width: "40px",
                   height: "40px",
-                  backgroundColor: selectedColor,
+                  backgroundColor: safeSelectedColor,
                   cursor: "pointer",
                   border: "2px solid #dee2e6"
                 },
@@ -2866,8 +2903,8 @@ var ColorPicker = ({
               {
                 type: "color",
                 id: "color-input-hidden",
-                value: selectedColor,
-                onChange: (e) => onColorChange(e.target.value),
+                value: safeSelectedColor,
+                onChange: (e) => handleColorChange(e.target.value),
                 className: "form-control-color-lg",
                 style: { width: "100%", height: "40px", cursor: "pointer" }
               }
@@ -2882,9 +2919,9 @@ var ColorPicker = ({
                 height: "28px",
                 backgroundColor: cor,
                 cursor: "pointer",
-                border: cor.toLowerCase() === selectedColor.toLowerCase() ? "2px solid #0d6efd" : "1px solid #dee2e6"
+                border: cor.toLowerCase() === safeSelectedColor.toLowerCase() ? "2px solid #0d6efd" : "1px solid #dee2e6"
               },
-              onClick: () => onColorChange(cor)
+              onClick: () => handleColorChange(cor)
             }
           ) }, cor)) })
         ] })
@@ -2981,252 +3018,17 @@ var UploadArea = ({
   );
 };
 
-// src/forms/AnexoManager.tsx
-var import_react20 = require("react");
-var import_react_dropzone2 = require("react-dropzone");
-var import_fi5 = require("react-icons/fi");
-var import_fa6 = require("react-icons/fa");
-var import_jsx_runtime40 = require("react/jsx-runtime");
-var UNIVERSAL_ACCEPT = {
-  "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"],
-  "application/pdf": [".pdf"],
-  "application/msword": [".doc"],
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-  "application/vnd.ms-excel": [".xls"],
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-  "text/csv": [".csv"],
-  "video/*": [".mp4", ".webm", ".avi", ".mov", ".mkv"],
-  "audio/*": [".mp3", ".wav", ".ogg", ".aac", ".m4a"],
-  "application/zip": [".zip", ".rar", ".7z", ".tar.gz"],
-  "text/plain": [".txt", ".log"]
-};
-function formatFileSize(bytes) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-function getFileCategory(tipo, nome) {
-  var _a;
-  const ext = ((_a = nome.split(".").pop()) == null ? void 0 : _a.toLowerCase()) || "";
-  if (tipo.startsWith("image/")) return "img";
-  if (tipo === "application/pdf" || ext === "pdf") return "pdf";
-  if (tipo.includes("word") || ext === "doc" || ext === "docx") return "doc";
-  if (tipo.includes("excel") || tipo.includes("spreadsheet") || ext === "xls" || ext === "xlsx") return "xls";
-  if (ext === "csv" || tipo === "text/csv") return "csv";
-  if (tipo.startsWith("video/")) return "vid";
-  if (tipo.startsWith("audio/")) return "aud";
-  if (tipo.includes("zip") || tipo.includes("rar") || ext === "zip" || ext === "rar" || ext === "7z") return "zip";
-  return "generic";
-}
-function FileIcon({ category }) {
-  switch (category) {
-    case "pdf":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFilePdf, {});
-    case "doc":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileWord, {});
-    case "xls":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileExcel, {});
-    case "csv":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileCsv, {});
-    case "img":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiImage, {});
-    case "vid":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiFilm, {});
-    case "aud":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiMusic, {});
-    case "zip":
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fa6.FaFileArchive, {});
-    default:
-      return /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiFile, {});
-  }
-}
-var AnexoManager = ({
-  persistidos = [],
-  locais = [],
-  onAddFiles,
-  onRemoveLocal,
-  onRemovePersistido,
-  onDownload,
-  onRetry,
-  loading = false,
-  readonly = false,
-  maxFileSize = 50 * 1024 * 1024,
-  maxFiles = 10,
-  dropzoneLabel
-}) => {
-  const [thumbUrls, setThumbUrls] = (0, import_react20.useState)({});
-  const [unavailableIds, setUnavailableIds] = (0, import_react20.useState)(/* @__PURE__ */ new Set());
-  const handleDownload = (0, import_react20.useCallback)(async (anexo) => {
-    if (!onDownload) return;
-    const url = anexo.url || anexo.signedUrl;
-    if (url) {
-      try {
-        const res = await fetch(url, { method: "HEAD", mode: "cors" });
-        if (res.ok) {
-          onDownload(anexo);
-          return;
-        }
-      } catch (e) {
-      }
-      setUnavailableIds((prev) => new Set(prev).add(anexo.id));
-      return;
-    }
-    onDownload(anexo);
-  }, [onDownload]);
-  (0, import_react20.useEffect)(() => {
-    const newUrls = {};
-    locais.forEach((a) => {
-      if (a.tipo.startsWith("image/") && !thumbUrls[a.localId]) {
-        newUrls[a.localId] = URL.createObjectURL(a.file);
-      }
-    });
-    if (Object.keys(newUrls).length) {
-      setThumbUrls((prev) => ({ ...prev, ...newUrls }));
-    }
-    return () => {
-      Object.values(newUrls).forEach(URL.revokeObjectURL);
-    };
-  }, [locais]);
-  const onDrop = (0, import_react20.useCallback)(
-    (acceptedFiles) => {
-      if (onAddFiles) onAddFiles(acceptedFiles);
-    },
-    [onAddFiles]
-  );
-  const { getRootProps, getInputProps, isDragActive } = (0, import_react_dropzone2.useDropzone)({
-    onDrop,
-    maxSize: maxFileSize,
-    maxFiles,
-    accept: UNIVERSAL_ACCEPT,
-    disabled: readonly
-  });
-  const allExtensions = (0, import_react20.useMemo)(
-    () => Object.values(UNIVERSAL_ACCEPT).flat().map((e) => e.replace(".", "").toUpperCase()),
-    []
-  );
-  const totalCount = persistidos.length + locais.length;
-  return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-manager", children: [
-    !readonly && /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(
-      "div",
-      {
-        ...getRootProps(),
-        className: `anexo-dropzone ${isDragActive ? "anexo-drag-active" : ""}`,
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("input", { ...getInputProps() }),
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-dropzone-inner", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiUploadCloud, { className: "anexo-dropzone-icon" }),
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("p", { className: "anexo-dropzone-text", children: dropzoneLabel || /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(import_jsx_runtime40.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("strong", { children: "Clique para selecionar" }),
-              " ou arraste arquivos aqui"
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("p", { className: "anexo-dropzone-hint", children: [
-              "M\xE1x. ",
-              formatFileSize(maxFileSize),
-              " por arquivo \xB7 At\xE9 ",
-              maxFiles,
-              " arquivos"
-            ] })
-          ] })
-        ]
-      }
-    ),
-    (totalCount > 0 || loading) && /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-list", children: [
-      loading && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-empty", children: "Carregando anexos..." }),
-      persistidos.map((anexo) => {
-        const cat = getFileCategory(anexo.tipo || "", anexo.nome);
-        const isUnavailable = anexo.unavailable || unavailableIds.has(anexo.id);
-        return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: `anexo-file-item ${isUnavailable ? "anexo-file-unavailable" : ""}`, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-meta", children: [
-              isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-error", children: "Anexo indisponivel" }),
-              !isUnavailable && anexo.tamanho ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: formatFileSize(anexo.tamanho) }) : null,
-              anexo.createdAt && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: new Date(anexo.createdAt).toLocaleDateString("pt-BR") })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-actions", children: [
-            onDownload && !isUnavailable && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-download",
-                title: "Download",
-                onClick: () => handleDownload(anexo),
-                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiDownload, {})
-              }
-            ),
-            !readonly && onRemovePersistido && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-danger",
-                title: "Remover",
-                onClick: () => onRemovePersistido(anexo.id),
-                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiTrash2, {})
-              }
-            )
-          ] })
-        ] }, `p-${anexo.id}`);
-      }),
-      locais.map((anexo) => {
-        const cat = getFileCategory(anexo.tipo, anexo.nome);
-        const isImg = anexo.tipo.startsWith("image/");
-        return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-item", children: [
-          isImg && thumbUrls[anexo.localId] ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("img", { src: thumbUrls[anexo.localId], alt: "", className: "anexo-file-thumb" }) : /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: `anexo-file-icon anexo-icon-${cat}`, children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(FileIcon, { category: cat }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-info", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-file-name", title: anexo.nome, children: anexo.nome }),
-            /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { children: formatFileSize(anexo.tamanho) }),
-              anexo.status === "uploading" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-uploading", children: "Enviando..." }),
-              anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "anexo-status-error", children: anexo.errorMessage || "Erro" })
-            ] }),
-            (anexo.status === "uploading" || anexo.status === "done") && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
-              "div",
-              {
-                className: `anexo-progress-fill ${anexo.status === "done" ? "anexo-progress-done" : ""}`,
-                style: { width: `${anexo.progress}%` }
-              }
-            ) }),
-            anexo.status === "error" && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-bar", children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-progress-fill anexo-progress-error", style: { width: "100%" } }) })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "anexo-file-actions", children: [
-            anexo.status === "error" && onRetry && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action",
-                title: "Tentar novamente",
-                onClick: () => onRetry(anexo.localId),
-                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiRefreshCw, {})
-              }
-            ),
-            (anexo.status === "pending" || anexo.status === "error") && onRemoveLocal && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
-              "button",
-              {
-                type: "button",
-                className: "anexo-btn-action anexo-btn-danger",
-                title: "Remover",
-                onClick: () => onRemoveLocal(anexo.localId),
-                children: /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_fi5.FiTrash2, {})
-              }
-            )
-          ] })
-        ] }, `l-${anexo.localId}`);
-      })
-    ] }),
-    !loading && totalCount === 0 && readonly && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "anexo-empty", children: "Nenhum anexo encontrado." })
-  ] });
-};
+// src/index.ts
+var import_ui_kit_core = require("@teraprox/ui-kit-core");
 
 // src/forms/FindRecursoByTagField.tsx
 var import_ui_kit_sgm3 = require("@teraprox/ui-kit-sgm");
 
 // src/forms/SectorSelector.tsx
-var import_react21 = require("react");
+var import_react20 = require("react");
 var import_react_bootstrap29 = require("react-bootstrap");
 var import_bs2 = require("react-icons/bs");
-var import_jsx_runtime41 = require("react/jsx-runtime");
+var import_jsx_runtime40 = require("react/jsx-runtime");
 var SectorSelector = ({
   setores,
   onSectorSelect,
@@ -3236,9 +3038,9 @@ var SectorSelector = ({
   defaultSectorName = false,
   allowAll = false
 }) => {
-  const [expanded, setExpanded] = (0, import_react21.useState)(false);
-  const [selectedSector, setSelectedSector] = (0, import_react21.useState)(null);
-  (0, import_react21.useEffect)(() => {
+  const [expanded, setExpanded] = (0, import_react20.useState)(false);
+  const [selectedSector, setSelectedSector] = (0, import_react20.useState)(null);
+  (0, import_react20.useEffect)(() => {
     if (defaultSectorName && setores.length > 0) {
       const setor = setores.find((s) => s.nome === defaultSectorName);
       if (setor && setor.id !== (selectedSector == null ? void 0 : selectedSector.id)) {
@@ -3258,19 +3060,19 @@ var SectorSelector = ({
   };
   if (hideComponent) return null;
   const setorOptions = allowAll ? [{ id: "all", nome: "Todos" }, ...setores] : [...setores];
-  return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(import_react_bootstrap29.Form.Floating, { className: "sector-selector-floating", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "custom-select-container", onClick: toggleExpand, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
-      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_bs2.BsChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_bs2.BsChevronDown, {}) })
+  return /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(import_react_bootstrap29.Form.Floating, { className: "sector-selector-floating", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)("div", { className: "custom-select-container", onClick: toggleExpand, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("span", { className: "selected-sector-label mt-1", children: (selectedSector == null ? void 0 : selectedSector.nome) || selectionPlaceholder }),
+      /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "zoom-container", children: expanded ? /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_bs2.BsChevronUp, {}) : /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(import_bs2.BsChevronDown, {}) })
     ] }),
-    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
-    expanded && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+    (selectedSector == null ? void 0 : selectedSector.nome) && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("label", { htmlFor: "floatingInputCustom", children: selectionLabel }),
+    expanded && /* @__PURE__ */ (0, import_jsx_runtime40.jsxs)(
       "div",
       {
         className: "custom-dropdown-menu",
         onMouseLeave: () => setExpanded(false),
         children: [
-          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          setorOptions.sort((a, b) => a.nome.localeCompare(b.nome)).map((setor, idx) => /* @__PURE__ */ (0, import_jsx_runtime40.jsx)(
             "div",
             {
               className: `dropdown-option ${setor.nome === (selectedSector == null ? void 0 : selectedSector.nome) ? "selected-option" : ""}`,
@@ -3279,7 +3081,7 @@ var SectorSelector = ({
             },
             idx
           )),
-          setores.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
+          setores.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime40.jsx)("div", { className: "dropdown-option text-muted italic", children: "Carregando setores..." })
         ]
       }
     )
@@ -3288,7 +3090,7 @@ var SectorSelector = ({
 
 // src/forms/UnidadeMaterialForm.tsx
 var import_react_bootstrap30 = require("react-bootstrap");
-var import_jsx_runtime42 = require("react/jsx-runtime");
+var import_jsx_runtime41 = require("react/jsx-runtime");
 var UnidadeMaterialForm = ({
   value,
   onMaterialSelected,
@@ -3305,10 +3107,10 @@ var UnidadeMaterialForm = ({
   className = ""
 }) => {
   var _a, _b, _c;
-  const renderNewMaterialButton = () => /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
-  const renderNewUnidadeButton = () => /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
-  return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: `unidade-material-form ${className}`, children: [
-    !hideMaterial && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+  const renderNewMaterialButton = () => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateMaterial, size: "sm", variant: "outline-primary", children: "Novo Material" });
+  const renderNewUnidadeButton = () => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(import_react_bootstrap30.Button, { onClick: onNavigateToCreateUnidade, size: "sm", variant: "outline-primary", children: "Nova Unidade" });
+  return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: `unidade-material-form ${className}`, children: [
+    !hideMaterial && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3320,7 +3122,7 @@ var UnidadeMaterialForm = ({
         actionButton: onNavigateToCreateMaterial ? renderNewMaterialButton : void 0
       }
     ),
-    !hideQuantidade && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+    !hideQuantidade && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
       FormField,
       {
         label: "Quantidade",
@@ -3329,7 +3131,7 @@ var UnidadeMaterialForm = ({
         ty: "number"
       }
     ),
-    !hideUnidade && /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+    !hideUnidade && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
       AutoComplete,
       {
         displayKey: "nome",
@@ -3345,7 +3147,7 @@ var UnidadeMaterialForm = ({
 };
 
 // src/icons/IconLabelItem.tsx
-var import_jsx_runtime43 = require("react/jsx-runtime");
+var import_jsx_runtime42 = require("react/jsx-runtime");
 var IconLabelItem = ({
   icon,
   label,
@@ -3354,16 +3156,16 @@ var IconLabelItem = ({
   onClick,
   style
 }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime43.jsxs)("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: containerClassName, onClick, style: { ...style, cursor: onClick ? "pointer" : "default" }, children: [
     icon,
-    /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("span", { className: labelClassName, children: label })
+    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: labelClassName, children: label })
   ] });
 };
 
 // src/icons/IconLabelList.tsx
-var import_jsx_runtime44 = require("react/jsx-runtime");
+var import_jsx_runtime43 = require("react/jsx-runtime");
 var IconLabelList = ({ items, className = "" }) => {
-  return /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime43.jsx)("div", { className: `icon-label-list ${className}`, children: items.map((item, index) => /* @__PURE__ */ (0, import_jsx_runtime43.jsx)(
     IconLabelItem,
     {
       labelClassName: "icon-label",
@@ -3377,18 +3179,18 @@ var IconLabelList = ({ items, className = "" }) => {
 };
 
 // src/icons/NotificationItem.tsx
-var import_react22 = require("react");
+var import_react21 = require("react");
 var import_react_bootstrap31 = require("react-bootstrap");
-var import_fi6 = require("react-icons/fi");
+var import_fi5 = require("react-icons/fi");
 var import_dayjs5 = __toESM(require("dayjs"));
-var import_jsx_runtime45 = require("react/jsx-runtime");
+var import_jsx_runtime44 = require("react/jsx-runtime");
 var NotificationItem = ({
   notification,
   onRead,
   onDismiss,
   emptyContentLabel = "Sem conte\xFAdo adicional dispon\xEDvel."
 }) => {
-  const [showModal, setShowModal] = (0, import_react22.useState)(false);
+  const [showModal, setShowModal] = (0, import_react21.useState)(false);
   const { context, contextId, content, status, createdAt, readAt } = notification;
   const handleOpenModal = (e) => {
     e.stopPropagation();
@@ -3404,49 +3206,49 @@ var NotificationItem = ({
     onDismiss(notification);
   };
   const displayTitle = contextId ? `${context} - ${contextId}` : context || "Notifica\xE7\xE3o";
-  return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_jsx_runtime45.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_jsx_runtime44.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(
       "div",
       {
         className: `notification-item-modern ${status === "unread" ? "unread" : ""}`,
         onClick: handleOpenModal,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 14 }) : /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 14 }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-main-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-header-row", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-title-modern", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-context", children: context }),
-              contextId && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_jsx_runtime45.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-separator", children: "/" }),
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("span", { className: "notification-context-id", children: contextId })
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: `notification-status-indicator ${status}`, children: status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiClock, { size: 14 }) : /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiCheck, { size: 14 }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-main-content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "notification-header-row", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-title-modern", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "notification-context", children: context }),
+              contextId && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_jsx_runtime44.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "notification-separator", children: "/" }),
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("span", { className: "notification-context-id", children: contextId })
               ] })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-preview", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-timestamp", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("small", { children: (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY HH:mm") })
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "notification-preview", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("p", { className: "notification-content-preview", children: content || "Nova mensagem recebida" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-timestamp", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiClock, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("small", { children: (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY HH:mm") })
               ] }),
-              readAt && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-read-time", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { children: [
+              readAt && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-read-time", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiCheck, { size: 12, className: "me-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("small", { children: [
                   "Lida em ",
                   (0, import_dayjs5.default)(readAt).format("DD/MM HH:mm")
                 ] })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "notification-quick-actions", children: status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
             import_react_bootstrap31.OverlayTrigger,
             {
               placement: "top",
-              overlay: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Tooltip, { children: "Descartar" }),
-              children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
+              overlay: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Tooltip, { children: "Descartar" }),
+              children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(
                 "button",
                 {
                   className: "notification-action-btn notification-dismiss-btn",
                   onClick: handleDismiss,
                   "aria-label": "Descartar notifica\xE7\xE3o",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiTrash2, { size: 14 })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiTrash2, { size: 14 })
                 }
               )
             }
@@ -3454,7 +3256,7 @@ var NotificationItem = ({
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(
       import_react_bootstrap31.Modal,
       {
         show: showModal,
@@ -3462,31 +3264,31 @@ var NotificationItem = ({
         centered: true,
         className: "notification-modal",
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Title, { className: "notification-modal-title", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "d-flex align-items-center", children: [
-            status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { className: "me-2 text-success" }),
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Modal.Header, { closeButton: true, className: "notification-modal-header", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Modal.Title, { className: "notification-modal-title", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "d-flex align-items-center", children: [
+            status === "unread" ? /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiClock, { className: "me-2 text-warning" }) : /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiCheck, { className: "me-2 text-success" }),
             "Detalhes da Notifica\xE7\xE3o"
           ] }) }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Modal.Body, { className: "notification-modal-body", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-meta", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("h6", { className: "notification-modal-source", children: displayTitle }),
-              /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "notification-modal-timestamps", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { className: "text-muted", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiClock, { size: 12, className: "me-1" }),
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Modal.Body, { className: "notification-modal-body", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-modal-content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-modal-meta", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("h6", { className: "notification-modal-source", children: displayTitle }),
+              /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("div", { className: "notification-modal-timestamps", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("small", { className: "text-muted", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiClock, { size: 12, className: "me-1" }),
                   "Criada em ",
                   (0, import_dayjs5.default)(createdAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] }),
-                readAt && /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { className: "text-muted ms-3", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiCheck, { size: 12, className: "me-1" }),
+                readAt && /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)("small", { className: "text-muted ms-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_fi5.FiCheck, { size: 12, className: "me-1" }),
                   "Lida em ",
                   (0, import_dayjs5.default)(readAt).format("DD/MM/YYYY [\xE0s] HH:mm")
                 ] })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-modal-message", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "mb-0", children: content || emptyContentLabel }) })
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("div", { className: "notification-modal-message", children: /* @__PURE__ */ (0, import_jsx_runtime44.jsx)("p", { className: "mb-0", children: content || emptyContentLabel }) })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_bootstrap31.Modal.Footer, { className: "notification-modal-footer", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-            status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_react_bootstrap31.Button, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
+          /* @__PURE__ */ (0, import_jsx_runtime44.jsxs)(import_react_bootstrap31.Modal.Footer, { className: "notification-modal-footer", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+            status === "unread" && /* @__PURE__ */ (0, import_jsx_runtime44.jsx)(import_react_bootstrap31.Button, { variant: "primary", onClick: handleReadAndClose, children: "Marcar como lida" })
           ] })
         ]
       }
@@ -3496,8 +3298,8 @@ var NotificationItem = ({
 
 // src/icons/NotificationBell.tsx
 var import_react_bootstrap32 = require("react-bootstrap");
-var import_fi7 = require("react-icons/fi");
-var import_jsx_runtime46 = require("react/jsx-runtime");
+var import_fi6 = require("react-icons/fi");
+var import_jsx_runtime45 = require("react/jsx-runtime");
 var NotificationBell = ({
   notifications,
   onItemRead,
@@ -3507,10 +3309,10 @@ var NotificationBell = ({
   className = ""
 }) => {
   const unreadCount = notifications.filter((n) => n.status === "unread").length;
-  return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap32.Dropdown, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap32.Dropdown.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_fi7.FiBell, { size }),
-      unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_bootstrap32.Dropdown, { align: "end", className: `notification-bell-dropdown ${className}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(import_react_bootstrap32.Dropdown.Toggle, { as: "div", className: "position-relative cursor-pointer p-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiBell, { size }),
+      unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
         import_react_bootstrap32.Badge,
         {
           pill: true,
@@ -3521,15 +3323,15 @@ var NotificationBell = ({
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)(
       import_react_bootstrap32.Dropdown.Menu,
       {
         className: "shadow-lg border-0",
         style: { width: "320px", padding: 0, maxHeight: "500px", overflowY: "auto" },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
-            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "p-3 border-bottom d-flex justify-content-between align-items-center bg-light", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("h6", { className: "mb-0 fw-bold", children: "Notifica\xE7\xF5es" }),
+            unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
               "button",
               {
                 className: "btn btn-link btn-sm p-0 text-decoration-none",
@@ -3541,7 +3343,7 @@ var NotificationBell = ({
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "notification-list", children: notifications.length > 0 ? notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((n) => /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(
             NotificationItem,
             {
               notification: n,
@@ -3549,11 +3351,11 @@ var NotificationBell = ({
               onDismiss: onItemDismiss
             },
             n.id
-          )) : /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("div", { className: "p-4 text-center text-muted", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_fi7.FiBell, { size: 24, className: "mb-2 opacity-25" }),
-            /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
+          )) : /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("div", { className: "p-4 text-center text-muted", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)(import_fi6.FiBell, { size: 24, className: "mb-2 opacity-25" }),
+            /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("p", { className: "mb-0 small", children: "Nenhuma notifica\xE7\xE3o por aqui." })
           ] }) }),
-          notifications.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)("small", { className: "text-muted", children: [
+          notifications.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime45.jsx)("div", { className: "p-2 border-top text-center bg-light", children: /* @__PURE__ */ (0, import_jsx_runtime45.jsxs)("small", { className: "text-muted", children: [
             "Total: ",
             notifications.length,
             " notifica\xE7\xF5es"
@@ -3566,7 +3368,7 @@ var NotificationBell = ({
 
 // src/modals/ModalBasicTemplate.tsx
 var import_react_bootstrap33 = require("react-bootstrap");
-var import_jsx_runtime47 = require("react/jsx-runtime");
+var import_jsx_runtime46 = require("react/jsx-runtime");
 var ModalBasicTemplate = ({
   show,
   closeFunc,
@@ -3580,7 +3382,7 @@ var ModalBasicTemplate = ({
     if (typeof part === "function") return part();
     return part;
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(
     import_react_bootstrap33.Modal,
     {
       show,
@@ -3589,11 +3391,11 @@ var ModalBasicTemplate = ({
       style: dialogStyle,
       ...modalProps,
       children: [
-        header && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Title, { children: renderPart(header) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Modal.Body, { style: bodyStyle, children: renderPart(body) }),
-        footer && /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_bootstrap33.Modal.Footer, { children: [
+        header && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_bootstrap33.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_bootstrap33.Modal.Title, { children: renderPart(header) }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_bootstrap33.Modal.Body, { style: bodyStyle, children: renderPart(body) }),
+        footer && /* @__PURE__ */ (0, import_jsx_runtime46.jsxs)(import_react_bootstrap33.Modal.Footer, { children: [
           renderPart(footer),
-          !footer && /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap33.Button, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
+          !footer && /* @__PURE__ */ (0, import_jsx_runtime46.jsx)(import_react_bootstrap33.Button, { variant: "secondary", onClick: closeFunc, children: "Fechar" })
         ] })
       ]
     }
@@ -3602,10 +3404,10 @@ var ModalBasicTemplate = ({
 var ModalBasicTemplate_default = ModalBasicTemplate;
 
 // src/modals/SelectDateModal.tsx
-var import_react23 = require("react");
+var import_react22 = require("react");
 var import_react_bootstrap34 = require("react-bootstrap");
 var import_dayjs6 = __toESM(require("dayjs"));
-var import_jsx_runtime48 = require("react/jsx-runtime");
+var import_jsx_runtime47 = require("react/jsx-runtime");
 var SelectDateModal = ({
   show,
   onClose,
@@ -3615,18 +3417,18 @@ var SelectDateModal = ({
   initialDate,
   allowFuture = true
 }) => {
-  const [selectedDate, setSelectedDate] = (0, import_react23.useState)(
+  const [selectedDate, setSelectedDate] = (0, import_react22.useState)(
     initialDate || (0, import_dayjs6.default)().format("YYYY-MM-DDTHH:mm")
   );
   const handleConfirm = () => {
     onSelect(selectedDate);
     onClose();
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Modal, { show, onHide: onClose, centered: true, size: "sm", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Title, { children: title }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Modal.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Form.Group, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Form.Label, { children: label }),
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_bootstrap34.Modal, { show, onHide: onClose, centered: true, size: "sm", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Modal.Title, { children: title }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Modal.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_bootstrap34.Form.Group, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Form.Label, { children: label }),
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(
         import_react_bootstrap34.Form.Control,
         {
           type: "datetime-local",
@@ -3636,19 +3438,19 @@ var SelectDateModal = ({
         }
       )
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap34.Modal.Footer, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Button, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
-      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap34.Button, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
+    /* @__PURE__ */ (0, import_jsx_runtime47.jsxs)(import_react_bootstrap34.Modal.Footer, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Button, { variant: "outline-secondary", onClick: onClose, children: "Cancelar" }),
+      /* @__PURE__ */ (0, import_jsx_runtime47.jsx)(import_react_bootstrap34.Button, { variant: "primary", onClick: handleConfirm, children: "Confirmar" })
     ] })
   ] });
 };
 
 // src/modals/JustificativaModal.tsx
-var import_react24 = require("react");
+var import_react23 = require("react");
 var import_react_bootstrap35 = require("react-bootstrap");
-var import_fa7 = require("react-icons/fa");
+var import_fa6 = require("react-icons/fa");
 var import_dayjs7 = __toESM(require("dayjs"));
-var import_jsx_runtime49 = require("react/jsx-runtime");
+var import_jsx_runtime48 = require("react/jsx-runtime");
 var JustificativaModal = ({
   show,
   onClose,
@@ -3657,10 +3459,10 @@ var JustificativaModal = ({
   currentUserName,
   onUpdateJustificativas
 }) => {
-  const [localJustificativas, setLocalJustificativas] = (0, import_react24.useState)(initialJustificativas);
-  const [novaDescricao, setNovaDescricao] = (0, import_react24.useState)("");
-  const [editandoId, setEditandoId] = (0, import_react24.useState)(null);
-  (0, import_react24.useEffect)(() => {
+  const [localJustificativas, setLocalJustificativas] = (0, import_react23.useState)(initialJustificativas);
+  const [novaDescricao, setNovaDescricao] = (0, import_react23.useState)("");
+  const [editandoId, setEditandoId] = (0, import_react23.useState)(null);
+  (0, import_react23.useEffect)(() => {
     setLocalJustificativas(initialJustificativas);
   }, [initialJustificativas]);
   const handleAddOrEdit = async () => {
@@ -3696,13 +3498,13 @@ var JustificativaModal = ({
     await onUpdateJustificativas(updated);
     setLocalJustificativas(updated);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Modal, { show, onHide: onClose, centered: true, size: "lg", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Title, { children: "Justificativas / Coment\xE1rios" }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Modal.Body, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Form, { className: "mb-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_react_bootstrap35.Form.Group, { controlId: "justificativaInput", className: "mb-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Form.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
-          /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap35.Modal, { show, onHide: onClose, centered: true, size: "lg", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Modal.Title, { children: "Justificativas / Coment\xE1rios" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap35.Modal.Body, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap35.Form, { className: "mb-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(import_react_bootstrap35.Form.Group, { controlId: "justificativaInput", className: "mb-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Form.Label, { className: "small text-muted fw-bold", children: "NOVO REGISTRO" }),
+          /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
             import_react_bootstrap35.Form.Control,
             {
               as: "textarea",
@@ -3713,12 +3515,12 @@ var JustificativaModal = ({
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Button, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("div", { className: "d-flex justify-content-end", children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Button, { variant: "primary", size: "sm", onClick: handleAddOrEdit, children: editandoId ? "Salvar Edi\xE7\xE3o" : "Adicionar Justificativa" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.ListGroup, { className: "border-0", children: localJustificativas.map((j) => {
+      /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.ListGroup, { className: "border-0", children: localJustificativas.map((j) => {
         var _a, _b, _c;
         const isMe = ((_a = j.user) == null ? void 0 : _a.userId) === currentUserId;
-        return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(
+        return /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)(
           import_react_bootstrap35.ListGroup.Item,
           {
             className: "border-0 px-0",
@@ -3730,11 +3532,11 @@ var JustificativaModal = ({
               backgroundColor: "transparent"
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
-                /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Badge, { bg: "secondary", style: { fontSize: "0.65rem" }, children: (0, import_dayjs7.default)(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
+              /* @__PURE__ */ (0, import_jsx_runtime48.jsxs)("div", { className: "d-flex align-items-center mb-1", style: { width: "100%", justifyContent: isMe ? "flex-start" : "flex-end" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("span", { className: "small fw-bold text-dark me-2", children: isMe ? "Voc\xEA" : ((_b = j.user) == null ? void 0 : _b.userName) || ((_c = j.user) == null ? void 0 : _c.firstName) || "Usu\xE1rio" }),
+                /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Badge, { bg: "secondary", style: { fontSize: "0.65rem" }, children: (0, import_dayjs7.default)(j.createdAt).format("DD/MM [\xE0s] HH:mm") })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
                 "div",
                 {
                   onClick: () => !j.removed && isMe && (setNovaDescricao(j.descricao), setEditandoId(j.id)),
@@ -3753,15 +3555,15 @@ var JustificativaModal = ({
                   children: j.descricao
                 }
               ),
-              isMe && /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Tooltip, { children: "Desfazer" }), children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
-                import_fa7.FaUndo,
+              isMe && /* @__PURE__ */ (0, import_jsx_runtime48.jsx)("div", { className: "mt-1 d-flex gap-2", children: j.removed ? /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Tooltip, { children: "Desfazer" }), children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
+                import_fa6.FaUndo,
                 {
                   onClick: () => handleUndoRemove(j.id),
                   className: "text-success cursor-pointer",
                   size: 14
                 }
-              ) }) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Tooltip, { children: "Remover" }), children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
-                import_fa7.FaTrashAlt,
+              ) }) : /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.OverlayTrigger, { placement: "top", overlay: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Tooltip, { children: "Remover" }), children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(
+                import_fa6.FaTrashAlt,
                 {
                   onClick: () => handleRemove(j.id),
                   className: "text-danger cursor-pointer",
@@ -3774,14 +3576,14 @@ var JustificativaModal = ({
         );
       }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Modal.Footer, { children: /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap35.Button, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
+    /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Modal.Footer, { children: /* @__PURE__ */ (0, import_jsx_runtime48.jsx)(import_react_bootstrap35.Button, { variant: "outline-secondary", onClick: onClose, children: "Fechar" }) })
   ] });
 };
 
 // src/modals/ImageViewModal.tsx
-var import_react25 = require("react");
+var import_react24 = require("react");
 var import_react_bootstrap36 = require("react-bootstrap");
-var import_jsx_runtime50 = require("react/jsx-runtime");
+var import_jsx_runtime49 = require("react/jsx-runtime");
 var ImageViewModal = ({
   show,
   onHide,
@@ -3790,10 +3592,10 @@ var ImageViewModal = ({
   imageAltText = "Visualiza\xE7\xE3o de imagem",
   resolveImageUrl
 }) => {
-  const [selectedImageKey, setSelectedImageKey] = (0, import_react25.useState)(null);
-  const [imageSrc, setImageSrc] = (0, import_react25.useState)(null);
-  const [currentAuthor, setCurrentAuthor] = (0, import_react25.useState)("Desconhecido");
-  (0, import_react25.useEffect)(() => {
+  const [selectedImageKey, setSelectedImageKey] = (0, import_react24.useState)(null);
+  const [imageSrc, setImageSrc] = (0, import_react24.useState)(null);
+  const [currentAuthor, setCurrentAuthor] = (0, import_react24.useState)("Desconhecido");
+  (0, import_react24.useEffect)(() => {
     if (show && initialImageData) {
       setSelectedImageKey(initialImageData.key);
       setCurrentAuthor(initialImageData.author || "Desconhecido");
@@ -3802,7 +3604,7 @@ var ImageViewModal = ({
       setCurrentAuthor(imagesData[0].author || "Desconhecido");
     }
   }, [show, initialImageData]);
-  (0, import_react25.useEffect)(() => {
+  (0, import_react24.useEffect)(() => {
     if (show && selectedImageKey) {
       setImageSrc(null);
       const file = imagesData.find((f) => f.key === selectedImageKey);
@@ -3815,7 +3617,7 @@ var ImageViewModal = ({
   }, [show, selectedImageKey]);
   const renderImageSelector = () => {
     if (imagesData.length <= 1) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "mb-3 d-flex flex-wrap justify-content-center gap-2", children: imagesData.map((img, idx) => /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
       import_react_bootstrap36.Button,
       {
         variant: selectedImageKey === img.key ? "primary" : "outline-secondary",
@@ -3829,9 +3631,9 @@ var ImageViewModal = ({
       idx
     )) });
   };
-  const body = /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "text-center", children: [
+  const body = /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("div", { className: "text-center", children: [
     renderImageSelector(),
-    imageSrc ? /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
+    imageSrc ? /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
       "img",
       {
         src: imageSrc,
@@ -3839,9 +3641,9 @@ var ImageViewModal = ({
         className: "img-fluid rounded shadow-sm",
         style: { maxHeight: "75vh", objectFit: "contain" }
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
+    ) : /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("div", { className: "p-5 text-muted", children: "Aguardando imagem..." })
   ] });
-  return /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(
     ModalBasicTemplate_default,
     {
       header: "Visualiza\xE7\xE3o de Imagem",
@@ -3849,12 +3651,12 @@ var ImageViewModal = ({
       show,
       body,
       props: { size: "lg" },
-      footer: () => /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("small", { className: "text-muted", children: [
+      footer: () => /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("div", { className: "w-100 d-flex justify-content-between align-items-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)("small", { className: "text-muted", children: [
           "Enviado por: ",
-          /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("strong", { children: currentAuthor })
+          /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("strong", { children: currentAuthor })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime50.jsx)(import_react_bootstrap36.Button, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
+        /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_react_bootstrap36.Button, { variant: "outline-secondary", size: "sm", onClick: onHide, children: "Fechar" })
       ] })
     }
   );
@@ -3862,14 +3664,14 @@ var ImageViewModal = ({
 
 // src/qr/QrReader.tsx
 var import_qr_scanner = __toESM(require("qr-scanner"));
-var import_react26 = require("react");
-var import_jsx_runtime51 = require("react/jsx-runtime");
+var import_react25 = require("react");
+var import_jsx_runtime50 = require("react/jsx-runtime");
 var QrReader = ({ callback }) => {
-  const scanner = (0, import_react26.useRef)(null);
-  const videoEl = (0, import_react26.useRef)(null);
-  const qrBoxEl = (0, import_react26.useRef)(null);
-  const [qrOn, setQrOn] = (0, import_react26.useState)(true);
-  const [scannedResult, setScannedResult] = (0, import_react26.useState)("");
+  const scanner = (0, import_react25.useRef)(null);
+  const videoEl = (0, import_react25.useRef)(null);
+  const qrBoxEl = (0, import_react25.useRef)(null);
+  const [qrOn, setQrOn] = (0, import_react25.useState)(true);
+  const [scannedResult, setScannedResult] = (0, import_react25.useState)("");
   const onScanSuccess = (result) => {
     setScannedResult(result.data);
     callback(result.data);
@@ -3879,7 +3681,7 @@ var QrReader = ({ callback }) => {
       console.error("QR Scanner Error:", err);
     }
   };
-  (0, import_react26.useEffect)(() => {
+  (0, import_react25.useEffect)(() => {
     if (videoEl.current && !scanner.current) {
       scanner.current = new import_qr_scanner.default(videoEl.current, onScanSuccess, {
         onDecodeError: onScanFail,
@@ -3901,17 +3703,17 @@ var QrReader = ({ callback }) => {
       }
     };
   }, []);
-  (0, import_react26.useEffect)(() => {
+  (0, import_react25.useEffect)(() => {
     if (!qrOn) {
       alert(
         "C\xE2mera est\xE1 bloqueada ou inacess\xEDvel. Por favor, habilite a c\xE2mera nas permiss\xF5es do seu navegador e recarregue a p\xE1gina."
       );
     }
   }, [qrOn]);
-  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
-    /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("div", { ref: qrBoxEl, className: "qr-box" }),
-    scannedResult && /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)("div", { className: "qr-reader", style: { position: "relative", width: "100%", maxWidth: "500px", margin: "0 auto" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("video", { ref: videoEl, style: { width: "100%", borderRadius: "8px" } }),
+    /* @__PURE__ */ (0, import_jsx_runtime50.jsx)("div", { ref: qrBoxEl, className: "qr-box" }),
+    scannedResult && /* @__PURE__ */ (0, import_jsx_runtime50.jsxs)(
       "div",
       {
         style: {
@@ -3935,15 +3737,15 @@ var QrReader = ({ callback }) => {
 };
 
 // src/qr/QrCodeScanButton.tsx
-var import_react27 = require("react");
+var import_react26 = require("react");
 var import_bs3 = require("react-icons/bs");
-var import_jsx_runtime52 = require("react/jsx-runtime");
+var import_jsx_runtime51 = require("react/jsx-runtime");
 var QrCodeScanButton = ({ callback, size = 25 }) => {
-  const [showQr, setShowQr] = (0, import_react27.useState)(false);
+  const [showQr, setShowQr] = (0, import_react26.useState)(false);
   const toggleQr = () => {
     setShowQr((prev) => !prev);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)(
     "div",
     {
       className: "hoverable-div",
@@ -3961,8 +3763,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
       },
       onClick: toggleQr,
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_bs3.BsQrCode, { size }),
-        showQr && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(import_bs3.BsQrCode, { size }),
+        showQr && /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
           "div",
           {
             style: {
@@ -3980,8 +3782,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
               padding: "20px"
             },
             onClick: (e) => e.stopPropagation(),
-            children: /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+            children: /* @__PURE__ */ (0, import_jsx_runtime51.jsxs)("div", { style: { width: "100%", maxWidth: "500px", backgroundColor: "#fff", borderRadius: "12px", padding: "20px", position: "relative" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
                 "div",
                 {
                   onClick: toggleQr,
@@ -3989,8 +3791,8 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
                   children: "\xD7"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("h5", { className: "mb-3 text-center", children: "Escaneie o QR Code" }),
+              /* @__PURE__ */ (0, import_jsx_runtime51.jsx)(
                 QrReader,
                 {
                   callback: (v) => {
@@ -3999,7 +3801,7 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
                   }
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
+              /* @__PURE__ */ (0, import_jsx_runtime51.jsx)("p", { className: "mt-3 text-muted text-center small", children: "Aponte a c\xE2mera para o c\xF3digo" })
             ] })
           }
         )
@@ -4009,9 +3811,9 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
 };
 
 // src/tables/ReusableTableWithModal.tsx
-var import_react28 = require("react");
+var import_react27 = require("react");
 var import_react_bootstrap37 = require("react-bootstrap");
-var import_jsx_runtime53 = require("react/jsx-runtime");
+var import_jsx_runtime52 = require("react/jsx-runtime");
 var ReusableTableWithModal = ({
   fetchDataCallback,
   modalButtonCallback,
@@ -4021,11 +3823,11 @@ var ReusableTableWithModal = ({
   confirmLabel = "Aceitar",
   onFetchData
 }) => {
-  const [data, setData] = (0, import_react28.useState)([]);
-  const [selectedItem, setSelectedItem] = (0, import_react28.useState)(null);
-  const [showModal, setShowModal] = (0, import_react28.useState)(false);
-  const [loading, setLoading] = (0, import_react28.useState)(false);
-  const [tableDataRows, setTableDataRows] = (0, import_react28.useState)([]);
+  const [data, setData] = (0, import_react27.useState)([]);
+  const [selectedItem, setSelectedItem] = (0, import_react27.useState)(null);
+  const [showModal, setShowModal] = (0, import_react27.useState)(false);
+  const [loading, setLoading] = (0, import_react27.useState)(false);
+  const [tableDataRows, setTableDataRows] = (0, import_react27.useState)([]);
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -4041,7 +3843,7 @@ var ReusableTableWithModal = ({
       setLoading(false);
     }
   };
-  (0, import_react28.useEffect)(() => {
+  (0, import_react27.useEffect)(() => {
     fetchData();
   }, []);
   const handleRowClick = (td) => {
@@ -4052,25 +3854,25 @@ var ReusableTableWithModal = ({
     setShowModal(false);
     setSelectedItem(null);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: headers.map((col, index) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("th", { children: col }, index)) }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tbody", { children: loading ? /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_jsx_runtime52.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_react_bootstrap37.Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("tr", { children: headers.map((col, index) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("th", { children: col }, index)) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("tbody", { children: loading ? /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
         "tr",
         {
           onClick: () => handleRowClick(td),
           style: { cursor: "pointer" },
-          children: td.columns.map((col, colIndex) => /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { children: col || "N/A" }, colIndex))
+          children: td.columns.map((col, colIndex) => /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("td", { children: col || "N/A" }, colIndex))
         },
         index
-      )) : /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
+      )) : /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("td", { colSpan: headers.length, className: "text-center py-4", children: "Nenhum dado encontrado." }) }) })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Modal, { show: showModal, onHide: handleCloseModal, centered: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Title, { children: "Detalhes" }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Modal.Body, { children: selectedItem && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_react_bootstrap37.Modal.Footer, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(import_react_bootstrap37.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
-        modalButtonCallback && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_react_bootstrap37.Modal, { show: showModal, onHide: handleCloseModal, centered: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap37.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap37.Modal.Title, { children: "Detalhes" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap37.Modal.Body, { children: selectedItem && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)("div", { children: modalContent ? modalContent(selectedItem) : "Visualizando detalhes do item." }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime52.jsxs)(import_react_bootstrap37.Modal.Footer, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(import_react_bootstrap37.Button, { variant: "outline-secondary", onClick: handleCloseModal, children: "Fechar" }),
+        modalButtonCallback && /* @__PURE__ */ (0, import_jsx_runtime52.jsx)(
           import_react_bootstrap37.Button,
           {
             variant: "primary",
@@ -4087,24 +3889,24 @@ var ReusableTableWithModal = ({
 };
 
 // src/text/TextWithMore.tsx
-var import_react29 = require("react");
+var import_react28 = require("react");
 var import_react_bootstrap38 = require("react-bootstrap");
-var import_jsx_runtime54 = require("react/jsx-runtime");
+var import_jsx_runtime53 = require("react/jsx-runtime");
 var TextWithMore = ({
   text = "Carregando...",
   maxLength,
   moreLabel = "ver mais",
   lessLabel = "ver menos"
 }) => {
-  const [expanded, setExpanded] = (0, import_react29.useState)(false);
+  const [expanded, setExpanded] = (0, import_react28.useState)(false);
   const handleToggleExpand = () => {
     setExpanded(!expanded);
   };
   const isTruncated = text.length > maxLength;
   const displayText = isTruncated && !expanded ? text.slice(0, maxLength) + "\u2026" : text;
-  return /* @__PURE__ */ (0, import_jsx_runtime54.jsxs)(import_jsx_runtime54.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime54.jsx)("span", { className: "text-with-more-content", children: displayText }),
-    isTruncated && /* @__PURE__ */ (0, import_jsx_runtime54.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime53.jsxs)(import_jsx_runtime53.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime53.jsx)("span", { className: "text-with-more-content", children: displayText }),
+    isTruncated && /* @__PURE__ */ (0, import_jsx_runtime53.jsx)(
       import_react_bootstrap38.Button,
       {
         variant: "link",
@@ -4116,6 +3918,9 @@ var TextWithMore = ({
     )
   ] });
 };
+
+// src/index.ts
+var import_ui_kit_sgp = require("@teraprox/ui-kit-sgp");
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   ActionButtons,
@@ -4128,6 +3933,9 @@ var TextWithMore = ({
   BonusButton,
   BranchDropDisplay,
   ButtonWithDropdown,
+  CalculadoraCorrecaoModal,
+  CalculoCorrecao,
+  CampoDeVerificacaoV2,
   CheckBox,
   ClickToWriteField,
   ColorPicker,
@@ -4137,6 +3945,7 @@ var TextWithMore = ({
   ExpandableCard,
   FindRecursoByTagField,
   FormField,
+  FrequenciaFormV2,
   Generic3DotMenu,
   GenericChart,
   GenericDisplay,
@@ -4171,8 +3980,10 @@ var TextWithMore = ({
   StatusPills,
   Switch,
   SwitchOnClick,
+  TarefaUnidadeForm,
   TextWithMore,
   TimerDisplay,
+  UnidadeMaterialCard,
   UnidadeMaterialForm,
   UnifiedPeriodSelector,
   UploadArea,

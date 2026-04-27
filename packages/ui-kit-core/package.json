@@ -5,11 +5,18 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./dist/index.css": {
+      "style": "./dist/index.css",
+      "default": "./dist/index.css"
     }
   },
   "files": [
@@ -54,6 +61,9 @@
     "file-saver": { "optional": true },
     "dayjs": { "optional": true },
     "react-google-charts": { "optional": true }
+  },
+  "dependencies": {
+    "teraprox-ui-kit": "file:../ui-kit"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

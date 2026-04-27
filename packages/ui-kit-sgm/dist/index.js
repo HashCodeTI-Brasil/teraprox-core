@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
@@ -24,6 +34,7 @@ __export(index_exports, {
   BranchDropDisplay: () => BranchDropDisplay,
   FindRecursoByTagField: () => FindRecursoByTagField,
   InspecaoModal: () => InspecaoModal,
+  MantenedorPicker: () => MantenedorPicker,
   MantenedorRender: () => MantenedorRender,
   MantenedorRenderCompact: () => MantenedorRenderCompact,
   ManutentorCard: () => ManutentorCard,
@@ -969,7 +980,6 @@ var RecursoDisplayer = ({
 };
 
 // src/tarefa/TarefaCard.tsx
-var import_react5 = require("react");
 var import_react_bootstrap7 = require("react-bootstrap");
 var import_fa62 = require("react-icons/fa6");
 
@@ -1312,8 +1322,8 @@ var TarefaCard = ({
   renderInspecoes,
   unidadeMaterialPickerProps
 }) => {
-  var _a, _b, _c, _d;
-  const [actualState, setActualState] = (0, import_react5.useState)(tarefa.sequencia);
+  var _a, _b, _c, _d, _e;
+  const ordem = (_a = tarefa == null ? void 0 : tarefa.sequencia) != null ? _a : posindex;
   const remove = () => {
     removeTarefaClick(tarefa.sequencia);
   };
@@ -1326,27 +1336,15 @@ var TarefaCard = ({
     return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Button, { variant: "danger", onClick: () => remove(), children: "Remover" });
   };
   return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.Card, { style: { margin: 12 }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Card.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.InputGroup, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.InputGroup.Text, { children: "N\xBA" }),
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-        import_react_bootstrap7.FormControl,
-        {
-          disabled: onlyView,
-          type: "number",
-          min: 1,
-          style: { maxWidth: "10%", textAlign: "center" },
-          value: actualState,
-          onBlur: (event) => onSequenciaChange(event.target.value),
-          onChangeCapture: (event) => setActualState(event.target.value)
-        }
-      ),
+    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Card.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "d-flex justify-content-between align-items-center gap-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: `Ordem: ${ordem}` }),
       !onlyView && conditionalActionButton()
     ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.Card.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "A realizar:" }),
         " ",
-        `${(tarefa == null ? void 0 : tarefa.modelIdentifier) ? tarefa == null ? void 0 : tarefa.modelIdentifier : (_a = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _a.nome} - ${(_b = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _b.descricao}`
+        `${(tarefa == null ? void 0 : tarefa.modelIdentifier) ? tarefa == null ? void 0 : tarefa.modelIdentifier : (_b = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _b.nome} - ${(_c = tarefa == null ? void 0 : tarefa.acao) == null ? void 0 : _c.descricao}`
       ] }),
       tarefa.unidadesMateriais && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "Material Nescessario:" }),
@@ -1361,7 +1359,7 @@ var TarefaCard = ({
               var _a2, _b2;
               return `${um.quantidade} ${((_a2 = um.unidade) == null ? void 0 : _a2.label) || um.labelUnidade} de ${((_b2 = um == null ? void 0 : um.material) == null ? void 0 : _b2.nome) || (um == null ? void 0 : um.materialNome) || (um == null ? void 0 : um.nomeMaterial)} `;
             },
-            opsSelected: (_c = tarefa == null ? void 0 : tarefa.unidadesMateriais) == null ? void 0 : _c.filter(
+            opsSelected: (_d = tarefa == null ? void 0 : tarefa.unidadesMateriais) == null ? void 0 : _d.filter(
               (um) => !um.removed
             ),
             outOption: unidadeMaterial,
@@ -1382,7 +1380,7 @@ var TarefaCard = ({
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("strong", { children: "Inspe\xE7\xF5es:" }),
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_react_bootstrap7.ListGroup, { as: "ol", numbered: true, children: tarefa.inspecoes && renderInspecoes ? renderInspecoes(tarefa.inspecoes) : null })
       ] }),
-      ((_d = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _d.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
+      ((_e = tarefa == null ? void 0 : tarefa.tarefaJustificativas) == null ? void 0 : _e.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_react_bootstrap7.ListGroup.Item, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(import_fa62.FaRegCommentDots, { size: 20 }),
         " ",
         tarefa.tarefaJustificativas[tarefa.tarefaJustificativas.length - 1].descricao
@@ -1392,7 +1390,7 @@ var TarefaCard = ({
 };
 
 // src/tarefa/TarefaItem.tsx
-var import_react6 = require("react");
+var import_react5 = require("react");
 var import_react_bootstrap8 = require("react-bootstrap");
 var import_fa3 = require("react-icons/fa");
 var import_teraprox_ui_kit7 = require("teraprox-ui-kit");
@@ -1428,12 +1426,12 @@ var TarefaItem = (props) => {
     renderNovaUnidadeMaterialForm
   } = props;
   const anexos = (tarefaForm == null ? void 0 : tarefaForm.anexos) || [];
-  const [showObs, setShowObs] = (0, import_react6.useState)(false);
-  const [showInsp, setShowInsp] = (0, import_react6.useState)(false);
-  const [showMat, setShowMat] = (0, import_react6.useState)(false);
-  const [quantidadeUnidadeMaterialIsChanged, setQuantidadeUnidadeMaterialIsChanged] = (0, import_react6.useState)(false);
+  const [showObs, setShowObs] = (0, import_react5.useState)(false);
+  const [showInsp, setShowInsp] = (0, import_react5.useState)(false);
+  const [showMat, setShowMat] = (0, import_react5.useState)(false);
+  const [quantidadeUnidadeMaterialIsChanged, setQuantidadeUnidadeMaterialIsChanged] = (0, import_react5.useState)(false);
   const saving = savingProp != null ? savingProp : false;
-  const checked = (0, import_react6.useMemo)(
+  const checked = (0, import_react5.useMemo)(
     () => tarefaForm.status === "ENCERRADO",
     [tarefaForm]
   );
@@ -1691,12 +1689,107 @@ var TarefaItem = (props) => {
     )
   ] });
 };
+
+// src/mantenedor/MantenedorPicker.tsx
+var import_react6 = __toESM(require("react"));
+var import_react_bootstrap9 = require("react-bootstrap");
+var import_gr4 = require("react-icons/gr");
+var import_teraprox_ui_kit8 = require("teraprox-ui-kit");
+var import_jsx_runtime15 = require("react/jsx-runtime");
+var MantenedorPicker = ({
+  viewModel,
+  currentOsId,
+  onSelected,
+  label = "Manutentores",
+  disabled,
+  className
+}) => {
+  const [hideOps, setHideOps] = import_react6.default.useState(true);
+  const handleClick = (m) => {
+    const kind = viewModel.requestSelect(m, currentOsId);
+    if (kind === "immediate") {
+      onSelected(m);
+      viewModel.search(m.nomeUsuario);
+      setHideOps(true);
+    } else {
+      setHideOps(true);
+    }
+  };
+  const handleConfirm = () => {
+    const item = viewModel.confirmSelect();
+    if (item) {
+      onSelected(item);
+      viewModel.search(item.nomeUsuario);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { onMouseLeave: () => setHideOps(true), className, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      import_teraprox_ui_kit8.FormField,
+      {
+        label,
+        labelPosition: "top",
+        val: viewModel.isLoading ? "Carregando..." : viewModel.searchTerm,
+        onValueUpdate: (v) => {
+          if (hideOps) setHideOps(false);
+          viewModel.search(v);
+        },
+        onFocus: () => {
+          setHideOps(false);
+          viewModel.cancelConfirm();
+        },
+        locked: disabled || viewModel.isLoading,
+        className: "mantenedores-label",
+        others: {
+          autoComplete: "off",
+          className: "mantenedores-select"
+        }
+      }
+    ),
+    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ListGroup, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ListGroup.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
+      const isBusyOther = m._busy && m.osId !== currentOsId;
+      const isBusyHere = m._busy && m.osId === currentOsId;
+      return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        import_react_bootstrap9.ListGroup.Item,
+        {
+          action: true,
+          onClick: () => handleClick(m),
+          className: `mantenedor-option ${isBusyOther ? "busy" : ""} ${isBusyHere ? "current-os" : ""}`,
+          children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("li", { className: "d-flex align-items-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: m.nomeUsuario }),
+            isBusyHere && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("span", { className: "current-os-indicator", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_gr4.GrCheckmark, { size: 18 }),
+              " Trabalhando nesta OS"
+            ] }),
+            isBusyOther && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
+          ] })
+        },
+        m.id
+      );
+    }) }),
+    viewModel.pendingConfirm && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      import_teraprox_ui_kit8.ApproveAndReproveButtons,
+      {
+        headerText: `Deseja desalocar ${viewModel.pendingConfirm.nomeUsuario} da OS-${viewModel.pendingConfirm.osId} para uma nova aloca\xE7\xE3o?`,
+        approveCallback: handleConfirm,
+        reproveCallback: () => {
+          viewModel.cancelConfirm();
+          setHideOps(false);
+        },
+        cancelCallback: () => {
+          viewModel.cancelConfirm();
+          setHideOps(false);
+        }
+      }
+    ) })
+  ] });
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AcaoPicker,
   BranchDropDisplay,
   FindRecursoByTagField,
   InspecaoModal,
+  MantenedorPicker,
   MantenedorRender,
   MantenedorRenderCompact,
   ManutentorCard,

@@ -23,7 +23,7 @@ const App = () => {
     const isAuth = global?.isAuth;
     const { validating } = useSessionRevalidation();
 
-    const { routes, componentRegistry, menuSections, loading } = useFederatedRoutes();
+    const { routes, componentRegistry, menuSections, menuTree, loading } = useFederatedRoutes();
 
     React.useEffect(() => {
         if (globalError) {
@@ -38,7 +38,7 @@ const App = () => {
 
     return (
         <div className="teraprox-shell">
-            {isAuth && !validating && <MenuBar menuSections={menuSections} />}
+            {isAuth && !validating && <MenuBar menuSections={menuSections} menuTree={menuTree} />}
             
             {/* 🔒 LGPD Consent Banner — shown on first visit and annually */}
             <LGPDConsentBanner />

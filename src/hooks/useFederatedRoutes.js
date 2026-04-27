@@ -9,6 +9,7 @@ export function useFederatedRoutes() {
     const [routes, setRoutes] = useState([]);
     const [componentRegistry, setComponentRegistry] = useState({});
     const [menuSections, setMenuSections] = useState([]);
+    const [menuTree, setMenuTree] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,6 +20,7 @@ export function useFederatedRoutes() {
                 setRoutes(result.allRoutes);
                 setComponentRegistry(result.componentRegistry);
                 setMenuSections(result.menuSections);
+                setMenuTree(result.menuTree || []);
                 setLoading(false);
             })
             .catch((err) => {
@@ -28,5 +30,5 @@ export function useFederatedRoutes() {
         return () => { cancelled = true; };
     }, []);
 
-    return { routes, componentRegistry, menuSections, loading };
+    return { routes, componentRegistry, menuSections, menuTree, loading };
 }

@@ -54,7 +54,7 @@ export interface IAnexoManagerViewModel {
   removePersistido(anexoId: string | number): Promise<void>
 
   /** Obtem signed URL para preview/download */
-  getUrl(anexoId: string | number): Promise<string>
+  getUrl(anexoId: string | number, key?: string): Promise<string>
 }
 
 export interface UseAnexoManagerOptions {

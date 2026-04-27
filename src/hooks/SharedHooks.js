@@ -11,5 +11,4 @@ export { useWebProvider } from './useWebProvider';
 export { useBasicService } from './useBasicService';
 export { useFetchData } from './useFetchData';
 export { usePostData } from './usePostData';
-export { useAnexoUpload } from './useAnexoUpload';
 

@@ -4,9 +4,13 @@ import { FaPalette } from "react-icons/fa"
 
 export interface ColorPickerProps {
   /** Cor selecionada atualmente */
-  selectedColor: string
+  selectedColor?: string
   /** Callback para quando a cor muda */
-  onColorChange: (color: string) => void
+  onColorChange?: (color: string) => void
+  /** Retrocompat legado */
+  defaultColor?: string
+  /** Retrocompat legado */
+  setCor?: (color: string) => void
   /** Lista de cores sugeridas para a paleta rápida */
   presetColors?: string[]
   /** Título do componente (padrão: 'Cor de Identificação') */
@@ -19,9 +23,22 @@ export interface ColorPickerProps {
 export const ColorPicker: React.FC<ColorPickerProps> = ({
   selectedColor,
   onColorChange,
+  defaultColor,
+  setCor,
   presetColors = ["#ff0000", "#ffd700", "#008000", "#0000ff", "#800080"],
   title = "Cor de Identificação"
 }) => {
+  const safeSelectedColor =
+    selectedColor ??
+    defaultColor ??
+    presetColors[0] ??
+    "#000000"
+
+  const handleColorChange = (color: string) => {
+    onColorChange?.(color)
+    setCor?.(color)
+  }
+
   return (
     <Card
       className="shadow-sm border-primary-hover mb-3"
@@ -41,7 +58,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
               style={{
                 width: "40px",
                 height: "40px",
-                backgroundColor: selectedColor,
+                backgroundColor: safeSelectedColor,
                 cursor: "pointer",
                 border: "2px solid #dee2e6",
               }}
@@ -57,8 +74,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             <Form.Control
               type="color"
               id="color-input-hidden"
-              value={selectedColor}
-              onChange={(e) => onColorChange(e.target.value)}
+              value={safeSelectedColor}
+              onChange={(e) => handleColorChange(e.target.value)}
               className="form-control-color-lg"
               style={{ width: "100%", height: "40px", cursor: 'pointer' }}
             />
@@ -77,11 +94,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                   backgroundColor: cor,
                   cursor: "pointer",
                   border:
-                    cor.toLowerCase() === selectedColor.toLowerCase()
+                    cor.toLowerCase() === safeSelectedColor.toLowerCase()
                       ? "2px solid #0d6efd"
                       : "1px solid #dee2e6",
                 }}
-                onClick={() => onColorChange(cor)}
+                onClick={() => handleColorChange(cor)}
               />
             </Col>
           ))}

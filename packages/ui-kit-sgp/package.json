@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -54,6 +55,10 @@
     "file-saver": { "optional": true },
     "dayjs": { "optional": true },
     "react-google-charts": { "optional": true }
+  },
+  "dependencies": {
+    "teraprox-ui-kit": "file:../ui-kit",
+    "@teraprox/ui-kit-core": "file:../ui-kit-core"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

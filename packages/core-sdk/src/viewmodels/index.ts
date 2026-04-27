@@ -95,3 +95,73 @@ export type {
 } from './IAnexoManagerViewModel'
 
 export { useAnexoManagerViewModel } from './useAnexoManagerViewModel'
+
+// Recorrencia (sprint 2026-04-20 code-split-fix — Track C.1 Port;
+// realinhado ao shape backend em Track C.1 UI finalizacao)
+export type {
+  IRecorrenciaViewModel,
+  RecorrenciaValue,
+  RecorrenciaValidationResult,
+  RecorrenciaEscala,
+} from './IRecorrenciaViewModel'
+
+export { useRecorrenciaViewModel } from './useRecorrenciaViewModel'
+
+export {
+  default as recorrenciaReducer,
+  setRecorrenciaValor,
+  setRecorrenciaEscala,
+  setRecorrenciaDataInicio,
+  populateRecorrencia,
+  clearRecorrencia,
+  selectRecorrencia,
+  RECORRENCIA_DEFAULT_KEY,
+} from './recorrenciaSlice'
+export type { RecorrenciaSliceState } from './recorrenciaSlice'
+
+// Contador (sprint 2026-04-20 code-split-fix — Track C.2 Port)
+export type {
+  IContadorViewModel,
+  ContadorValue,
+  ContadorValidationResult,
+  ContadorBoundRule,
+} from './IContadorViewModel'
+
+export { useContadorViewModel } from './useContadorViewModel'
+
+// MantenedorPicker (Wave 5B — hexagonal promotion de MantenedoresDisplay)
+export type {
+  IMantenedorPickerViewModel,
+  MantenedorOption,
+} from './IMantenedorPickerViewModel'
+
+export { useMantenedorPickerViewModel } from './useMantenedorPickerViewModel'
+
+export {
+  default as mantenedorPickerReducer,
+  setMantenedorOptions,
+  setMantenedorSearchTerm,
+  setMantenedorLoading,
+  setMantenedorError,
+  setMantenedorPendingConfirm,
+  clearMantenedorSlot,
+} from './mantenedorPickerSlice'
+export type {
+  MantenedorPickerSliceState,
+  MantenedorPickerSlot,
+} from './mantenedorPickerSlice'
+
+export {
+  default as contadorReducer,
+  setContadorValor,
+  setContadorUnidade,
+  setContadorParametro,
+  addContadorLimite,
+  removeContadorLimiteAt,
+  updateContadorLimiteAt,
+  populateContador,
+  clearContador,
+  selectContador,
+  CONTADOR_DEFAULT_KEY,
+} from './contadorSlice'
+export type { ContadorSliceState } from './contadorSlice'

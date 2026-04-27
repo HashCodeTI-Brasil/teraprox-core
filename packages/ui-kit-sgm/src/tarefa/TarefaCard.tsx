@@ -1,10 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Button,
   Card,
-  FormControl,
-  InputGroup,
   ListGroup,
 } from 'react-bootstrap'
 import { FaRegCommentDots } from 'react-icons/fa6'
@@ -57,7 +55,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({
   renderInspecoes,
   unidadeMaterialPickerProps,
 }) => {
-  const [actualState, setActualState] = useState(tarefa.sequencia)
+  const ordem = tarefa?.sequencia ?? posindex
 
   const remove = () => {
     removeTarefaClick(tarefa.sequencia)
@@ -84,22 +82,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({
   return (
     <Card style={{ margin: 12 }} key={`${posindex}${tarefa.sequencia}`}>
       <Card.Header>
-        <InputGroup>
-          <InputGroup.Text>Nº</InputGroup.Text>
-          <FormControl
-            disabled={onlyView}
-            type="number"
-            min={1}
-            style={{ maxWidth: '10%', textAlign: 'center' }}
-            value={actualState}
-            onBlur={(event: any) => onSequenciaChange(event.target.value)}
-            onChangeCapture={(event: any) =>
-              setActualState(event.target.value)
-            }
-          />
-
+        <div className="d-flex justify-content-between align-items-center gap-2">
+          <strong>{`Ordem: ${ordem}`}</strong>
           {!onlyView && conditionalActionButton()}
-        </InputGroup>
+        </div>
       </Card.Header>
       <Card.Body>
         <ListGroup>

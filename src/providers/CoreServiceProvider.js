@@ -5,7 +5,6 @@ import { WebProvider } from '../websocket/wsProvider'
 import { useToasts } from 'react-toast-notifications'
 import { useDispatch } from 'react-redux'
 import {
-    logOut,
     setNeedUserLogin,
     setToken,
 } from '../Reducers/default-reducers/globalConfigReducer'
@@ -126,7 +125,6 @@ export default function CoreServiceProvider({ children }) {
                     if (!alreadyWaiting) {
                         dispatch(setNeedUserLogin(true))
                         toast.addToast('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
-                        dispatch(logOut())
                     }
                     return Promise.reject(error)
                 }

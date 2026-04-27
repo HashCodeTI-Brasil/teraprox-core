@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { FloatingLabel, Form, InputGroup, ListGroup, Spinner } from "react-bootstrap"
 
+type LabelPosition = "top" | "floating"
+
 export interface AutoCompleteProps {
 	className?: string
 	/** Opções estáticas iniciais */
@@ -54,6 +56,12 @@ export interface AutoCompleteProps {
 	showListOnFocus?: boolean
 	/** Se deve carregar sob demanda ao digitar */
 	lazyLoad?: boolean
+	/**
+	 * Posicao da label:
+	 *  - 'top' (default): label acima do input (padrao UX /os/form)
+	 *  - 'floating': comportamento Bootstrap FloatingLabel legado
+	 */
+	labelPosition?: LabelPosition
 }
 
 /**
@@ -93,6 +101,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = ({
 	maxItems,
 	showListOnFocus = true,
 	lazyLoad = false,
+	labelPosition = "top",
 }) => {
 	const [liItem, setListItem] = useState<any[]>([])
 	const [options, setOptions] = useState<any[]>([])
@@ -235,30 +244,51 @@ export const AutoComplete: React.FC<AutoCompleteProps> = ({
 			onMouseLeave={() => setHide(true)}
 		>
 			{!hideComponent && (
-				<InputGroup>
-					<FloatingLabel controlId="floatingInput" label={title} style={{ zIndex: 0, flex: 1 }}>
-						<Form.Control
-							autoFocus={autoFocusConfig}
-							disabled={disableComponent || disableSelect}
-							placeholder={placeH}
-							autoComplete="off"
-							value={input}
-							onClickCapture={() => {
-								const canOpen = showListOnFocus && input.length >= minChars
-								setHide(!canOpen)
-							}}
-							onChange={(e) => onFieldUpdate(e.currentTarget.value)}
-							type="text"
-						/>
-					</FloatingLabel>
-					{loading && (
-						<InputGroup.Text>
-							<Spinner animation="border" size="sm" />
-						</InputGroup.Text>
+				<>
+					{labelPosition === "top" && title && (
+						<Form.Label className="fw-semibold small mb-1">{title}</Form.Label>
 					)}
-					{!disableComponent && actionButton?.(() => setInput(""))}
-					{!disableComponent && actionButton2?.(input)}
-				</InputGroup>
+					<InputGroup>
+						{labelPosition === "floating" ? (
+							<FloatingLabel controlId="floatingInput" label={title} style={{ zIndex: 0, flex: 1 }}>
+								<Form.Control
+									autoFocus={autoFocusConfig}
+									disabled={disableComponent || disableSelect}
+									placeholder={placeH}
+									autoComplete="off"
+									value={input}
+									onClickCapture={() => {
+										const canOpen = showListOnFocus && input.length >= minChars
+										setHide(!canOpen)
+									}}
+									onChange={(e) => onFieldUpdate(e.currentTarget.value)}
+									type="text"
+								/>
+							</FloatingLabel>
+						) : (
+							<Form.Control
+								autoFocus={autoFocusConfig}
+								disabled={disableComponent || disableSelect}
+								placeholder={placeH || title}
+								autoComplete="off"
+								value={input}
+								onClickCapture={() => {
+									const canOpen = showListOnFocus && input.length >= minChars
+									setHide(!canOpen)
+								}}
+								onChange={(e) => onFieldUpdate(e.currentTarget.value)}
+								type="text"
+							/>
+						)}
+						{loading && (
+							<InputGroup.Text>
+								<Spinner animation="border" size="sm" />
+							</InputGroup.Text>
+						)}
+						{!disableComponent && actionButton?.(() => setInput(""))}
+						{!disableComponent && actionButton2?.(input)}
+					</InputGroup>
+				</>
 			)}
 
 			<ListGroup

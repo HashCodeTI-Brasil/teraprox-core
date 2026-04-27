@@ -8,8 +8,15 @@ export interface FormFieldProps {
   onValueUpdate?: (val: string, event: React.ChangeEvent<any>) => void;
   /** Callback no blur */
   onBlur?: (val: string, event: React.FocusEvent<any>) => void;
-  /** Label exibida no FloatingLabel */
+  /** Label exibida acima do input (top) ou dentro como FloatingLabel */
   label?: string;
+  /**
+   * Posicao da label:
+   *  - 'top'      (default): label como elemento separado acima do control
+   *  - 'floating'          : comportamento Bootstrap FloatingLabel wrapping
+   * Default 'top' alinhado com auditoria browser /os/form (Wave 5A fix).
+   */
+  labelPosition?: 'top' | 'floating';
   /** Tipo do input (text, number, password, etc) */
   ty?: string;
   /** Callback para botão de ação à direita */
@@ -47,13 +54,20 @@ export interface FormFieldProps {
 }
 
 /**
- * Campo de formulário padronizado com suporte a FloatingLabel e botões de ação laterais.
+ * Campo de formulário padronizado com suporte a label-top (default) ou
+ * FloatingLabel, mais botões de ação laterais.
+ *
+ * Wave 5A fix (sprint 2026-04-21-ui-kit-domain-split-wave0): default de
+ * `labelPosition` e 'top' para alinhar com padrao visual auditado no browser.
+ * Callers que dependem explicitamente de FloatingLabel devem passar
+ * `labelPosition="floating"`.
  */
 export const FormField: React.FC<FormFieldProps> = ({
   val,
   onValueUpdate,
   onBlur,
   label,
+  labelPosition = 'top',
   ty,
   actionClick,
   actionClick2,
@@ -108,20 +122,27 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   if (hide) return null;
 
+  // Textarea nunca envolveu com FloatingLabel; respeita apenas 'top' label.
+  const useFloating = labelPosition === 'floating' && !asTextArea;
+
   return (
     <Form.Group
       onFocusCapture={(e) => onFocusHandler((e.target as HTMLInputElement).value)}
       onMouseLeave={onMouseLv}
       onKeyDown={onKeyDownHandler}
       style={{ marginTop: 4, marginBottom: 4, width: '100%' }}
+      controlId={!useFloating ? controlId : undefined}
     >
+      {!useFloating && label && (
+        <Form.Label className="fw-semibold small mb-1">{label}</Form.Label>
+      )}
       <InputGroup>
-        {asTextArea ? (
-          renderField()
-        ) : (
+        {useFloating ? (
           <FloatingLabel style={{ zIndex: 0, flex: 1 }} label={label} controlId={controlId || 'floatingInput'}>
             {renderField()}
           </FloatingLabel>
+        ) : (
+          renderField()
         )}
         {actionClick && actionClick()}
         {actionClick2 && actionClick2()}

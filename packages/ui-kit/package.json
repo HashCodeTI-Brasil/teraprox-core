@@ -6,6 +6,7 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "style": "dist/index.css",
+  "sideEffects": ["**/*.css", "dist/index.css"],
   "exports": {
     ".": {
       "style": "./dist/index.css",

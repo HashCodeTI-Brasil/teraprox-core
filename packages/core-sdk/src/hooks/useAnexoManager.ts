@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useCoreService } from './useCoreService'
 import type { IAnexoPort, AnexoPersistido, AnexoLocal, UploadIntent } from '../types/IAnexoPort'
 
@@ -32,6 +32,43 @@ function generateLocalId(): string {
 }
 
 /**
+ * Sequelize/API usam `originalName`/`contentType`/`size`; o AnexoManager precisa de `nome`/`tipo`/`tamanho`.
+ */
+function mapRowToPersistido(raw: any): AnexoPersistido {
+  const r = raw?.dataValues != null ? { ...raw.dataValues, id: raw.id ?? raw.dataValues?.id } : raw
+  if (!r || typeof r !== 'object') {
+    return { id: 'unknown', nome: 'Anexo', tipo: 'application/octet-stream' }
+  }
+  const nome =
+    (typeof r.nome === 'string' && r.nome) ||
+    (typeof r.originalName === 'string' && r.originalName) ||
+    (typeof r.fileName === 'string' && r.fileName) ||
+    (typeof r.key === 'string' && r.key.split('/').pop()) ||
+    'Anexo'
+  const tipo =
+    (typeof r.contentType === 'string' && r.contentType) ||
+    (typeof r.tipo === 'string' && r.tipo) ||
+    'application/octet-stream'
+  const id = r.id ?? r.anexoId ?? String(nome)
+  const tamanho =
+    typeof r.size === 'number'
+      ? r.size
+      : typeof r.tamanho === 'number'
+        ? r.tamanho
+        : undefined
+  return {
+    id,
+    nome,
+    tipo,
+    tamanho,
+    url: r.url,
+    signedUrl: r.signedUrl,
+    key: r.key,
+    createdAt: r.createdAt,
+  }
+}
+
+/**
  * Hook central para gerenciamento de anexos.
  * Conecta a UI (AnexoManager do ui-kit) com a infraestrutura HTTP (core-sdk).
  */
@@ -40,11 +77,13 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
   const [persistidos, setPersistidos] = useState<AnexoPersistido[]>([])
   const [locais, setLocais] = useState<AnexoLocal[]>([])
   const [loading, setLoading] = useState(false)
-  const controllerRef = useRef(createController('anexo'))
+  // Alinhar ao createController do host (FederatedBridge); useRef congelava o 1.º controller (endpoint errado)
+  const anexoController = useMemo(() => createController('anexo'), [createController])
 
   const getPort = useCallback((): IAnexoPort => {
-    if (port) return port
-    const ctrl = controllerRef.current
+    // Só port real (IAnexoPort); string/wrong tipo quebrava p.intent / readByEntity em runtime
+    if (port && typeof port === 'object' && 'readByEntity' in port) return port
+    const ctrl = anexoController
     return {
       intent: (params) => ctrl.post('intent', {
         fileName: params.nome,
@@ -67,16 +106,19 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
         })
       },
       readByEntity: (ctx, eid) => ctrl.get(`${eid}/${ctx}`),
-      getSignedUrl: (anexoId) => ctrl.post('signedUrl', { anexoId }).then((r: any) => r?.url || r?.signedUrl || ''),
+      getSignedUrl: (anexoId, key) =>
+        key
+          ? ctrl.post('signedUrl', { key }).then((r: any) => r?.signedUrl || r?.url || '')
+          : ctrl.post('signedUrl', { anexoId }).then((r: any) => r?.url || r?.signedUrl || ''),
       remove: (anexoId) => ctrl.delete('', anexoId),
     }
-  }, [port, createController])
+  }, [port, anexoController, createController])
 
   const loadAnexos = useCallback(async () => {
     setLoading(true)
     try {
       const data = await getPort().readByEntity(context, entityId)
-      setPersistidos(Array.isArray(data) ? data : [])
+      setPersistidos((Array.isArray(data) ? data : []).map(mapRowToPersistido))
     } catch {
       setPersistidos([])
     } finally {
@@ -135,16 +177,22 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
         let result: AnexoPersistido
         const intentUrl = intent?.uploadUrl || intent?.signedUrl
         if (intentUrl) {
-          await fetch(intentUrl, {
+          // A API (intent) não devolve anexoId — o `confirm` da gateway só grava a linha com key/dataId/dataContext.
+          const putRes = await fetch(intentUrl, {
             method: 'PUT',
             body: anexo.file,
-            headers: { 'Content-Type': anexo.tipo },
+            headers: { 'Content-Type': anexo.tipo || 'application/octet-stream' },
           })
+          if (!putRes.ok) {
+            const hint = await putRes.text().catch(() => '')
+            throw new Error(
+              `Falha ao enviar ficheiro para o armazenamento (HTTP ${putRes.status}). ${hint ? hint.slice(0, 180) : ''}`.trim(),
+            )
+          }
           setLocais((prev) =>
             prev.map((a) => a.localId === anexo.localId ? { ...a, progress: 80 } : a)
           )
           result = await p.confirm({
-            anexoId: intent!.anexoId,
             context,
             entityId: eid,
             key: intent!.key,
@@ -158,7 +206,7 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
         setLocais((prev) =>
           prev.map((a) => a.localId === anexo.localId ? { ...a, status: 'done' as const, progress: 100 } : a)
         )
-        results.push(result)
+        results.push(mapRowToPersistido(result))
       } catch (err: any) {
         setLocais((prev) =>
           prev.map((a) =>
@@ -187,9 +235,17 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
     }
   }, [getPort])
 
-  const getUrl = useCallback(async (anexoId: string | number): Promise<string> => {
-    return getPort().getSignedUrl(anexoId)
-  }, [getPort])
+  const getUrl = useCallback(
+    async (anexoId: string | number, key?: string): Promise<string> => {
+      let k = key
+      if (k == null || k === "") {
+        const p = persistidos.find((a) => String(a.id) === String(anexoId))
+        k = p?.key
+      }
+      return getPort().getSignedUrl(anexoId, k)
+    },
+    [getPort, persistidos]
+  )
 
   return {
     persistidos,

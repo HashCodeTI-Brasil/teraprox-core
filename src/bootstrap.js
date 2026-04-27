@@ -20,6 +20,10 @@ import WebProviderComponent from './websocket/wsProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'teraprox-ui-kit/index.css';
+// ui-kit-core styles (AnexoManager, FrequenciaFormV2, ClickToWriteField, etc.)
+// O host precisa carregar este CSS porque no modo federado os bootstrap.tsx
+// dos remotes não são executados — apenas os módulos expostos são importados.
+import '@teraprox/ui-kit-core/dist/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

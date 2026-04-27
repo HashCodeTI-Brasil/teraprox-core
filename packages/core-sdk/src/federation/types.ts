@@ -35,6 +35,19 @@ export interface RemoteMenuSection {
   /** Ícone da seção */
   icon?: string
   items: RemoteMenuItem[]
+  /**
+   * NOVO: agrupamento global na MenuBar (ex: 'SGM').
+   * Sections com mesmo `group` (ou cujo manifest tem `menuGroup.name` igual)
+   * são fundidas em 1 nó top-level.
+   */
+  group?: string
+  /** NOVO: ordem dentro do group (ou top-level). Default = 999 (final). */
+  order?: number
+  /**
+   * NOVO: se true e dentro de group, items vão direto pro group
+   * (sem sub-grupo intermediário pela section.label). Default false.
+   */
+  flatten?: boolean
 }
 
 /**
@@ -84,4 +97,13 @@ export interface RemoteManifest {
   reducerMap?: RemoteReducerMap
   /** Reducer keys injetados em TODAS as rotas deste remote */
   defaultReducers?: DefaultReducerKeys
+  /**
+   * NOVO opcional: aplica `group=name` a TODAS as `menuSections` deste remote
+   * (atalho declarativo). Sections com seu próprio `group` ainda têm precedência.
+   */
+  menuGroup?: {
+    name: string
+    icon?: string
+    order?: number
+  }
 }

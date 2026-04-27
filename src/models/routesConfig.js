@@ -45,6 +45,8 @@ export const routesConfig = [
             { configuration: { context: "solicitacaoDeServico", path: paths.solicitacoesDeServico, endPoint: endPointManutencao } },
             { configuration: { context: "solicitacaoDeServico", path: paths.solicitacaoDeServicoForm, endPoint: endPointManutencao } },
             { configuration: { context: "solicitacaoDeServico", path: paths.aprovaStatus, endPoint: endPointManutencao } },
+            // intent/confirm/readByEntity do useAnexoManager — sem rota, resolveEndpoint vira "" e o fetch vira /anexo/... no origin (3000) em vez do gateway
+            { configuration: { context: "anexo", endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeManutencao", path: paths.ordensDeManutencao, endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeManutencao", path: paths.ordemDeManutencaoForm, endPoint: endPointManutencao } },
             { configuration: { context: "ordemDeManutencao", path: paths.executarOrdemDeManutencao, endPoint: endPointManutencao } },

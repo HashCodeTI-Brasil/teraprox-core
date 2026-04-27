@@ -81,3 +81,9 @@ export {
   UnidadeMaterialPicker,
   type UnidadeMaterialPickerProps,
 } from './tarefa/UnidadeMaterialPicker'
+
+// Wave 5B — MantenedorPicker hexagonal (consome IMantenedorPickerViewModel do core-sdk)
+export {
+  MantenedorPicker,
+  type MantenedorPickerProps,
+} from './mantenedor/MantenedorPicker'
