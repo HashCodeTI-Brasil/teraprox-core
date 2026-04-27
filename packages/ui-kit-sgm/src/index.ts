@@ -44,6 +44,11 @@ export {
 } from './acao-manutentor/ManutentorCard'
 
 export {
+  ManutentorCardCompact,
+  type ManutentorCardCompactProps,
+} from './acao-manutentor/ManutentorCardCompact'
+
+export {
   MetricasDisplay,
   type MetricasDisplayProps,
 } from './acao-manutentor/MetricasDisplay'
