@@ -283,6 +283,19 @@ export const TarefaItem: React.FC<TarefaItemProps> = ({
     setShowObs(true)
   }
 
+  const handleOpenAnexo = async () => {
+    // Carrega persistidos sob demanda quando o usuario abre o modal
+    // (mesmo padrao de handleOpenObs). vm.anexos.persistidos comeca vazio
+    // — useAnexoManager so popula via loadAnexos() que chama
+    // GET /anexo/{entityId}/{context}.
+    try {
+      await vm.anexos?.loadAnexos?.()
+    } catch {
+      // ignora — modal abre mesmo em erro de fetch
+    }
+    setShowAnexo(true)
+  }
+
   const handleSendObs = async (texto: string) => {
     if (onSaveObservacao) {
       onSaveObservacao(texto)
@@ -419,7 +432,7 @@ export const TarefaItem: React.FC<TarefaItemProps> = ({
                   title="Anexos"
                   size={25}
                   className="hoverable-div"
-                  onClick={() => setShowAnexo(true)}
+                  onClick={() => void handleOpenAnexo()}
                 />
               }
               content={anexoCount > 0 ? anexoCount : null}
