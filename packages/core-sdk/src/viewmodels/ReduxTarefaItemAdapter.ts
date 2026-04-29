@@ -90,15 +90,16 @@ export function useTarefaItemViewModel(
       return () => {}
     }
 
+    // Refresher no-op: observacoes/anexos sao carregados sob demanda
+    // pela UI quando o usuario abre o respectivo modal (espelha legacy
+    // TarefaItem.js#236-248 que so fazia fetch em handleOpenObservacoesModal).
+    // Carregar no subscribe inicial gerava 404 quando tarefaId tinha
+    // formato UUID (recorrencias) e poluia console em tarefas com RTDB
+    // ativo. Caller (UI consumidora) e responsavel por refresh Redux
+    // full-tarefa via useMatchingObject proprio (ver SGM-OS
+    // OrdemDeServico.tsx TarefaItemRow#reduxRefresher).
     const refresher = () => {
-      // Refresca dados sensiveis a eventos RTDB. Mantemos conservador:
-      // apenas observacoes (justificativas/encerramentos) — anexos sao
-      // refrescados sob demanda pela propria UI ao abrir o modal.
-      try {
-        observacoesRef.current.load()
-      } catch {
-        // ignora
-      }
+      // intencionalmente vazio
     }
 
     const moTarefa: MatchingObjectSubscription = {

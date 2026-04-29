@@ -24,6 +24,10 @@ import 'teraprox-ui-kit/index.css';
 // O host precisa carregar este CSS porque no modo federado os bootstrap.tsx
 // dos remotes não são executados — apenas os módulos expostos são importados.
 import '@teraprox/ui-kit-core/dist/index.css';
+// ui-kit-sgm styles (TarefaItem.tsx — sprint 2026-04-29-tarefa-item-unified
+// migrou TarefaItem.css de teraprox-SGM-OS pro package). Mesma razão acima:
+// host carrega para que tela de execução / OS form em federation veja o CSS.
+import '@teraprox/ui-kit-sgm/dist/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
