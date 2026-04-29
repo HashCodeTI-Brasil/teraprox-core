@@ -2,10 +2,14 @@
  * Adapter default do Port `IObservacoesTarefaViewModel`.
  *
  * Embora nomeado "Redux*Adapter" pela convencao do core-sdk, NAO usa Redux —
- * apenas `useState` local + `useCoreService().createController('ordemDeServico')`
+ * apenas `useState` local + `useCoreService().createController('tarefa')`
  * para chamar:
- *   - `GET /ordemDeServico/tarefa/readObservacoesTarefa/:id`  → `load()`
- *   - `POST /ordemDeServico/tarefa/addObservacaoTarefa/:id`   → `add({ texto })`
+ *   - `GET /tarefa/readObservacoesTarefa/:id`  → `load()`
+ *   - `POST /tarefa/addObservacaoTarefa/:id`   → `add({ texto })`
+ *
+ * Backend: TarefaController em api-manutencao agora montado em `@Controller("/")`
+ * + prefix `tarefa` (sprint 2026-04-29-tarefa-item-unified — anteriormente
+ * `@Controller("/ordemDeServico")`).
  *
  * Em erro de persistencia, dispara `useToast().warning(...)` e mantem o
  * estado local consistente.
@@ -30,16 +34,16 @@ export function useObservacoesTarefaViewModel(
   const [list, setList] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
-  const ordemServicoCtrl = useMemo(
-    () => createController('ordemDeServico'),
+  const tarefaCtrl = useMemo(
+    () => createController('tarefa'),
     [createController]
   )
 
   const load = useCallback(async (): Promise<void> => {
     setLoading(true)
     try {
-      const res = await ordemServicoCtrl.get(
-        `tarefa/readObservacoesTarefa/${tarefaId}`
+      const res = await tarefaCtrl.get(
+        `readObservacoesTarefa/${tarefaId}`
       )
       setList(Array.isArray(res) ? res : res?.data ?? [])
     } catch (err: any) {
@@ -54,14 +58,14 @@ export function useObservacoesTarefaViewModel(
     } finally {
       setLoading(false)
     }
-  }, [ordemServicoCtrl, tarefaId, toast])
+  }, [tarefaCtrl, tarefaId, toast])
 
   const add = useCallback(
     async (obs: ObservacaoTarefaPayload): Promise<void> => {
       setLoading(true)
       try {
-        await ordemServicoCtrl.post(
-          `tarefa/addObservacaoTarefa/${tarefaId}`,
+        await tarefaCtrl.post(
+          `addObservacaoTarefa/${tarefaId}`,
           obs
         )
         await load()
@@ -77,7 +81,7 @@ export function useObservacoesTarefaViewModel(
         setLoading(false)
       }
     },
-    [ordemServicoCtrl, tarefaId, load, toast]
+    [tarefaCtrl, tarefaId, load, toast]
   )
 
   return useMemo<IObservacoesTarefaViewModel>(

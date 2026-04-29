@@ -2,11 +2,12 @@
  * Adapter default do Port `ITarefaStatusViewModel`.
  *
  * Embora nomeado "Redux*Adapter" pela convencao do core-sdk, NAO usa Redux —
- * apenas `useState` local + `useCoreService().createController('ordemDeServico')`
- * para persistir via `PUT /ordemDeServico/tarefa/:id`.
+ * apenas `useState` local + `useCoreService().createController('tarefa')`
+ * para persistir via `PUT /tarefa/:id`.
  *
- * O nome `ordemDeServico` no controller alinha-se ao backend (TarefaController
- * em `@Controller('/ordemDeServico')` + prefix `tarefa` → `/ordemDeServico/tarefa/...`).
+ * Backend: TarefaController montado em `@Controller("/")` + prefix `tarefa`
+ * → `/tarefa/:id` (root, sem prefixo /ordemDeServico). Tarefas com id UUID
+ * (recorrencia) tambem sao aceitas porque o service trata generico.
  *
  * Em caso de erro de persistencia, reverte o estado e dispara
  * `useToast().warning(...)` informando o usuario.
@@ -31,8 +32,8 @@ export function useTarefaStatusViewModel(
   const [current, setCurrent] = useState<TarefaStatus>(initialStatus)
   const [saving, setSaving] = useState<boolean>(false)
 
-  const ordemServicoCtrl = useMemo(
-    () => createController('ordemDeServico'),
+  const tarefaCtrl = useMemo(
+    () => createController('tarefa'),
     [createController]
   )
 
@@ -51,7 +52,7 @@ export function useTarefaStatusViewModel(
       if (fatherId !== undefined && fatherId !== null) {
         body.fatherId = fatherId
       }
-      await ordemServicoCtrl.put(`tarefa/${tarefaId}`, body)
+      await tarefaCtrl.put(String(tarefaId), body)
     } catch (err: any) {
       // Reverte e avisa
       setCurrent(previous)
@@ -65,7 +66,7 @@ export function useTarefaStatusViewModel(
     } finally {
       setSaving(false)
     }
-  }, [saving, current, ordemServicoCtrl, tarefaId, fatherId, toast])
+  }, [saving, current, tarefaCtrl, tarefaId, fatherId, toast])
 
   return useMemo<ITarefaStatusViewModel>(
     () => ({ current, toggle, saving }),

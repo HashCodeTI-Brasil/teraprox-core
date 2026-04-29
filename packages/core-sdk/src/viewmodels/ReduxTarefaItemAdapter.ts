@@ -44,8 +44,8 @@ export function useTarefaItemViewModel(
   const { createController, subscribe, unsubscribe } = useCoreService()
   const toast = useToast()
 
-  const ordemServicoCtrl = useMemo(
-    () => createController('ordemDeServico'),
+  const tarefaCtrl = useMemo(
+    () => createController('tarefa'),
     [createController]
   )
 
@@ -69,7 +69,7 @@ export function useTarefaItemViewModel(
   const updateDescricao = useCallback(
     async (texto: string): Promise<void> => {
       try {
-        await ordemServicoCtrl.put(`tarefa/${tarefaId}`, { descricao: texto })
+        await tarefaCtrl.put(String(tarefaId), { descricao: texto })
       } catch (err: any) {
         const msg =
           err?.message ||
@@ -82,7 +82,7 @@ export function useTarefaItemViewModel(
         throw err
       }
     },
-    [ordemServicoCtrl, tarefaId, toast]
+    [tarefaCtrl, tarefaId, toast]
   )
 
   const subscribeLive = useCallback((): (() => void) => {
