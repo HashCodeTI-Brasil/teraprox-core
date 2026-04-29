@@ -66,4 +66,19 @@ export interface IUnidadeMaterialViewModel {
 
   /** Alias semantico de clear() para modal composto */
   reset(): void
+
+  /**
+   * Persiste edicao inline da quantidade utilizada de uma TarefaUnidadeMaterial.
+   *
+   * Em modo `edit` a UI consumidora pode interceptar via callback opcional
+   * (`TarefaItemProps.onAddUnidadeMaterial` etc); em `execute` o adapter
+   * persiste direto via `PUT /tarefaUnidadeMaterial/:id`.
+   *
+   * O adapter recebe `tarefaId` na construcao do hook
+   * (`useUnidadeMaterialViewModel(tarefaId)`) e o adiciona ao body.
+   *
+   * Em caso de erro, dispara `useToast().warning(...)` e relan ca o erro
+   * para que o caller possa reverter estado otimista se desejar.
+   */
+  updateQuantidade(tumId: string | number, quantidade: number): Promise<void>
 }

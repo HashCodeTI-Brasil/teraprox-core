@@ -92,6 +92,15 @@ export type {
   MantenedorOption,
   MantenedorPickerSliceState,
   MantenedorPickerSlot,
+  ITarefaStatusViewModel,
+  TarefaStatus,
+  UseTarefaStatusOptions,
+  IObservacoesTarefaViewModel,
+  ObservacaoTarefaPayload,
+  UseObservacoesTarefaOptions,
+  ITarefaItemViewModel,
+  TarefaItemMode,
+  UseTarefaItemViewModelOptions,
 } from './viewmodels'
 export {
   useUnidadeMaterialViewModel,
@@ -148,6 +157,9 @@ export {
   setMantenedorError,
   setMantenedorPendingConfirm,
   clearMantenedorSlot,
+  useTarefaStatusViewModel,
+  useObservacoesTarefaViewModel,
+  useTarefaItemViewModel,
 } from './viewmodels'
 
 // Reducers (existentes)

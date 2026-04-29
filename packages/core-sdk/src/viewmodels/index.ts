@@ -165,3 +165,30 @@ export {
   CONTADOR_DEFAULT_KEY,
 } from './contadorSlice'
 export type { ContadorSliceState } from './contadorSlice'
+
+// TarefaStatus (sprint 2026-04-29 tarefa-item-unified — Phase 1)
+export type {
+  ITarefaStatusViewModel,
+  TarefaStatus,
+  UseTarefaStatusOptions,
+} from './ITarefaStatusViewModel'
+
+export { useTarefaStatusViewModel } from './ReduxTarefaStatusAdapter'
+
+// ObservacoesTarefa (sprint 2026-04-29 tarefa-item-unified — Phase 1)
+export type {
+  IObservacoesTarefaViewModel,
+  ObservacaoTarefaPayload,
+  UseObservacoesTarefaOptions,
+} from './IObservacoesTarefaViewModel'
+
+export { useObservacoesTarefaViewModel } from './ReduxObservacoesTarefaAdapter'
+
+// TarefaItem umbrella (sprint 2026-04-29 tarefa-item-unified — Phase 1)
+export type {
+  ITarefaItemViewModel,
+  TarefaItemMode,
+  UseTarefaItemViewModelOptions,
+} from './ITarefaItemViewModel'
+
+export { useTarefaItemViewModel } from './ReduxTarefaItemAdapter'

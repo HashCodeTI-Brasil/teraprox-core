@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHttpController } from '../hooks/useHttpController'
+import { useToast } from '../hooks/useToast'
 import type {
   IUnidadeMaterialViewModel,
   UnidadeMaterialRef,
@@ -57,9 +58,11 @@ export function useUnidadeMaterialViewModel(
   tarefaId?: string | number
 ): IUnidadeMaterialViewModel {
   const dispatch = useDispatch()
+  const toast = useToast()
 
   const materialCtrl = useHttpController('material')
   const unidadeCtrl = useHttpController('unidade')
+  const tarefaUnidadeMaterialCtrl = useHttpController('tarefaUnidadeMaterial')
 
   const value = useSelector((state: any) =>
     selectUnidadeMaterial(state, tarefaId)
@@ -131,6 +134,31 @@ export function useUnidadeMaterialViewModel(
     }
   }, [value])
 
+  const updateQuantidade = useCallback(
+    async (tumId: string | number, quantidade: number): Promise<void> => {
+      try {
+        const body: { quantidade: number; tarefaId?: string | number } = {
+          quantidade,
+        }
+        if (tarefaId !== undefined && tarefaId !== null) {
+          body.tarefaId = tarefaId
+        }
+        await tarefaUnidadeMaterialCtrl.put(String(tumId), body)
+      } catch (err: any) {
+        const msg =
+          err?.message ||
+          'Nao foi possivel atualizar a quantidade do material.'
+        try {
+          toast.warning(msg)
+        } catch {
+          // toast indisponivel — silencia
+        }
+        throw err
+      }
+    },
+    [tarefaUnidadeMaterialCtrl, tarefaId, toast]
+  )
+
   const isValid = useMemo(() => runValidate(value).ok, [value])
 
   return useMemo<IUnidadeMaterialViewModel>(
@@ -148,6 +176,7 @@ export function useUnidadeMaterialViewModel(
       validate,
       submit,
       reset,
+      updateQuantidade,
     }),
     [
       value,
@@ -163,6 +192,7 @@ export function useUnidadeMaterialViewModel(
       validate,
       submit,
       reset,
+      updateQuantidade,
     ]
   )
 }

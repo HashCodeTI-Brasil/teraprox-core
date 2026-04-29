@@ -243,4 +243,29 @@ interface ColorPickerProps {
 }
 declare function ColorPicker({ defaultColor, setCor, disabled, label }: ColorPickerProps): react_jsx_runtime.JSX.Element;
 
-export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, ColorPicker, type ColorPickerProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, type RecorrenciaEscala, type RecorrenciaValue };
+/**
+ * IconWithBadge — ícone com badge numérico opcional (ex.: contagem de itens).
+ *
+ * Promovido de `teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx`
+ * para `@teraprox/ui-kit-core` na sprint 2026-04-29 (tarefa-item-unified, Phase 2).
+ * Cross-domain (SGM/SGP) e apresentacional puro — zero Redux, zero IO.
+ *
+ * Modos:
+ *  - `overlay` (default): badge sobreposto no canto superior direito do ícone
+ *  - `inline`: ícone + badge lado-a-lado, com gap
+ */
+type IconWithBadgeMode = 'overlay' | 'inline';
+type IconWithBadgeBg = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+interface IconWithBadgeProps {
+    /** Conteúdo do ícone (tipicamente um <FaXxx /> de react-icons) */
+    icon: React.ReactNode;
+    /** Conteúdo do badge. Se for falsy/0, o badge não é renderizado. */
+    content?: React.ReactNode;
+    /** `overlay` (default) ou `inline` */
+    mode?: IconWithBadgeMode;
+    /** Variant Bootstrap (default `danger`) */
+    bg?: IconWithBadgeBg;
+}
+declare const IconWithBadge: React.FC<IconWithBadgeProps>;
+
+export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, ColorPicker, type ColorPickerProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, IconWithBadge, type IconWithBadgeBg, type IconWithBadgeMode, type IconWithBadgeProps, type RecorrenciaEscala, type RecorrenciaValue };

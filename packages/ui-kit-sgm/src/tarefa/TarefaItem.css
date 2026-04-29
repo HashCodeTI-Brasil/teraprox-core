@@ -1,0 +1,349 @@
+/* General Grid Structure */
+.tarefa-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: clamp(12px, 2vw, 16px);
+	align-items: center;
+
+	padding: clamp(8px, 1vw, 16px);
+	height: auto;
+  }
+
+  /* Desktop Alignment */
+  .tarefa-description {
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+  }
+
+  .tarefa-icons {
+	display: flex;
+	gap: clamp(8px, 1vw, 12px);
+	justify-content: center;
+  }
+
+  .tarefa-status {
+	text-align: right;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+	.tarefa-grid {
+	  grid-template-columns: 1fr;
+	}
+
+	.tarefa-status {
+	  justify-content: center;
+	}
+  }
+
+  /* Utility Classes */
+  .tarefa-title-line, .editable-text-container {
+	display: flex;
+
+	gap: clamp(4px, 0.5vw, 8px);
+	font-size: clamp(1rem, 1.5vw, 1.2rem);
+  }
+
+  .editable-text-icon {
+	cursor: pointer;
+	font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  }
+
+  .tarefa-acao-line {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: #666;
+	font-size: clamp(0.9rem, 1.2vw, 1rem);
+  }
+
+  .clickable-icon {
+	cursor: pointer;
+	transition: opacity 0.3s;
+  }
+
+  .clickable-icon:hover {
+	opacity: 0.7;
+  }
+
+  /* Tarefa Card Shell */
+  .tarefa-shell-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* Inspecoes cards */
+  .inspecoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .inspecao-card {
+    background: #ffffff;
+    border: 1px solid #dfe6f2;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.06);
+  }
+
+  .inspecao-title-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .inspecao-title-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .inspecao-title-subtext {
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1.2;
+  }
+
+  .inspecao-summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .inspecao-chip {
+    background: #f3f6fb;
+    border: 1px solid #e3eaf5;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.78rem;
+    color: #44546f;
+  }
+
+/* ── Tarefas Tab Header (consumido pela TarefasTab no caller SGM-OS) ─────────── */
+.tarefas-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0.75rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.tarefas-tab-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tarefas-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tarefas-tab-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* ── Empty State ────────────────────────────────────── */
+.tarefas-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #adb5bd;
+}
+
+.tarefas-empty-icon {
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.tarefas-empty-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.tarefas-empty-subtitle {
+  font-size: 0.875rem;
+  color: #adb5bd;
+  margin-bottom: 1.5rem;
+}
+
+.tarefas-empty-cta {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* ── Add Panel ──────────────────────────────────────── */
+.tarefa-add-panel {
+  margin-top: 0.75rem;
+  border-radius: 10px !important;
+  background: #f8f9fa !important;
+  animation: tarefa-panel-in 0.18s ease-out;
+}
+
+@keyframes tarefa-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tarefa-add-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tarefa-add-panel-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.tarefa-add-panel-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  transition: color 0.15s;
+}
+
+.tarefa-add-panel-close:hover {
+  color: #212529;
+}
+
+.tarefa-add-panel-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem 0.5rem;
+}
+
+.tarefa-add-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tarefa-add-col--modelo {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.tarefa-add-col-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+}
+
+.tarefa-add-col-hint {
+  font-size: 0.8rem;
+  color: #adb5bd;
+  margin: 0;
+}
+
+.tarefa-add-modelo-btn {
+  font-size: 0.875rem;
+  padding: 0.45rem 1rem;
+}
+
+.tarefa-add-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #adb5bd;
+  font-size: 0.8rem;
+  padding-top: 2rem;
+}
+
+.tarefa-add-divider::before,
+.tarefa-add-divider::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 2rem;
+  background: #dee2e6;
+  margin: 0.25rem 0;
+}
+
+/* ── Bottom Action Bar ──────────────────────────────── */
+.tarefa-add-bar {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.25rem 0;
+  border-top: 1px dashed #dee2e6;
+  margin-top: 0.75rem;
+}
+
+.tarefa-add-bar-btn {
+  font-size: 0.875rem;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .tarefa-add-panel-body {
+    grid-template-columns: 1fr;
+  }
+
+  .tarefa-add-divider {
+    flex-direction: row;
+    padding-top: 0;
+  }
+
+  .tarefa-add-divider::before,
+  .tarefa-add-divider::after {
+    width: 2rem;
+    height: 1px;
+    margin: 0 0.5rem;
+  }
+
+  .tarefa-add-bar {
+    flex-direction: column;
+  }
+}

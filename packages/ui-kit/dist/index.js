@@ -848,7 +848,7 @@ var ResponsiveContainer2 = ({
     if (onClose) onClose();
   };
   return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_react_bootstrap13.Modal, { size: "lg", show, onHide: handleClose, scrollable, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_react_bootstrap13.Modal.Header, { closeButton: true, onClick: handleClose }),
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_react_bootstrap13.Modal.Header, { closeButton: true, onClick: handleClose, children: title && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_react_bootstrap13.Modal.Title, { children: title }) }),
     /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_react_bootstrap13.ModalBody, { children })
   ] });
 };

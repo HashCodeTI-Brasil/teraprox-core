@@ -41,6 +41,7 @@ __export(index_exports, {
   ManutentorCardCompact: () => ManutentorCardCompact,
   ManutentoresDisplay: () => ManutentoresDisplay,
   MetricasDisplay: () => MetricasDisplay,
+  ObservacaoModal: () => ObservacaoModal,
   RecursoDisplayer: () => RecursoDisplayer,
   TarefaCard: () => TarefaCard,
   TarefaItem: () => TarefaItem,
@@ -1432,178 +1433,442 @@ var TarefaCard = ({
 };
 
 // src/tarefa/TarefaItem.tsx
+var import_react6 = require("react");
+var import_react_bootstrap10 = require("react-bootstrap");
+var import_fa4 = require("react-icons/fa");
+var import_md3 = require("react-icons/md");
+var import_teraprox_ui_kit7 = require("teraprox-ui-kit");
+var import_ui_kit_core3 = require("@teraprox/ui-kit-core");
+
+// src/tarefa/ObservacaoModal.tsx
 var import_react5 = require("react");
 var import_react_bootstrap9 = require("react-bootstrap");
 var import_fa3 = require("react-icons/fa");
-var import_teraprox_ui_kit7 = require("teraprox-ui-kit");
+var import_gr4 = require("react-icons/gr");
 var import_jsx_runtime15 = require("react/jsx-runtime");
-var TarefaItem = (props) => {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i;
-  const {
-    tarefa: tarefaForm,
-    readOnly,
-    index,
-    fatherId = null,
-    isMobile = false,
-    saving: savingProp,
-    onToggleStatus,
-    onDescricaoUpdate,
-    onQuantidadeUnidadeMaterialChange,
-    onQuantidadeUnidadeMaterialBlur,
-    onOpenObservacoes,
-    onSaveObservacao,
-    onUploadAnexo,
-    onDeleteAnexo,
-    onSaveNovaInspecao,
-    onAddUnidadeMaterial,
-    onUpdateInspecaoField,
-    unidadeMaterialFormValue,
-    unidadeMaterialFormHandlers,
-    renderAnexos,
-    renderIconWithBadge,
-    renderEditableDescricao,
-    renderObservacaoModal,
-    renderInspecoesList,
-    renderNovaInspecaoForm,
-    renderNovaUnidadeMaterialForm
-  } = props;
-  const anexos = (tarefaForm == null ? void 0 : tarefaForm.anexos) || [];
-  const [showObs, setShowObs] = (0, import_react5.useState)(false);
-  const [showInsp, setShowInsp] = (0, import_react5.useState)(false);
-  const [showMat, setShowMat] = (0, import_react5.useState)(false);
-  const [quantidadeUnidadeMaterialIsChanged, setQuantidadeUnidadeMaterialIsChanged] = (0, import_react5.useState)(false);
-  const saving = savingProp != null ? savingProp : false;
-  const checked = (0, import_react5.useMemo)(
-    () => tarefaForm.status === "ENCERRADO",
-    [tarefaForm]
-  );
-  const handleQuantidadeChange = (quantidade, indexUM) => {
-    if (!quantidadeUnidadeMaterialIsChanged)
-      setQuantidadeUnidadeMaterialIsChanged(true);
-    onQuantidadeUnidadeMaterialChange(quantidade, indexUM);
-  };
-  const handleQuantidadeBlur = (tumId, form) => {
-    if (quantidadeUnidadeMaterialIsChanged) {
-      onQuantidadeUnidadeMaterialBlur(tumId, form);
-      setQuantidadeUnidadeMaterialIsChanged(false);
+var ObservacaoModal = ({
+  show,
+  onClose,
+  observacoes,
+  currentUserId,
+  currentUserName,
+  readOnly = false,
+  onSend,
+  onUpdate,
+  onRemove,
+  title
+}) => {
+  const [newMessage, setNewMessage] = (0, import_react5.useState)("");
+  const [sending, setSending] = (0, import_react5.useState)(false);
+  const messagesEndRef = (0, import_react5.useRef)(null);
+  const sortedMessages = (0, import_react5.useMemo)(() => {
+    const list = Array.isArray(observacoes) ? observacoes.slice() : [];
+    return list.sort((a, b) => {
+      const ta = (a == null ? void 0 : a.createdAt) ? new Date(a.createdAt).getTime() : 0;
+      const tb = (b == null ? void 0 : b.createdAt) ? new Date(b.createdAt).getTime() : 0;
+      return ta - tb;
+    });
+  }, [observacoes]);
+  (0, import_react5.useEffect)(() => {
+    var _a;
+    if (!show) return;
+    (_a = messagesEndRef.current) == null ? void 0 : _a.scrollIntoView({ behavior: "smooth" });
+  }, [sortedMessages, show]);
+  const handleSendMessage = async () => {
+    const trimmed = newMessage.trim();
+    if (!trimmed || !onSend) return;
+    try {
+      setSending(true);
+      await onSend(trimmed);
+      setNewMessage("");
+    } finally {
+      setSending(false);
     }
   };
-  const handleOpenObsClick = async () => {
-    await onOpenObservacoes();
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void handleSendMessage();
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_react_bootstrap9.Modal, { show, size: "lg", onHide: onClose, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ModalHeader, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("h5", { children: title != null ? title : "Chat de Observa\xE7\xF5es" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.ModalBody, { children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "chat-container", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "chat-messages", children: [
+        sortedMessages.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "no-messages", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_fa3.FaRegComments, { size: 40, className: "no-messages-icon" }),
+          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("p", { className: "no-messages-text", children: !readOnly ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+            "Nenhuma mensagem ainda. ",
+            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("br", {}),
+            "Seja o(a) primeiro(a) a dizer algo!"
+          ] }) : "N\xE3o h\xE1 nada para ler." })
+        ] }) : sortedMessages.map((msg, index) => {
+          var _a, _b;
+          const isCurrentUser = currentUserId !== void 0 && msg.userId === currentUserId;
+          const ts = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString() : "";
+          return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+            "div",
+            {
+              className: `message-bubble ${isCurrentUser ? "sent" : "received"}`,
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "message-header", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("strong", { children: (_b = msg.nomeUsuario) != null ? _b : "-" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { className: "message-time", children: ts })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "message-content", children: [
+                  !readOnly && onUpdate ? /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+                    "span",
+                    {
+                      role: "textbox",
+                      tabIndex: 0,
+                      onClick: () => {
+                        var _a2;
+                        return onUpdate({
+                          id: msg.id,
+                          descricao: String((_a2 = msg.descricao) != null ? _a2 : ""),
+                          index
+                        });
+                      },
+                      style: { cursor: "text" },
+                      children: msg.descricao
+                    }
+                  ) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("span", { children: msg.descricao }),
+                  !readOnly && onRemove && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+                    import_react_bootstrap9.Button,
+                    {
+                      variant: "link",
+                      size: "sm",
+                      className: "ms-2 p-0",
+                      onClick: () => onRemove(msg),
+                      "aria-label": "Remover observa\xE7\xE3o",
+                      children: "remover"
+                    }
+                  )
+                ] })
+              ]
+            },
+            (_a = msg.id) != null ? _a : `obs-${index}`
+          );
+        }),
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { ref: messagesEndRef })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: `send-field ${readOnly ? "locked-chat" : ""}`, children: !readOnly ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          import_react_bootstrap9.Form.Control,
+          {
+            as: "textarea",
+            rows: 1,
+            value: newMessage,
+            onChange: (e) => setNewMessage(e.target.value),
+            onKeyPress: handleKeyPress,
+            placeholder: currentUserName ? `Digite uma mensagem como ${currentUserName}...` : "Digite uma mensagem...",
+            className: "send-input",
+            disabled: sending
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          import_react_bootstrap9.Button,
+          {
+            variant: "primary",
+            onClick: () => void handleSendMessage(),
+            className: "send-button",
+            disabled: sending || !newMessage.trim(),
+            children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_gr4.GrSend, {})
+          }
+        )
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        import_react_bootstrap9.Form.Control,
+        {
+          style: { cursor: "not-allowed" },
+          disabled: true,
+          value: "Indispon\xEDvel"
+        }
+      ) })
+    ] }) })
+  ] });
+};
+
+// src/tarefa/TarefaItem.tsx
+var import_jsx_runtime16 = require("react/jsx-runtime");
+var TarefaItem = ({
+  tarefa,
+  vm,
+  mode,
+  index: _index,
+  isMobile = false,
+  onRemove,
+  onDuplicate,
+  allowDupe = false,
+  inspecaoExtras,
+  currentUserId,
+  currentUserName,
+  renderInspecoesList,
+  onSaveNovaInspecao,
+  onAddUnidadeMaterial,
+  onSaveObservacao
+}) => {
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+  const isExecute = mode === "execute";
+  const isEdit = mode === "edit";
+  const isReadOnly = mode === "readOnly";
+  const [showObs, setShowObs] = (0, import_react6.useState)(false);
+  const [showInsp, setShowInsp] = (0, import_react6.useState)(false);
+  const [showAddInsp, setShowAddInsp] = (0, import_react6.useState)(false);
+  const [showMat, setShowMat] = (0, import_react6.useState)(false);
+  const [showAddMat, setShowAddMat] = (0, import_react6.useState)(false);
+  const [showAnexo, setShowAnexo] = (0, import_react6.useState)(false);
+  const [savingTUM, setSavingTUM] = (0, import_react6.useState)(/* @__PURE__ */ new Set());
+  const [localQty, setLocalQty] = (0, import_react6.useState)({});
+  const [dirtyQty, setDirtyQty] = (0, import_react6.useState)(/* @__PURE__ */ new Set());
+  const subscribeLive = vm.subscribeLive;
+  (0, import_react6.useEffect)(() => {
+    return subscribeLive();
+  }, [subscribeLive]);
+  const anexosLocais = (_a = vm.anexos) == null ? void 0 : _a.locais;
+  const uploadAll = (_b = vm.anexos) == null ? void 0 : _b.uploadAll;
+  const tarefaIdForUpload = tarefa == null ? void 0 : tarefa.id;
+  (0, import_react6.useEffect)(() => {
+    if (!isExecute || !tarefaIdForUpload || !uploadAll) return;
+    const pending = (anexosLocais != null ? anexosLocais : []).filter(
+      (a) => a.status === "pending" || a.status === "error"
+    );
+    if (pending.length === 0) return;
+    void uploadAll(tarefaIdForUpload);
+  }, [isExecute, tarefaIdForUpload, uploadAll, anexosLocais]);
+  const tarefaUM = Array.isArray(tarefa == null ? void 0 : tarefa.tarefaUnidadesMateriais) ? tarefa.tarefaUnidadesMateriais : [];
+  const inspecoes = Array.isArray(tarefa == null ? void 0 : tarefa.inspecoes) ? tarefa.inspecoes : [];
+  const anexoCount = Array.isArray(tarefa == null ? void 0 : tarefa.anexos) ? tarefa.anexos.length : 0;
+  const checked = (0, import_react6.useMemo)(
+    () => {
+      var _a2, _b2;
+      return ((_b2 = (_a2 = vm.status) == null ? void 0 : _a2.current) != null ? _b2 : tarefa == null ? void 0 : tarefa.status) === "ENCERRADO";
+    },
+    [(_c = vm.status) == null ? void 0 : _c.current, tarefa == null ? void 0 : tarefa.status]
+  );
+  const handleQuantidadeChange = (tumId, value) => {
+    setLocalQty((prev) => ({ ...prev, [String(tumId)]: value }));
+    setDirtyQty((prev) => {
+      if (prev.has(tumId)) return prev;
+      const next = new Set(prev);
+      next.add(tumId);
+      return next;
+    });
+  };
+  const handleQuantidadeBlur = async (tumId) => {
+    if (!dirtyQty.has(tumId)) return;
+    const raw = localQty[String(tumId)];
+    const num = typeof raw === "number" ? raw : Number(raw);
+    if (Number.isNaN(num)) {
+      setDirtyQty((prev) => {
+        const next = new Set(prev);
+        next.delete(tumId);
+        return next;
+      });
+      return;
+    }
+    setSavingTUM((prev) => {
+      const next = new Set(prev);
+      next.add(tumId);
+      return next;
+    });
+    try {
+      await vm.unidadeMaterial.updateQuantidade(tumId, num);
+      setDirtyQty((prev) => {
+        const next = new Set(prev);
+        next.delete(tumId);
+        return next;
+      });
+    } catch (e) {
+    } finally {
+      setSavingTUM((prev) => {
+        const next = new Set(prev);
+        next.delete(tumId);
+        return next;
+      });
+    }
+  };
+  const handleOpenObs = async () => {
+    try {
+      await vm.observacoes.load();
+    } catch (e) {
+    }
     setShowObs(true);
   };
-  const conditionalMaterialUtilizadoFieldRender = (tUM, i) => {
-    if (saving) {
-      return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "w-100", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.Spinner, { animation: "border" }) });
+  const handleSendObs = async (texto) => {
+    if (onSaveObservacao) {
+      onSaveObservacao(texto);
+      return;
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+    await vm.observacoes.add({ texto });
+  };
+  const handleToggleStatus = async () => {
+    try {
+      await vm.status.toggle();
+    } catch (e) {
+    }
+  };
+  const handleConfirmedNovaInspecao = async (dto) => {
+    if (onSaveNovaInspecao) {
+      onSaveNovaInspecao(dto);
+      return;
+    }
+  };
+  const handleConfirmedAddMaterial = async (dto) => {
+    if (onAddUnidadeMaterial) {
+      onAddUnidadeMaterial(dto);
+      return;
+    }
+  };
+  const conditionalMaterialUtilizadoFieldRender = (tUM, _i2) => {
+    const tumId = tUM.id;
+    if (savingTUM.has(tumId)) {
+      return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "w-100", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.Spinner, { animation: "border" }) });
+    }
+    const localValue = localQty[String(tumId)];
+    const displayValue = localValue !== void 0 ? localValue : tUM.quantidade;
+    return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
       import_teraprox_ui_kit7.FormField,
       {
         styleObj: { fontSize: "1.2rem" },
         ty: "number",
         className: "w-100",
-        val: tUM.quantidade,
-        onValueUpdate: (v) => handleQuantidadeChange(v, i),
-        onBlur: () => handleQuantidadeBlur(tUM.id, {
-          quantidade: tUM.quantidade,
-          tarefaId: tarefaForm.id
-        })
+        val: displayValue,
+        onValueUpdate: (v) => handleQuantidadeChange(tumId, v),
+        onBlur: () => void handleQuantidadeBlur(tumId)
       }
     );
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_react_bootstrap9.Card, { className: "shadow-sm", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-title-line", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("strong", { children: [
-              tarefaForm.sequencia,
-              "."
-            ] }),
-            renderEditableDescricao({
-              initialValue: tarefaForm.descricao,
-              onHide: (descricao) => onDescricaoUpdate(descricao),
-              renderFallback: (setActive, setOldValue) => /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "editable-text-container", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-                  import_teraprox_ui_kit7.TextWithMore,
-                  {
-                    text: tarefaForm.descricao,
-                    maxLength: 25
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.GenericDisplay, { children: !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-                  import_fa3.FaRegEdit,
-                  {
-                    onClick: () => {
-                      setActive(true);
-                      setOldValue(tarefaForm.descricao);
-                    },
-                    className: "editable-text-icon zoom-container ms-2"
-                  }
-                ) })
-              ] })
-            })
+  const anexosPersistidos = (0, import_react6.useMemo)(() => {
+    var _a2, _b2;
+    return ((_b2 = (_a2 = vm.anexos) == null ? void 0 : _a2.persistidos) != null ? _b2 : []).map((a, i) => {
+      var _a3, _b3, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2;
+      return {
+        id: (_a3 = a.id) != null ? _a3 : `p-${i}`,
+        nome: (_c2 = (_b3 = a.nome) != null ? _b3 : a.name) != null ? _c2 : `Anexo ${i + 1}`,
+        originalName: (_d2 = a.originalName) != null ? _d2 : a.nome,
+        mimeType: (_e2 = a.mimeType) != null ? _e2 : a.contentType,
+        tipo: (_h2 = (_g2 = (_f2 = a.tipo) != null ? _f2 : a.type) != null ? _g2 : a.contentType) != null ? _h2 : "",
+        tamanho: (_i2 = a.tamanho) != null ? _i2 : a.size,
+        url: (_j2 = a.url) != null ? _j2 : a.signedUrl,
+        signedUrl: a.signedUrl,
+        key: a.key,
+        createdAt: a.createdAt
+      };
+    });
+  }, [(_d = vm.anexos) == null ? void 0 : _d.persistidos]);
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_react_bootstrap10.Card, { className: "shadow-sm tarefa-shell-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "tarefa-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "tarefa-title-line", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("strong", { children: (_e = tarefa.sequencia && `${tarefa.sequencia}.`) != null ? _e : "-" }),
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "ms-2", children: tarefa.descricao })
           ] }),
-          ((_a = tarefaForm.acao) == null ? void 0 : _a.nome) && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "tarefa-acao-line", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_fa3.FaWrench, {}),
+          ((_f = tarefa.acao) == null ? void 0 : _f.nome) && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "tarefa-acao-line", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_fa4.FaWrench, {}),
             " ",
-            tarefaForm.acao.nome
+            tarefa.acao.nome
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { className: "d-flex gap-3 align-items-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-            import_fa3.FaComments,
+        /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "d-flex gap-3 align-items-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            import_fa4.FaComments,
             {
               title: "Observa\xE7\xF5es",
               size: 25,
               className: "hoverable-div",
-              onClick: handleOpenObsClick
+              onClick: () => void handleOpenObs()
             }
           ),
-          renderIconWithBadge({
-            icon: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-              import_fa3.FaClipboardList,
-              {
-                title: "Inspe\xE7\xF5es",
-                size: 25,
-                className: "hoverable-div",
-                onClick: () => setShowInsp(true)
-              }
-            ),
-            content: (_c = (_b = tarefaForm == null ? void 0 : tarefaForm.inspecoes) == null ? void 0 : _b.length) != null ? _c : 0
-          }),
-          renderIconWithBadge({
-            icon: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-              import_fa3.FaCubes,
-              {
-                title: "Materiais",
-                size: 25,
-                className: "hoverable-div",
-                onClick: () => setShowMat(true)
-              }
-            ),
-            content: (_e = (_d = tarefaForm == null ? void 0 : tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _d.length) != null ? _e : 0
-          }),
-          renderAnexos({
-            onUpload: (anexo) => onUploadAnexo(anexo),
-            onDelete: (id, anexoKey) => onDeleteAnexo(id, anexoKey),
-            filesData: anexos
-          })
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            import_ui_kit_core3.IconWithBadge,
+            {
+              icon: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                import_fa4.FaClipboardList,
+                {
+                  title: "Inspe\xE7\xF5es",
+                  size: 25,
+                  className: "hoverable-div",
+                  onClick: () => setShowInsp(true)
+                }
+              ),
+              content: inspecoes.length
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            import_ui_kit_core3.IconWithBadge,
+            {
+              icon: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                import_fa4.FaCubes,
+                {
+                  title: "Materiais",
+                  size: 25,
+                  className: "hoverable-div",
+                  onClick: () => setShowMat(true)
+                }
+              ),
+              content: tarefaUM.length
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            import_ui_kit_core3.IconWithBadge,
+            {
+              icon: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                import_fa4.FaPaperclip,
+                {
+                  title: "Anexos",
+                  size: 25,
+                  className: "hoverable-div",
+                  onClick: () => setShowAnexo(true)
+                }
+              ),
+              content: anexoCount > 0 ? anexoCount : null
+            }
+          )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+        isEdit && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_jsx_runtime16.Fragment, { children: [
+          allowDupe && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "d-flex gap-3 align-items-center", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            import_md3.MdContentCopy,
+            {
+              className: "hoverable-div",
+              size: 20,
+              onClick: () => onDuplicate == null ? void 0 : onDuplicate(),
+              role: "button",
+              "aria-label": "Duplicar tarefa"
+            }
+          ) }),
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            "div",
+            {
+              style: { marginLeft: "auto" },
+              className: "d-flex gap-3 align-items-center",
+              children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                import_fa4.FaTimes,
+                {
+                  className: "hoverable-div",
+                  size: 20,
+                  onClick: () => onRemove == null ? void 0 : onRemove(),
+                  role: "button",
+                  "aria-label": "Remover tarefa"
+                }
+              )
+            }
+          )
+        ] }),
+        (isExecute || isReadOnly) && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "d-flex align-items-start", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
           import_teraprox_ui_kit7.StatusBadge,
           {
-            status: tarefaForm.status,
-            showCheckbox: !readOnly,
+            status: (_h = (_g = vm.status) == null ? void 0 : _g.current) != null ? _h : tarefa.status,
+            showCheckbox: isExecute,
             checked,
-            onToggle: onToggleStatus,
-            loading: saving
+            onToggle: isExecute ? () => void handleToggleStatus() : void 0,
+            loading: !!((_i = vm.status) == null ? void 0 : _i.saving)
           }
         ) })
       ] }),
-      ((_f = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _f.length) > 0 && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_react_bootstrap9.Card.Footer, { children: (_g = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _g.map((tum, i) => {
-        var _a2, _b2;
-        return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+      tarefaUM.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.Card.Footer, { children: tarefaUM.map((tum, i) => {
+        var _a2, _b2, _c2, _d2, _e2, _f2, _g2;
+        return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
           "div",
           {
             style: {
@@ -1614,68 +1879,86 @@ var TarefaItem = (props) => {
               opacity: 0.7
             },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { style: { textAlign: "center" }, children: i + 1 }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { style: { textAlign: "center" }, children: i + 1 }),
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { children: (_d2 = (_c2 = (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) != null ? _c2 : tum.nomeMaterial) != null ? _d2 : "-" }),
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { children: [
                 tum.quantidade,
                 " ",
-                (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.labelUnidade
+                (_g2 = (_f2 = (_e2 = tum.unidadeMaterial) == null ? void 0 : _e2.labelUnidade) != null ? _f2 : tum.labelUnidade) != null ? _g2 : ""
               ] })
             ]
           },
-          i
+          (_a2 = tum.id) != null ? _a2 : i
         );
       }) })
     ] }),
-    renderObservacaoModal({
-      readOnly,
-      show: showObs,
-      close: () => setShowObs(false),
-      saveCallback: onSaveObservacao
-    }),
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+      ObservacaoModal,
+      {
+        show: showObs,
+        onClose: () => setShowObs(false),
+        observacoes: (_k = (_j = vm.observacoes) == null ? void 0 : _j.list) != null ? _k : [],
+        currentUserId,
+        currentUserName,
+        readOnly: isReadOnly,
+        onSend: handleSendObs
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
       import_teraprox_ui_kit7.ResponsiveContainer,
       {
         title: "Inspe\xE7\xF5es",
         show: showInsp,
         setShow: setShowInsp,
         children: [
-          renderInspecoesList({
-            readOnly,
-            inspecoes: tarefaForm.inspecoes,
+          renderInspecoesList ? renderInspecoesList({
+            inspecoes,
             isMobile,
-            updateInspecaoCallback: onUpdateInspecaoField
-          }),
-          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-            import_teraprox_ui_kit7.ResponsiveContainer,
+            readOnly: isReadOnly
+          }) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "text-muted small p-2", children: inspecoes.length === 0 ? "Nenhuma inspe\xE7\xE3o cadastrada." : `${inspecoes.length} inspe\xE7\xE3o(\xF5es) \u2014 visualizacao detalhada nao disponivel neste contexto.` }),
+          !isReadOnly && inspecaoExtras && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "mt-3", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            "button",
             {
-              setShow: handleClose,
-              title: "Nova inspe\xE7\xE3o",
-              show: true,
-              children: renderNovaInspecaoForm({
-                onSaveClick: (inspecao) => onSaveNovaInspecao(inspecao),
-                handleClose
-              })
+              type: "button",
+              className: "btn btn-outline-primary",
+              onClick: () => setShowAddInsp(true),
+              children: "Nova inspe\xE7\xE3o"
             }
-          ) }) })
+          ) })
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+    !isReadOnly && inspecaoExtras && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+      InspecaoModal,
+      {
+        show: showAddInsp,
+        onClose: () => setShowAddInsp(false),
+        onConfirmed: async (dto) => {
+          await handleConfirmedNovaInspecao(dto);
+          setShowAddInsp(false);
+        },
+        vm: vm.inspecao,
+        tiposDeDado: inspecaoExtras.tiposDeDado,
+        parametrosOps: inspecaoExtras.parametrosOps,
+        loadUnidadesFunc: inspecaoExtras.loadUnidadesFunc,
+        renderLimitesDeControle: inspecaoExtras.renderLimitesDeControle
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(
       import_teraprox_ui_kit7.ResponsiveContainer,
       {
         title: "Materiais",
         show: showMat,
         setShow: setShowMat,
         children: [
-          !isMobile ? /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_react_bootstrap9.Table, { bordered: true, size: "sm", className: "mt-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("tr", { style: { textAlign: "center" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "N\u02DA" }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Material" }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Planejada" }),
-              /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("th", { children: "Utilizada" })
+          !isMobile ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_react_bootstrap10.Table, { bordered: true, size: "sm", className: "mt-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("tr", { style: { textAlign: "center" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "N\u02DA" }),
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Material" }),
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Planejada" }),
+              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Utilizada" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
               "tbody",
               {
                 style: {
@@ -1683,61 +1966,117 @@ var TarefaItem = (props) => {
                   textAlign: "center",
                   fontSize: "1.2rem"
                 },
-                children: (_h = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _h.map((tum, i) => {
-                  var _a2, _b2, _c2;
-                  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("tr", { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: i + 1 }),
-                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: ((_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) || "-" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)("td", { children: [
-                      (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.quantidade,
+                children: tarefaUM.map((tum, i) => {
+                  var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2;
+                  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("tr", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: i + 1 }),
+                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: (_d2 = (_c2 = (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) != null ? _c2 : tum.nomeMaterial) != null ? _d2 : "-" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("td", { children: [
+                      (_f2 = (_e2 = tum.unidadeMaterial) == null ? void 0 : _e2.quantidade) != null ? _f2 : tum.quantidade,
                       " ",
-                      (_c2 = tum.unidadeMaterial) == null ? void 0 : _c2.labelUnidade
+                      (_i2 = (_h2 = (_g2 = tum.unidadeMaterial) == null ? void 0 : _g2.labelUnidade) != null ? _h2 : tum.labelUnidade) != null ? _i2 : ""
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("td", { children: conditionalMaterialUtilizadoFieldRender(tum, i) })
-                  ] }, tum.id);
+                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: isExecute ? conditionalMaterialUtilizadoFieldRender(tum, i) : `${(_j2 = tum.quantidade) != null ? _j2 : "-"}` })
+                  ] }, (_a2 = tum.id) != null ? _a2 : i);
                 })
               }
             )
-          ] }) : (_i = tarefaForm.tarefaUnidadesMateriais) == null ? void 0 : _i.map((tum, i) => {
-            var _a2, _b2, _c2, _d2;
-            return /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("div", { className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+          ] }) : tarefaUM.map((tum, i) => {
+            var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2;
+            return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
               import_teraprox_ui_kit7.ExpandableCard,
               {
                 items: [
                   {
-                    content: ((_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) || "-",
+                    content: (_d2 = (_c2 = (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) != null ? _c2 : tum.nomeMaterial) != null ? _d2 : "-",
                     label: "Nome"
                   },
                   {
-                    content: ((_c2 = tum.unidadeMaterial) == null ? void 0 : _c2.quantidade) + " " + ((_d2 = tum.unidadeMaterial) == null ? void 0 : _d2.labelUnidade),
+                    content: `${(_g2 = (_f2 = (_e2 = tum.unidadeMaterial) == null ? void 0 : _e2.quantidade) != null ? _f2 : tum.quantidade) != null ? _g2 : ""} ${(_j2 = (_i2 = (_h2 = tum.unidadeMaterial) == null ? void 0 : _h2.labelUnidade) != null ? _i2 : tum.labelUnidade) != null ? _j2 : ""}`,
                     label: "Qtd planejada"
                   },
                   {
-                    content: conditionalMaterialUtilizadoFieldRender(tum, i),
+                    content: isExecute ? conditionalMaterialUtilizadoFieldRender(tum, i) : `${(_k2 = tum.quantidade) != null ? _k2 : "-"}`,
                     label: "Utilizado"
                   }
                 ]
               }
             ) }, (_a2 = tum.id) != null ? _a2 : i);
           }),
-          !readOnly && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(import_teraprox_ui_kit7.SwitchOnClick, { children: ({ handleClose }) => renderNovaUnidadeMaterialForm({
-            onSaveClick: (form) => onAddUnidadeMaterial(form, handleClose),
-            handleClose,
-            value: unidadeMaterialFormValue,
-            handlers: unidadeMaterialFormHandlers
-          }) })
+          !isReadOnly && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              "button",
+              {
+                type: "button",
+                className: "btn btn-outline-primary",
+                onClick: () => {
+                  var _a2, _b2;
+                  (_b2 = (_a2 = vm.unidadeMaterial) == null ? void 0 : _a2.reset) == null ? void 0 : _b2.call(_a2);
+                  setShowAddMat(true);
+                },
+                children: "Adicionar material"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+              UnidadeMaterialModal,
+              {
+                show: showAddMat,
+                onClose: () => setShowAddMat(false),
+                onConfirmed: async (dto) => {
+                  await handleConfirmedAddMaterial(dto);
+                  setShowAddMat(false);
+                },
+                vm: vm.unidadeMaterial
+              }
+            )
+          ] })
         ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+      import_teraprox_ui_kit7.ResponsiveContainer,
+      {
+        title: "Anexos",
+        show: showAnexo,
+        setShow: setShowAnexo,
+        scrollable: true,
+        children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+          import_ui_kit_core3.AnexoManager,
+          {
+            persistidos: anexosPersistidos,
+            locais: (_m = (_l = vm.anexos) == null ? void 0 : _l.locais) != null ? _m : [],
+            onAddFiles: (_n = vm.anexos) == null ? void 0 : _n.addFiles,
+            onRemoveLocal: (_o = vm.anexos) == null ? void 0 : _o.removeLocal,
+            onRemovePersistido: (_p = vm.anexos) == null ? void 0 : _p.removePersistido,
+            getImageReadUrl: async (anexo) => {
+              const u = anexo.url || anexo.signedUrl;
+              if (u) return u;
+              try {
+                return await vm.anexos.getUrl(anexo.id, anexo.key);
+              } catch (e) {
+                return "";
+              }
+            },
+            onDownload: async (anexo) => {
+              const url = anexo.url || anexo.signedUrl || await vm.anexos.getUrl(anexo.id, anexo.key).catch(() => "");
+              if (url) window.open(url, "_blank");
+            },
+            loading: (_q = vm.anexos) == null ? void 0 : _q.loading,
+            readonly: isReadOnly,
+            maxFiles: 10
+          }
+        )
       }
     )
   ] });
 };
 
 // src/mantenedor/MantenedorPicker.tsx
-var import_react6 = __toESM(require("react"));
-var import_react_bootstrap10 = require("react-bootstrap");
-var import_gr4 = require("react-icons/gr");
+var import_react7 = __toESM(require("react"));
+var import_react_bootstrap11 = require("react-bootstrap");
+var import_gr5 = require("react-icons/gr");
 var import_teraprox_ui_kit8 = require("teraprox-ui-kit");
-var import_jsx_runtime16 = require("react/jsx-runtime");
+var import_jsx_runtime17 = require("react/jsx-runtime");
 var MantenedorPicker = ({
   viewModel,
   currentOsId,
@@ -1746,7 +2085,7 @@ var MantenedorPicker = ({
   disabled,
   className
 }) => {
-  const [hideOps, setHideOps] = import_react6.default.useState(true);
+  const [hideOps, setHideOps] = import_react7.default.useState(true);
   const handleClick = (m) => {
     const kind = viewModel.requestSelect(m, currentOsId);
     if (kind === "immediate") {
@@ -1764,8 +2103,8 @@ var MantenedorPicker = ({
       viewModel.search(item.nomeUsuario);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { onMouseLeave: () => setHideOps(true), className, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { onMouseLeave: () => setHideOps(true), className, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
       import_teraprox_ui_kit8.FormField,
       {
         label,
@@ -1787,28 +2126,28 @@ var MantenedorPicker = ({
         }
       }
     ),
-    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.ListGroup, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_react_bootstrap10.ListGroup.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
+    !hideOps && viewModel.pendingConfirm === null && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(import_react_bootstrap11.ListGroup, { className: "list-mantenedor-container", children: viewModel.filteredOptions.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(import_react_bootstrap11.ListGroup.Item, { children: "Nenhum manutentor encontrado." }) : viewModel.filteredOptions.map((m) => {
       const isBusyOther = m._busy && m.osId !== currentOsId;
       const isBusyHere = m._busy && m.osId === currentOsId;
-      return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
-        import_react_bootstrap10.ListGroup.Item,
+      return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
+        import_react_bootstrap11.ListGroup.Item,
         {
           action: true,
           onClick: () => handleClick(m),
           className: `mantenedor-option ${isBusyOther ? "busy" : ""} ${isBusyHere ? "current-os" : ""}`,
-          children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("li", { className: "d-flex align-items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { children: m.nomeUsuario }),
-            isBusyHere && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("span", { className: "current-os-indicator", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_gr4.GrCheckmark, { size: 18 }),
+          children: /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("li", { className: "d-flex align-items-center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { children: m.nomeUsuario }),
+            isBusyHere && /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("span", { className: "current-os-indicator", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(import_gr5.GrCheckmark, { size: 18 }),
               " Trabalhando nesta OS"
             ] }),
-            isBusyOther && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
+            isBusyOther && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "busy-os-indicator", children: `Alocado OS-${m.osId}` })
           ] })
         },
         m.id
       );
     }) }),
-    viewModel.pendingConfirm && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+    viewModel.pendingConfirm && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("div", { className: "confirm-desaloc-container", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
       import_teraprox_ui_kit8.ApproveAndReproveButtons,
       {
         headerText: `Deseja desalocar ${viewModel.pendingConfirm.nomeUsuario} da OS-${viewModel.pendingConfirm.osId} para uma nova aloca\xE7\xE3o?`,
@@ -1838,6 +2177,7 @@ var MantenedorPicker = ({
   ManutentorCardCompact,
   ManutentoresDisplay,
   MetricasDisplay,
+  ObservacaoModal,
   RecursoDisplayer,
   TarefaCard,
   TarefaItem,

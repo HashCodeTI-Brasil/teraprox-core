@@ -1,330 +1,478 @@
-// @ts-nocheck
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Card, Spinner, Table } from 'react-bootstrap'
 import {
   FaClipboardList,
   FaComments,
   FaCubes,
-  FaRegEdit,
+  FaPaperclip,
+  FaTimes,
   FaWrench,
 } from 'react-icons/fa'
+import { MdContentCopy } from 'react-icons/md'
 import {
   ExpandableCard,
   FormField,
-  GenericDisplay as IconGenericDisplay,
   ResponsiveContainer,
   StatusBadge,
   SwitchOnClick,
-  TextWithMore,
 } from 'teraprox-ui-kit'
+import { AnexoManager, IconWithBadge } from '@teraprox/ui-kit-core'
+import type {
+  ITarefaItemViewModel,
+  TarefaItemMode,
+} from 'teraprox-core-sdk'
+
+import { InspecaoModal } from '../inspecao/InspecaoModal'
+import { UnidadeMaterialModal } from '../unidade-material/UnidadeMaterialModal'
+import { ObservacaoModal } from './ObservacaoModal'
+import './TarefaItem.css'
 
 /**
- * TarefaItem — widget apresentacional migrado de SGM-OS
- * (Wave 2B da sprint 2026-04-21-ui-kit-domain-split-wave0).
+ * TarefaItem — componente apresentacional unificado para os tres modos
+ * de uso (`edit`, `execute`, `readOnly`). Sprint 2026-04-29
+ * tarefa-item-unified, Phase 2.
  *
- * Fluxos removidos vs. original:
- *   - `useDispatch`, `useCoreService` (subscribe/unsubscribe + controller),
- *     `useTarefaService`, `useUnidadeMaterialViewModel` saem da UI.
- *   - `endPointManutencao`, `ObjectUtils`, reducers SGM-OS e Screens
- *     (`InspecaoForm`, `ObservacaoModal`, `InspecoesList`,
- *     `GenericContextForm`, `GenericImageAttachment`,
- *     `InnerEditableTextField`, `IconWithBadge`) passam a ser injetados
- *     via props/slots pelo caller (SGM-OS).
+ * Diferente da versao Wave 2B (slot-driven), este TarefaItem **internaliza**
+ * todos os modais e consome o ViewModel umbrella `ITarefaItemViewModel`
+ * (core-sdk). O caller monta o vm via `useTarefaItemViewModel({ tarefaId,
+ * mode, fatherId })` e passa pelo prop `vm`.
  *
- * O widget foca apenas em composição visual + interações locais
- * (showObs / showInsp / showMat / edição inline de quantidade).
- * O caller orquestra: fetch, dispatch Redux, subscribes MatchingObject,
- * ciclo de ViewModel (Port `IUnidadeMaterialViewModel` do core-sdk).
+ * Restricao hexagonal:
+ *  - Zero `useDispatch`, `useSelector`, `useCoreService`, `useHttpController`,
+ *    `endPointManutencao`. Toda IO via Port `vm`.
+ *  - Zero imports de `teraprox-SGM-OS/...` (componente nao conhece o caller).
+ *  - Imports permitidos: `teraprox-ui-kit`, `@teraprox/ui-kit-core`,
+ *    `teraprox-core-sdk` (apenas tipos), Bootstrap.
+ *
+ * Diferenciacao por modo:
+ *  - `execute`  → StatusBadge clicavel (toggle PENDENTE↔ENCERRADO via
+ *                 vm.status.toggle()), descricao plana, subscribeLive() ativo.
+ *  - `edit`     → sem StatusBadge clicavel, ícones FaTimes/MdContentCopy
+ *                 para remover/duplicar, descricao plana (TODO inline-edit).
+ *  - `readOnly` → sem mutacao alguma; modais abrem em modo apresentacional.
  */
+export interface TarefaItemInspecaoExtras {
+  /** Lista de tipos de dado (ex: filtrado de tiposDeCampo) */
+  tiposDeDado: Array<{ nome: string; type?: string }>
+  /** Parametros pre-cadastrados (caller carrega via useEffect) */
+  parametrosOps: Array<{
+    nome: string
+    labelUnidade?: string
+    id?: string
+    [k: string]: any
+  }>
+  /** Carregador de unidades sob demanda (passa pro AutoComplete) */
+  loadUnidadesFunc: () => Promise<any[]>
+  /**
+   * Componente de Limites de Controle (LimiteDeControlePicker) — vive em
+   * SGM-OS, injetado para compor o InspecaoModal. Opcional.
+   */
+  renderLimitesDeControle?: (vm: import('teraprox-core-sdk').IInspecaoModalViewModel) => React.ReactNode
+}
+
 export interface TarefaItemProps {
+  /** Shape do backend (id, descricao, status, sequencia, inspecoes,
+   *  tarefaUnidadesMateriais, anexos, acao, tarefaJustificativas). */
   tarefa: any
-  readOnly?: boolean
+  /** ViewModel umbrella vindo do core-sdk (`useTarefaItemViewModel(...)`). */
+  vm: ITarefaItemViewModel
+  /** Modo de operacao do componente */
+  mode: TarefaItemMode
+  /** Indice na lista (mantido para compat com legacy callers) */
   index: number
-  fatherId?: number | null
+  /** Detecta layout responsivo (default: false) */
   isMobile?: boolean
-  saving?: boolean
 
-  /** Chamado quando o status switch muda (argumento: evento). */
-  onToggleStatus: (e: any) => void
-  /** Chamado com a nova descrição após edição inline. */
-  onDescricaoUpdate: (descricao: string) => void
-  /** Chamado quando o usuário edita a quantidade utilizada de uma TUM. */
-  onQuantidadeUnidadeMaterialChange: (
-    quantidade: any,
-    indexUnidadeMaterial: number,
-  ) => void
-  /** Chamado no blur da quantidade (persiste no backend). */
-  onQuantidadeUnidadeMaterialBlur: (
-    tarefaUnidadeMaterialId: any,
-    formToUpdate: any,
-  ) => void
-  /** Chamado ao abrir o modal de observações (fetch + open). */
-  onOpenObservacoes: () => void
-  /** Chamado ao salvar observação no modal. */
-  onSaveObservacao: (obs: any) => void
-  /** Chamado ao enviar um anexo (file). */
-  onUploadAnexo: (anexo: any) => void
-  /** Chamado ao deletar um anexo. */
-  onDeleteAnexo: (id: any, anexoKey: any) => void
-  /** Chamado ao salvar uma nova inspeção a partir do form. */
-  onSaveNovaInspecao: (inspecao: any) => void
-  /** Chamado ao adicionar uma unidade-material no modal de materiais. */
-  onAddUnidadeMaterial: (form: any, closeForm: () => void) => void
-  /** Chamado para atualizar inspeção (usado no slot de inspeções). */
-  onUpdateInspecaoField: (
-    id: any,
-    valor: any,
-    field: string,
-    indexInspecao: number,
-  ) => void
+  // ─── edit-only ───────────────────────────────────────────────────────────
+  /** Remover esta tarefa (visivel apenas em mode='edit') */
+  onRemove?: () => void
+  /** Duplicar esta tarefa (visivel apenas em mode='edit' e allowDupe) */
+  onDuplicate?: () => void
+  /** Permite o icone de duplicar (visivel apenas em mode='edit') */
+  allowDupe?: boolean
 
-  /** Estado do formulário unidade-material (do ViewModel do core-sdk). */
-  unidadeMaterialFormValue?: any
-  unidadeMaterialFormHandlers?: {
-    onMaterialSelected?: (m: any) => void
-    onQuantidadeUpdate?: (q: any) => void
-    onUnidadeSelected?: (u: any) => void
-    loadMaterialsFunc?: (...a: any[]) => any
-    loadUnidadesFunc?: (...a: any[]) => any
-  }
+  // ─── inspecao extras ─────────────────────────────────────────────────────
+  /**
+   * Dados/render externos para o InspecaoModal embutido. Quando ausente,
+   * o botao "Nova inspecao" nao e renderizado (modo readOnly de inspecao).
+   */
+  inspecaoExtras?: TarefaItemInspecaoExtras
 
-  /** Slot: anexos (GenericImageAttachment) controlado pelo caller. */
-  renderAnexos: (ctx: {
-    onUpload: (anexo: any) => void
-    onDelete: (id: any, anexoKey: any) => void
-    filesData: any[]
-  }) => React.ReactNode
-  /** Slot: componente de contador com badge (IconWithBadge). */
-  renderIconWithBadge: (ctx: {
-    icon: React.ReactNode
-    content: number
-  }) => React.ReactNode
-  /** Slot: campo editável inline (InnerEditableTextField). */
-  renderEditableDescricao: (ctx: {
-    initialValue: string
-    onHide: (desc: string) => void
-    renderFallback: (
-      setActive: (v: boolean) => void,
-      setOldValue: (v: any) => void,
-    ) => React.ReactNode
-  }) => React.ReactNode
-  /** Slot: modal de observações (ObservacaoModal). */
-  renderObservacaoModal: (ctx: {
-    readOnly?: boolean
-    show: boolean
-    close: () => void
-    saveCallback: (obs: any) => void
-  }) => React.ReactNode
-  /** Slot: lista de inspeções (InspecoesList). */
-  renderInspecoesList: (ctx: {
-    readOnly?: boolean
+  // ─── observacoes (UI extras) ─────────────────────────────────────────────
+  /** Id do usuario atual — destaca bubbles "sent" no chat de observacoes */
+  currentUserId?: string | number
+  /** Nome do usuario atual — incluido no payload de envio de observacoes */
+  currentUserName?: string
+
+  // ─── renderInspecoesList (slot opcional, justificado abaixo) ─────────────
+  /**
+   * Renderizador da lista de inspecoes (legacy `InspecoesList` do SGM-OS).
+   * Mantido como slot opcional porque o componente legacy depende de
+   * `useInspecaoService`, `endPointManutencao`, `GenericImageAttachment`,
+   * `InnerEditableTextField` e `InspecaoItem` — nao trivial migrar para
+   * apresentacional puro nesta sprint. Quando ausente, exibe placeholder.
+   *
+   * Sub-sprint dedicada: 2026-04-29-tarefa-item-unified Phase 2 (slot
+   * justificado em decisoes-log).
+   */
+  renderInspecoesList?: (ctx: {
     inspecoes: any[]
     isMobile?: boolean
-    updateInspecaoCallback: (
+    readOnly?: boolean
+    /** Callback para atualizar campo de uma inspecao (delegado ao vm). */
+    onUpdateInspecaoField?: (
       id: any,
       valor: any,
       field: string,
       indexInspecao: number,
     ) => void
   }) => React.ReactNode
-  /** Slot: form de nova inspeção (GenericContextForm + InspecaoForm). */
-  renderNovaInspecaoForm: (ctx: {
-    onSaveClick: (inspecao: any) => void
-    handleClose: () => void
-  }) => React.ReactNode
-  /** Slot: form de nova unidade-material no container de Materiais. */
-  renderNovaUnidadeMaterialForm: (ctx: {
-    onSaveClick: (form: any) => void
-    handleClose: () => void
-    value?: any
-    handlers?: TarefaItemProps['unidadeMaterialFormHandlers']
-  }) => React.ReactNode
+
+  // ─── overrides opcionais para `mode='edit'` (P3) ─────────────────────────
+  /**
+   * Override opcional. Em `edit` mode, o caller redireciona a IO da
+   * confirmacao do `<InspecaoModal>` para o Redux do form (em vez de
+   * persistir direto via `vm.inspecao.submit()`). Em `execute`/`readOnly`
+   * mode, deixe ausente — o componente chama `vm.inspecao.submit()` por
+   * default e persiste direto via API.
+   */
+  onSaveNovaInspecao?: (dto: any) => void
+  /**
+   * Override opcional. Em `edit` mode, o caller redireciona a IO da
+   * confirmacao do `<UnidadeMaterialModal>` para o Redux do form. Em
+   * `execute`/`readOnly` mode, deixe ausente — o componente chama
+   * `vm.unidadeMaterial.submit()` por default.
+   */
+  onAddUnidadeMaterial?: (dto: any) => void
+  /**
+   * Override opcional. Em `edit` mode, o caller redireciona o envio do
+   * `<ObservacaoModal>` para o Redux do form. Em `execute`/`readOnly`
+   * mode, deixe ausente — o componente chama `vm.observacoes.add({texto})`
+   * por default.
+   */
+  onSaveObservacao?: (texto: string) => void
 }
 
-export const TarefaItem: React.FC<TarefaItemProps> = (props) => {
-  const {
-    tarefa: tarefaForm,
-    readOnly,
-    index,
-    fatherId = null,
-    isMobile = false,
-    saving: savingProp,
-    onToggleStatus,
-    onDescricaoUpdate,
-    onQuantidadeUnidadeMaterialChange,
-    onQuantidadeUnidadeMaterialBlur,
-    onOpenObservacoes,
-    onSaveObservacao,
-    onUploadAnexo,
-    onDeleteAnexo,
-    onSaveNovaInspecao,
-    onAddUnidadeMaterial,
-    onUpdateInspecaoField,
-    unidadeMaterialFormValue,
-    unidadeMaterialFormHandlers,
-    renderAnexos,
-    renderIconWithBadge,
-    renderEditableDescricao,
-    renderObservacaoModal,
-    renderInspecoesList,
-    renderNovaInspecaoForm,
-    renderNovaUnidadeMaterialForm,
-  } = props
+export const TarefaItem: React.FC<TarefaItemProps> = ({
+  tarefa,
+  vm,
+  mode,
+  index: _index,
+  isMobile = false,
+  onRemove,
+  onDuplicate,
+  allowDupe = false,
+  inspecaoExtras,
+  currentUserId,
+  currentUserName,
+  renderInspecoesList,
+  onSaveNovaInspecao,
+  onAddUnidadeMaterial,
+  onSaveObservacao,
+}) => {
+  const isExecute = mode === 'execute'
+  const isEdit = mode === 'edit'
+  const isReadOnly = mode === 'readOnly'
 
-  const anexos = tarefaForm?.anexos || []
   const [showObs, setShowObs] = useState(false)
   const [showInsp, setShowInsp] = useState(false)
+  const [showAddInsp, setShowAddInsp] = useState(false)
   const [showMat, setShowMat] = useState(false)
-  const [quantidadeUnidadeMaterialIsChanged, setQuantidadeUnidadeMaterialIsChanged] =
-    useState(false)
+  const [showAddMat, setShowAddMat] = useState(false)
+  const [showAnexo, setShowAnexo] = useState(false)
 
-  const saving = savingProp ?? false
+  // Estado local para persistencia inline da quantidade de TUM em mode='execute'.
+  // - savingTUM: spinner per-row enquanto vm.unidadeMaterial.updateQuantidade esta pending.
+  // - localQty: input controlado local (evita re-render por mudanca em prop tarefa).
+  // - dirtyQty: rastreia ids cuja quantidade local diverge da prop (so persiste se mudou).
+  const [savingTUM, setSavingTUM] = useState<Set<string | number>>(new Set())
+  const [localQty, setLocalQty] = useState<Record<string, any>>({})
+  const [dirtyQty, setDirtyQty] = useState<Set<string | number>>(new Set())
+
+  // Subscribe RTDB live — no-op em modos != execute (o adapter retorna () => {})
+  // Dep precisa ser apenas `vm.subscribeLive` (callback estável com deps primitivas:
+  // mode + tarefaId + subscribe/unsubscribe). Usar `[vm]` causa re-subscribe a cada
+  // render porque o vm umbrella recria quando QUALQUER sub-VM muda (anexos/observacoes
+  // têm state interno) — gera loop infinito (subscribe → refresher → load → setState
+  // → vm recria → effect rerruns).
+  const subscribeLive = vm.subscribeLive
+  useEffect(() => {
+    return subscribeLive()
+  }, [subscribeLive])
+
+  // Auto-upload de anexos em mode='execute' — o tarefa.id é real, então não há
+  // razão de manter arquivos como 'local'. Disparamos uploadAll quando há
+  // pendentes. Watch via useEffect (não no onAddFiles) para evitar closure
+  // stale: addFiles faz setLocais async; chamar uploadAll imediato leria a
+  // lista antiga. Aqui o effect roda DEPOIS do commit do React.
+  const anexosLocais = vm.anexos?.locais
+  const uploadAll = vm.anexos?.uploadAll
+  const tarefaIdForUpload = tarefa?.id
+  useEffect(() => {
+    if (!isExecute || !tarefaIdForUpload || !uploadAll) return
+    const pending = (anexosLocais ?? []).filter(
+      (a: any) => a.status === 'pending' || a.status === 'error',
+    )
+    if (pending.length === 0) return
+    void uploadAll(tarefaIdForUpload)
+  }, [isExecute, tarefaIdForUpload, uploadAll, anexosLocais])
+
+  const tarefaUM = Array.isArray(tarefa?.tarefaUnidadesMateriais)
+    ? tarefa.tarefaUnidadesMateriais
+    : []
+  const inspecoes = Array.isArray(tarefa?.inspecoes) ? tarefa.inspecoes : []
+  const anexoCount = Array.isArray(tarefa?.anexos) ? tarefa.anexos.length : 0
+
   const checked = useMemo(
-    () => tarefaForm.status === 'ENCERRADO',
-    [tarefaForm],
+    () => (vm.status?.current ?? tarefa?.status) === 'ENCERRADO',
+    [vm.status?.current, tarefa?.status],
   )
 
-  const handleQuantidadeChange = (quantidade: any, indexUM: number) => {
-    if (!quantidadeUnidadeMaterialIsChanged)
-      setQuantidadeUnidadeMaterialIsChanged(true)
-    onQuantidadeUnidadeMaterialChange(quantidade, indexUM)
+  const handleQuantidadeChange = (tumId: string | number, value: any) => {
+    setLocalQty((prev) => ({ ...prev, [String(tumId)]: value }))
+    setDirtyQty((prev) => {
+      if (prev.has(tumId)) return prev
+      const next = new Set(prev)
+      next.add(tumId)
+      return next
+    })
   }
 
-  const handleQuantidadeBlur = (tumId: any, form: any) => {
-    if (quantidadeUnidadeMaterialIsChanged) {
-      onQuantidadeUnidadeMaterialBlur(tumId, form)
-      setQuantidadeUnidadeMaterialIsChanged(false)
+  const handleQuantidadeBlur = async (tumId: string | number) => {
+    if (!dirtyQty.has(tumId)) return
+    const raw = localQty[String(tumId)]
+    const num = typeof raw === 'number' ? raw : Number(raw)
+    if (Number.isNaN(num)) {
+      // valor invalido — apenas limpa dirty para nao spammar
+      setDirtyQty((prev) => {
+        const next = new Set(prev)
+        next.delete(tumId)
+        return next
+      })
+      return
+    }
+    setSavingTUM((prev) => {
+      const next = new Set(prev)
+      next.add(tumId)
+      return next
+    })
+    try {
+      await vm.unidadeMaterial.updateQuantidade(tumId, num)
+      setDirtyQty((prev) => {
+        const next = new Set(prev)
+        next.delete(tumId)
+        return next
+      })
+    } catch {
+      // toast ja disparado pelo adapter — mantem dirty para o usuario tentar de novo
+    } finally {
+      setSavingTUM((prev) => {
+        const next = new Set(prev)
+        next.delete(tumId)
+        return next
+      })
     }
   }
 
-  const handleOpenObsClick = async () => {
-    await onOpenObservacoes()
+  const handleOpenObs = async () => {
+    try {
+      await vm.observacoes.load()
+    } catch {
+      // ignora — modal abre mesmo em erro de fetch
+    }
     setShowObs(true)
   }
 
-  const conditionalMaterialUtilizadoFieldRender = (tUM: any, i: number) => {
-    if (saving) {
+  const handleSendObs = async (texto: string) => {
+    if (onSaveObservacao) {
+      onSaveObservacao(texto)
+      return
+    }
+    await vm.observacoes.add({ texto })
+  }
+
+  const handleToggleStatus = async () => {
+    try {
+      await vm.status.toggle()
+    } catch {
+      // toast ja disparado pelo adapter
+    }
+  }
+
+  const handleConfirmedNovaInspecao = async (dto: any) => {
+    if (onSaveNovaInspecao) {
+      // Em edit mode, caller redireciona IO para Redux do form
+      onSaveNovaInspecao(dto)
+      return
+    }
+    // Default: persistencia direta via vm.inspecao (server-direct). O proprio
+    // <InspecaoModal> ja chamou vm.inspecao.submit() antes de invocar este
+    // callback — nada mais a fazer aqui.
+  }
+
+  const handleConfirmedAddMaterial = async (dto: any) => {
+    if (onAddUnidadeMaterial) {
+      // Em edit mode, caller redireciona IO para Redux do form
+      onAddUnidadeMaterial(dto)
+      return
+    }
+    // Default: persistencia direta via vm.unidadeMaterial (server-direct).
+    // O proprio <UnidadeMaterialModal> ja chamou vm.unidadeMaterial.submit()
+    // — nada mais a fazer aqui.
+  }
+
+  const conditionalMaterialUtilizadoFieldRender = (tUM: any, _i: number) => {
+    const tumId = tUM.id
+    if (savingTUM.has(tumId)) {
       return (
         <div className="w-100">
           <Spinner animation="border" />
         </div>
       )
     }
+    const localValue = localQty[String(tumId)]
+    const displayValue = localValue !== undefined ? localValue : tUM.quantidade
     return (
       <FormField
         styleObj={{ fontSize: '1.2rem' }}
         ty={'number'}
         className={'w-100'}
-        val={tUM.quantidade}
-        onValueUpdate={(v: any) => handleQuantidadeChange(v, i)}
-        onBlur={() =>
-          handleQuantidadeBlur(tUM.id, {
-            quantidade: tUM.quantidade,
-            tarefaId: tarefaForm.id,
-          })
-        }
+        val={displayValue}
+        onValueUpdate={(v: any) => handleQuantidadeChange(tumId, v)}
+        onBlur={() => void handleQuantidadeBlur(tumId)}
       />
     )
   }
 
+  // Mapeamento dos anexos do VM para o shape esperado pelo AnexoManager
+  const anexosPersistidos = useMemo(() => {
+    return (vm.anexos?.persistidos ?? []).map((a: any, i: number) => ({
+      id: a.id ?? `p-${i}`,
+      nome: a.nome ?? a.name ?? `Anexo ${i + 1}`,
+      originalName: a.originalName ?? a.nome,
+      mimeType: a.mimeType ?? a.contentType,
+      tipo: a.tipo ?? a.type ?? a.contentType ?? '',
+      tamanho: a.tamanho ?? a.size,
+      url: a.url ?? a.signedUrl,
+      signedUrl: a.signedUrl,
+      key: a.key,
+      createdAt: a.createdAt,
+    }))
+  }, [vm.anexos?.persistidos])
+
   return (
     <>
-      <Card className="shadow-sm">
+      <Card className="shadow-sm tarefa-shell-card">
         <div className="tarefa-grid">
-          {/* ----- descrição + ação ----- */}
+          {/* ----- descricao + acao ----- */}
           <div>
             <div className="tarefa-title-line">
-              <strong>{tarefaForm.sequencia}.</strong>
-
-              {renderEditableDescricao({
-                initialValue: tarefaForm.descricao,
-                onHide: (descricao: string) => onDescricaoUpdate(descricao),
-                renderFallback: (setActive, setOldValue) => (
-                  <div className="editable-text-container">
-                    <TextWithMore
-                      text={tarefaForm.descricao}
-                      maxLength={25}
-                    />
-                    <IconGenericDisplay>
-                      {!readOnly && (
-                        <FaRegEdit
-                          onClick={() => {
-                            setActive(true)
-                            setOldValue(tarefaForm.descricao)
-                          }}
-                          className="editable-text-icon zoom-container ms-2"
-                        />
-                      )}
-                    </IconGenericDisplay>
-                  </div>
-                ),
-              })}
+              <strong>
+                {(tarefa.sequencia && `${tarefa.sequencia}.`) ?? '-'}
+              </strong>
+              <span className="ms-2">{tarefa.descricao}</span>
             </div>
 
-            {tarefaForm.acao?.nome && (
+            {tarefa.acao?.nome && (
               <div className="tarefa-acao-line">
-                <FaWrench /> {tarefaForm.acao.nome}
+                <FaWrench /> {tarefa.acao.nome}
               </div>
             )}
           </div>
 
-          {/* ----- ícones de ação ----- */}
+          {/* ----- icones de acao ----- */}
           <div className="d-flex gap-3 align-items-center">
             <FaComments
               title="Observações"
               size={25}
               className="hoverable-div"
-              onClick={handleOpenObsClick}
+              onClick={() => void handleOpenObs()}
             />
 
-            {renderIconWithBadge({
-              icon: (
+            <IconWithBadge
+              icon={
                 <FaClipboardList
                   title="Inspeções"
                   size={25}
                   className="hoverable-div"
                   onClick={() => setShowInsp(true)}
                 />
-              ),
-              content: tarefaForm?.inspecoes?.length ?? 0,
-            })}
+              }
+              content={inspecoes.length}
+            />
 
-            {renderIconWithBadge({
-              icon: (
+            <IconWithBadge
+              icon={
                 <FaCubes
                   title="Materiais"
                   size={25}
                   className="hoverable-div"
                   onClick={() => setShowMat(true)}
                 />
-              ),
-              content: tarefaForm?.tarefaUnidadesMateriais?.length ?? 0,
-            })}
+              }
+              content={tarefaUM.length}
+            />
 
-            {renderAnexos({
-              onUpload: (anexo: any) => onUploadAnexo(anexo),
-              onDelete: (id: any, anexoKey: any) =>
-                onDeleteAnexo(id, anexoKey),
-              filesData: anexos,
-            })}
-          </div>
-
-          {/* ----- status ----- */}
-          <div className="d-flex align-items-start">
-            <StatusBadge
-              status={tarefaForm.status}
-              showCheckbox={!readOnly}
-              checked={checked}
-              onToggle={onToggleStatus}
-              loading={saving}
+            <IconWithBadge
+              icon={
+                <FaPaperclip
+                  title="Anexos"
+                  size={25}
+                  className="hoverable-div"
+                  onClick={() => setShowAnexo(true)}
+                />
+              }
+              content={anexoCount > 0 ? anexoCount : null}
             />
           </div>
-        </div>
-        {tarefaForm.tarefaUnidadesMateriais?.length > 0 && (
-          <Card.Footer>
-            {tarefaForm.tarefaUnidadesMateriais?.map((tum: any, i: number) => (
+
+          {/* ----- edit: remover/duplicar ; execute: status badge ----- */}
+          {isEdit && (
+            <>
+              {allowDupe && (
+                <div className="d-flex gap-3 align-items-center">
+                  <MdContentCopy
+                    className="hoverable-div"
+                    size={20}
+                    onClick={() => onDuplicate?.()}
+                    role="button"
+                    aria-label="Duplicar tarefa"
+                  />
+                </div>
+              )}
               <div
-                key={i}
+                style={{ marginLeft: 'auto' }}
+                className="d-flex gap-3 align-items-center"
+              >
+                <FaTimes
+                  className="hoverable-div"
+                  size={20}
+                  onClick={() => onRemove?.()}
+                  role="button"
+                  aria-label="Remover tarefa"
+                />
+              </div>
+            </>
+          )}
+
+          {(isExecute || isReadOnly) && (
+            <div className="d-flex align-items-start">
+              <StatusBadge
+                status={vm.status?.current ?? tarefa.status}
+                showCheckbox={isExecute}
+                checked={checked}
+                onToggle={isExecute ? () => void handleToggleStatus() : undefined}
+                loading={!!vm.status?.saving}
+              />
+            </div>
+          )}
+        </div>
+
+        {tarefaUM.length > 0 && (
+          <Card.Footer>
+            {tarefaUM.map((tum: any, i: number) => (
+              <div
+                key={tum.id ?? i}
                 style={{
                   gap: '8px',
                   display: 'flex',
@@ -334,9 +482,14 @@ export const TarefaItem: React.FC<TarefaItemProps> = (props) => {
                 }}
               >
                 <div style={{ textAlign: 'center' }}>{i + 1}</div>
-                <div>{tum.unidadeMaterial?.nomeMaterial || '-'}</div>
                 <div>
-                  {tum.quantidade} {tum.unidadeMaterial?.labelUnidade}
+                  {tum.unidadeMaterial?.nomeMaterial ??
+                    tum.nomeMaterial ??
+                    '-'}
+                </div>
+                <div>
+                  {tum.quantidade}{' '}
+                  {tum.unidadeMaterial?.labelUnidade ?? tum.labelUnidade ?? ''}
                 </div>
               </div>
             ))}
@@ -344,46 +497,69 @@ export const TarefaItem: React.FC<TarefaItemProps> = (props) => {
         )}
       </Card>
 
-      {/* ----- modais e containers ----- */}
-      {renderObservacaoModal({
-        readOnly,
-        show: showObs,
-        close: () => setShowObs(false),
-        saveCallback: onSaveObservacao,
-      })}
+      {/* ─── Modal: Observacoes ─────────────────────────────────────────── */}
+      <ObservacaoModal
+        show={showObs}
+        onClose={() => setShowObs(false)}
+        observacoes={vm.observacoes?.list ?? []}
+        currentUserId={currentUserId}
+        currentUserName={currentUserName}
+        readOnly={isReadOnly}
+        onSend={handleSendObs}
+      />
 
+      {/* ─── Container: Inspecoes ───────────────────────────────────────── */}
       <ResponsiveContainer
         title="Inspeções"
         show={showInsp}
         setShow={setShowInsp}
       >
-        {renderInspecoesList({
-          readOnly,
-          inspecoes: tarefaForm.inspecoes,
-          isMobile,
-          updateInspecaoCallback: onUpdateInspecaoField,
-        })}
-        {!readOnly && (
+        {renderInspecoesList ? (
+          renderInspecoesList({
+            inspecoes,
+            isMobile,
+            readOnly: isReadOnly,
+          })
+        ) : (
+          <div className="text-muted small p-2">
+            {inspecoes.length === 0
+              ? 'Nenhuma inspeção cadastrada.'
+              : `${inspecoes.length} inspeção(ões) — visualizacao detalhada nao disponivel neste contexto.`}
+          </div>
+        )}
+        {!isReadOnly && inspecaoExtras && (
           <div className="mt-3">
-            <SwitchOnClick>
-              {({ handleClose }: any) => (
-                <ResponsiveContainer
-                  setShow={handleClose}
-                  title="Nova inspeção"
-                  show
-                >
-                  {renderNovaInspecaoForm({
-                    onSaveClick: (inspecao: any) =>
-                      onSaveNovaInspecao(inspecao),
-                    handleClose,
-                  })}
-                </ResponsiveContainer>
-              )}
-            </SwitchOnClick>
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={() => setShowAddInsp(true)}
+            >
+              Nova inspeção
+            </button>
           </div>
         )}
       </ResponsiveContainer>
 
+      {/* InspecaoModal — sibling do container "Inspeções" para evitar
+          chicken-and-egg (botão de abrir não pode estar dentro do container
+          que só renderiza quando aberto). */}
+      {!isReadOnly && inspecaoExtras && (
+        <InspecaoModal
+          show={showAddInsp}
+          onClose={() => setShowAddInsp(false)}
+          onConfirmed={async (dto) => {
+            await handleConfirmedNovaInspecao(dto)
+            setShowAddInsp(false)
+          }}
+          vm={vm.inspecao}
+          tiposDeDado={inspecaoExtras.tiposDeDado}
+          parametrosOps={inspecaoExtras.parametrosOps}
+          loadUnidadesFunc={inspecaoExtras.loadUnidadesFunc}
+          renderLimitesDeControle={inspecaoExtras.renderLimitesDeControle}
+        />
+      )}
+
+      {/* ─── Container: Materiais ───────────────────────────────────────── */}
       <ResponsiveContainer
         title="Materiais"
         show={showMat}
@@ -406,37 +582,55 @@ export const TarefaItem: React.FC<TarefaItemProps> = (props) => {
                 fontSize: '1.2rem',
               }}
             >
-              {tarefaForm.tarefaUnidadesMateriais?.map((tum: any, i: number) => (
-                <tr key={tum.id}>
+              {tarefaUM.map((tum: any, i: number) => (
+                <tr key={tum.id ?? i}>
                   <td>{i + 1}</td>
-                  <td>{tum.unidadeMaterial?.nomeMaterial || '-'}</td>
                   <td>
-                    {tum.unidadeMaterial?.quantidade}{' '}
-                    {tum.unidadeMaterial?.labelUnidade}
+                    {tum.unidadeMaterial?.nomeMaterial ??
+                      tum.nomeMaterial ??
+                      '-'}
                   </td>
-                  <td>{conditionalMaterialUtilizadoFieldRender(tum, i)}</td>
+                  <td>
+                    {tum.unidadeMaterial?.quantidade ?? tum.quantidade}{' '}
+                    {tum.unidadeMaterial?.labelUnidade ??
+                      tum.labelUnidade ??
+                      ''}
+                  </td>
+                  <td>
+                    {isExecute
+                      ? conditionalMaterialUtilizadoFieldRender(tum, i)
+                      : `${tum.quantidade ?? '-'}`}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </Table>
         ) : (
-          tarefaForm.tarefaUnidadesMateriais?.map((tum: any, i: number) => (
+          tarefaUM.map((tum: any, i: number) => (
             <div className="mb-3" key={tum.id ?? i}>
               <ExpandableCard
                 items={[
                   {
-                    content: tum.unidadeMaterial?.nomeMaterial || '-',
+                    content:
+                      tum.unidadeMaterial?.nomeMaterial ??
+                      tum.nomeMaterial ??
+                      '-',
                     label: 'Nome',
                   },
                   {
-                    content:
-                      tum.unidadeMaterial?.quantidade +
-                      ' ' +
-                      tum.unidadeMaterial?.labelUnidade,
+                    content: `${
+                      tum.unidadeMaterial?.quantidade ?? tum.quantidade ?? ''
+                    } ${
+                      tum.unidadeMaterial?.labelUnidade ??
+                      tum.labelUnidade ??
+                      ''
+                    }`,
                     label: 'Qtd planejada',
                   },
                   {
-                    content: conditionalMaterialUtilizadoFieldRender(tum, i),
+                    content: isExecute
+                      ? conditionalMaterialUtilizadoFieldRender(tum, i)
+                      : `${tum.quantidade ?? '-'}`,
                     label: 'Utilizado',
                   },
                 ]}
@@ -444,19 +638,66 @@ export const TarefaItem: React.FC<TarefaItemProps> = (props) => {
             </div>
           ))
         )}
-        {!readOnly && (
-          <SwitchOnClick>
-            {({ handleClose }: any) =>
-              renderNovaUnidadeMaterialForm({
-                onSaveClick: (form: any) =>
-                  onAddUnidadeMaterial(form, handleClose),
-                handleClose,
-                value: unidadeMaterialFormValue,
-                handlers: unidadeMaterialFormHandlers,
-              })
-            }
-          </SwitchOnClick>
+        {!isReadOnly && (
+          <div className="mt-3">
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={() => {
+                vm.unidadeMaterial?.reset?.()
+                setShowAddMat(true)
+              }}
+            >
+              Adicionar material
+            </button>
+            <UnidadeMaterialModal
+              show={showAddMat}
+              onClose={() => setShowAddMat(false)}
+              onConfirmed={async (dto) => {
+                await handleConfirmedAddMaterial(dto)
+                setShowAddMat(false)
+              }}
+              vm={vm.unidadeMaterial}
+            />
+          </div>
         )}
+      </ResponsiveContainer>
+
+      {/* ─── Container: Anexos ──────────────────────────────────────────── */}
+      <ResponsiveContainer
+        title="Anexos"
+        show={showAnexo}
+        setShow={setShowAnexo}
+        scrollable
+      >
+        <AnexoManager
+          persistidos={anexosPersistidos}
+          locais={vm.anexos?.locais ?? []}
+          onAddFiles={vm.anexos?.addFiles}
+          onRemoveLocal={vm.anexos?.removeLocal}
+          onRemovePersistido={vm.anexos?.removePersistido}
+          getImageReadUrl={async (anexo) => {
+            const u = (anexo as any).url || (anexo as any).signedUrl
+            if (u) return u
+            try {
+              return await vm.anexos.getUrl(anexo.id, (anexo as any).key)
+            } catch {
+              return ''
+            }
+          }}
+          onDownload={async (anexo) => {
+            const url =
+              (anexo as any).url ||
+              (anexo as any).signedUrl ||
+              (await vm.anexos
+                .getUrl(anexo.id, (anexo as any).key)
+                .catch(() => ''))
+            if (url) window.open(url, '_blank')
+          }}
+          loading={vm.anexos?.loading}
+          readonly={isReadOnly}
+          maxFiles={10}
+        />
       </ResponsiveContainer>
     </>
   )

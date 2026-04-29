@@ -80,12 +80,22 @@ export {
 export {
   TarefaItem,
   type TarefaItemProps,
+  type TarefaItemInspecaoExtras,
 } from './tarefa/TarefaItem'
 
 export {
   UnidadeMaterialPicker,
   type UnidadeMaterialPickerProps,
 } from './tarefa/UnidadeMaterialPicker'
+
+// Sprint 2026-04-29 tarefa-item-unified, Phase 2 — modal apresentacional
+// promovido de teraprox-SGM-OS/Components/manutencao/ObservacaoModal.js
+// (zero Redux, zero ChatComponent legacy — props-driven puro).
+export {
+  ObservacaoModal,
+  type ObservacaoModalProps,
+  type ObservacaoMessage,
+} from './tarefa/ObservacaoModal'
 
 // Wave 5B — MantenedorPicker hexagonal (consome IMantenedorPickerViewModel do core-sdk)
 export {

@@ -36,7 +36,8 @@ __export(index_exports, {
   CombineModeToggle: () => CombineModeToggle,
   ContadorPicker: () => ContadorPicker,
   FormModal: () => FormModal,
-  FrequenciaFormV2: () => FrequenciaFormV2
+  FrequenciaFormV2: () => FrequenciaFormV2,
+  IconWithBadge: () => IconWithBadge
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -1084,6 +1085,72 @@ function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label
     ] })
   ] });
 }
+
+// src/icons/IconWithBadge.tsx
+var import_react_bootstrap5 = require("react-bootstrap");
+var import_jsx_runtime8 = require("react/jsx-runtime");
+var IconWithBadge = ({
+  icon,
+  content,
+  mode = "overlay",
+  bg = "danger"
+}) => {
+  const showBadge = content !== null && content !== void 0 && content !== 0 && content !== "";
+  if (mode === "inline") {
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+      "div",
+      {
+        style: {
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px"
+        },
+        children: [
+          icon,
+          showBadge ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+            import_react_bootstrap5.Badge,
+            {
+              bg,
+              pill: true,
+              style: {
+                fontSize: "10px",
+                fontWeight: 600,
+                padding: "2px 6px",
+                minWidth: "18px",
+                lineHeight: 1.2,
+                opacity: 0.9
+              },
+              children: content
+            }
+          ) : null
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { position: "relative", display: "inline-block" }, children: [
+    icon,
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+      import_react_bootstrap5.Badge,
+      {
+        bg,
+        style: {
+          position: "absolute",
+          top: "-5px",
+          right: "-10px",
+          padding: "5px",
+          borderRadius: "50%",
+          minWidth: "20px",
+          minHeight: "20px",
+          fontSize: "12px",
+          alignItems: "center",
+          justifyContent: "center",
+          display: showBadge ? "flex" : "none"
+        },
+        children: content
+      }
+    )
+  ] });
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AnexoManager,
@@ -1092,5 +1159,6 @@ function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label
   CombineModeToggle,
   ContadorPicker,
   FormModal,
-  FrequenciaFormV2
+  FrequenciaFormV2,
+  IconWithBadge
 });

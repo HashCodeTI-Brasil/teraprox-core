@@ -38,7 +38,9 @@ const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
 
   return (
     <Modal size="lg" show={show} onHide={handleClose} scrollable={scrollable}>
-      <Modal.Header closeButton onClick={handleClose} />
+      <Modal.Header closeButton onClick={handleClose}>
+        {title && <Modal.Title>{title}</Modal.Title>}
+      </Modal.Header>
       <ModalBody>{children}</ModalBody>
     </Modal>
   )

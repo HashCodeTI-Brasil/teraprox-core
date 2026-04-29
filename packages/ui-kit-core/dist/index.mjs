@@ -1052,6 +1052,72 @@ function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label
     ] })
   ] });
 }
+
+// src/icons/IconWithBadge.tsx
+import { Badge } from "react-bootstrap";
+import { jsx as jsx8, jsxs as jsxs8 } from "react/jsx-runtime";
+var IconWithBadge = ({
+  icon,
+  content,
+  mode = "overlay",
+  bg = "danger"
+}) => {
+  const showBadge = content !== null && content !== void 0 && content !== 0 && content !== "";
+  if (mode === "inline") {
+    return /* @__PURE__ */ jsxs8(
+      "div",
+      {
+        style: {
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px"
+        },
+        children: [
+          icon,
+          showBadge ? /* @__PURE__ */ jsx8(
+            Badge,
+            {
+              bg,
+              pill: true,
+              style: {
+                fontSize: "10px",
+                fontWeight: 600,
+                padding: "2px 6px",
+                minWidth: "18px",
+                lineHeight: 1.2,
+                opacity: 0.9
+              },
+              children: content
+            }
+          ) : null
+        ]
+      }
+    );
+  }
+  return /* @__PURE__ */ jsxs8("div", { style: { position: "relative", display: "inline-block" }, children: [
+    icon,
+    /* @__PURE__ */ jsx8(
+      Badge,
+      {
+        bg,
+        style: {
+          position: "absolute",
+          top: "-5px",
+          right: "-10px",
+          padding: "5px",
+          borderRadius: "50%",
+          minWidth: "20px",
+          minHeight: "20px",
+          fontSize: "12px",
+          alignItems: "center",
+          justifyContent: "center",
+          display: showBadge ? "flex" : "none"
+        },
+        children: content
+      }
+    )
+  ] });
+};
 export {
   AnexoManager,
   ClickToWriteField,
@@ -1059,5 +1125,6 @@ export {
   CombineModeToggle,
   ContadorPicker,
   FormModal,
-  FrequenciaFormV2
+  FrequenciaFormV2,
+  IconWithBadge
 };

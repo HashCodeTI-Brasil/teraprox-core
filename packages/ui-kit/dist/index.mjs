@@ -756,7 +756,7 @@ var ResponsiveContainer2 = ({
     if (onClose) onClose();
   };
   return /* @__PURE__ */ jsxs11(Modal3, { size: "lg", show, onHide: handleClose, scrollable, children: [
-    /* @__PURE__ */ jsx18(Modal3.Header, { closeButton: true, onClick: handleClose }),
+    /* @__PURE__ */ jsx18(Modal3.Header, { closeButton: true, onClick: handleClose, children: title && /* @__PURE__ */ jsx18(Modal3.Title, { children: title }) }),
     /* @__PURE__ */ jsx18(ModalBody, { children })
   ] });
 };

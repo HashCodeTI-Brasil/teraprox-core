@@ -56,3 +56,13 @@ export type {
 export { ColorPicker } from './color-picker/ColorPicker'
 export type { ColorPickerProps } from './color-picker/ColorPicker'
 
+// IconWithBadge — ícone com badge numérico opcional, cross-domain (SGM/SGP).
+// Promovido de teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx
+// na sprint 2026-04-29 (tarefa-item-unified, Phase 2). Apresentacional puro.
+export { IconWithBadge } from './icons/IconWithBadge'
+export type {
+  IconWithBadgeProps,
+  IconWithBadgeMode,
+  IconWithBadgeBg,
+} from './icons/IconWithBadge'
+
