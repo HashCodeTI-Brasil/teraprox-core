@@ -105,7 +105,8 @@ export function useAnexoManager({ context, entityId, port }: UseAnexoManagerOpti
           anexos: [{ nome: file.name, tipo: file.type, tamanho: file.size }],
         })
       },
-      readByEntity: (ctx, eid) => ctrl.get(`${eid}/${ctx}`),
+      readByEntity: (ctx, eid) =>
+        ctrl.post('readByData', { dataId: String(eid), dataContext: ctx }),
       getSignedUrl: (anexoId, key) =>
         key
           ? ctrl.post('signedUrl', { key }).then((r: any) => r?.signedUrl || r?.url || '')
