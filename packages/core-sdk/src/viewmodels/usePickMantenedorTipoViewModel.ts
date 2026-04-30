@@ -125,7 +125,10 @@ export function usePickMantenedorTipoViewModel(): IPickMantenedorTipoViewModel {
       dispatch(setPickMantenedorTipoAssigning(true))
       try {
         const ctl = core.createController('ordemDeServico')
-        await ctl.put('updateTipoBulk', { osIds, tipoId })
+        // Backend declara updateTipoDeOrdemBulk como POST (vide
+        // OrdemDeServicoController.ts:41-43). PUT colide com auto-route
+        // PUT /ordemDeServico/:id (interpreta 'updateTipoBulk' como id).
+        await ctl.post('updateTipoBulk', { osIds, tipoId })
       } finally {
         dispatch(setPickMantenedorTipoAssigning(false))
       }
