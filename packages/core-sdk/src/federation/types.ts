@@ -27,6 +27,11 @@ export interface RemoteMenuItem {
   componentId?: string
   /** Ícone react-icons (ex: 'FaTools') */
   icon?: string
+  /**
+   * Ordem dentro da sub-section (quando mesma `section.label` é declarada
+   * por múltiplos remotes e items são merged). Default = 999.
+   */
+  order?: number
 }
 
 export interface RemoteMenuSection {

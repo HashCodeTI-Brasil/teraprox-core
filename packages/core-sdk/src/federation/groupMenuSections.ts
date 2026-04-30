@@ -24,8 +24,8 @@ export interface MenuTreeNode {
  * - kind='item': item direto (top-level legacy ou flatten=true)
  */
 export type MenuTreeChild =
-  | { kind: 'section'; label: string; icon?: string; items: RemoteMenuItem[] }
-  | { kind: 'item'; item: RemoteMenuItem }
+  | { kind: 'section'; label: string; icon?: string; items: RemoteMenuItem[]; order?: number }
+  | { kind: 'item'; item: RemoteMenuItem; order?: number }
 
 /**
  * Recebe array de manifests e produz árvore agregada por `group`.
@@ -77,14 +77,56 @@ export function groupMenuSections(manifests: RemoteManifest[]): MenuTreeNode[] {
 
       if (section.flatten) {
         for (const item of section.items) {
-          groupNode.children.push({ kind: 'item', item })
+          groupNode.children.push({ kind: 'item', item, order: section.order })
         }
       } else {
-        groupNode.children.push({
-          kind: 'section',
-          label: section.label,
-          icon: section.icon,
-          items: section.items,
+        // Merge sub-sections com mesma `label` dentro do mesmo group
+        // (caso típico: SGM-OS e SGM-OM ambos contribuírem com seção
+        // "Manutenção" em group 'SGM' — usuário quer 1 sub-header com
+        // OS+OM listados juntos, não 2 sub-headers repetidos).
+        const existing = groupNode.children.find(
+          (c): c is { kind: 'section'; label: string; icon?: string; items: RemoteMenuItem[]; order?: number } =>
+            c.kind === 'section' && c.label === section.label
+        )
+        if (existing) {
+          existing.items = [...existing.items, ...section.items]
+          if (!existing.icon && section.icon) existing.icon = section.icon
+          // Mantém o menor order (first-wins se ambos tiverem)
+          if (section.order != null && (existing.order == null || section.order < existing.order)) {
+            existing.order = section.order
+          }
+        } else {
+          groupNode.children.push({
+            kind: 'section',
+            label: section.label,
+            icon: section.icon,
+            items: [...section.items],
+            order: section.order,
+          })
+        }
+      }
+    }
+  }
+
+  // Sort: (1) sub-sections dentro de um group por section.order;
+  //       (2) items dentro de cada sub-section por item.order.
+  // Default = 999. Tiebreaker por label (estável).
+  for (const node of groupMap.values()) {
+    node.children.sort((a, b) => {
+      const oa = a.order ?? 999
+      const ob = b.order ?? 999
+      if (oa !== ob) return oa - ob
+      const la = a.kind === 'section' ? a.label : a.item.label ?? ''
+      const lb = b.kind === 'section' ? b.label : b.item.label ?? ''
+      return la.localeCompare(lb)
+    })
+    for (const child of node.children) {
+      if (child.kind === 'section') {
+        child.items.sort((a, b) => {
+          const oa = a.order ?? 999
+          const ob = b.order ?? 999
+          if (oa !== ob) return oa - ob
+          return (a.label ?? '').localeCompare(b.label ?? '')
         })
       }
     }
