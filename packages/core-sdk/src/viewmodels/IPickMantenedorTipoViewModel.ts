@@ -49,6 +49,23 @@ export interface IPickMantenedorTipoViewModel {
     tipoId: number | string
   ): Promise<void>
 
+  /**
+   * Aplica os mesmos mantenedores em N OS (uma chamada bulk por mantenedor).
+   * Usa POST ordemDeServico/atribuirMantenedorBulk { osIds, mantenedorId, userId }.
+   */
+  assignMantenedoresMultiOs(
+    osIds: Array<number | string>,
+    mantenedores: PickMantenedorOption[]
+  ): Promise<void>
+
+  /**
+   * Aplica o mesmo tipo em N OS via PUT ordemDeServico/updateTipoBulk { osIds, tipoId }.
+   */
+  assignTipoMultiOs(
+    osIds: Array<number | string>,
+    tipoId: number | string
+  ): Promise<void>
+
   /** Reseta estado (limpa cache de options) */
   reset(): void
 }

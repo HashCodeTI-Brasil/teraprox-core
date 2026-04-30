@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Spinner, Row, Col, Accordion, Form } from 'react-bootstrap'
 import { ManutentorCardCompact } from '../acao-manutentor/ManutentorCardCompact'
 import type {
@@ -12,70 +12,132 @@ import type {
  * PickMantenedorTipoModal — promovido do
  * teraprox-SGM-OS/Components/.../OsPlanejada/PickMantenedorModal.js.
  *
- * Componente apresentacional. Consome IPickMantenedorTipoViewModel
- * (Port do core-sdk). Zero Redux/createController internos.
+ * Modos de uso:
+ *  - **Single OS**: passar prop `os` (legacy SGM-OS). Modal exibe e
+ *    atribui apenas para essa OS.
+ *  - **Multi OS**: passar prop `osList` (>1 item). Modal exibe lista de
+ *    OS com checkboxes (default todas selecionadas) e usa rotas bulk
+ *    do core-sdk: PUT updateTipoBulk + POST atribuirMantenedorBulk.
+ *
+ * Em modo multi, missingMaintainers/missingType são derivados das OS
+ * selecionadas (true se ALGUMA OS marcada está faltando o campo).
  */
 
 export interface PickMantenedorTipoModalProps {
   show: boolean
   onHide: () => void
-  os: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null
+  /** Modo single-OS (legacy SGM-OS). Ignorado se `osList` é fornecido. */
+  os?: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null
+  /** Modo multi-OS — lista de OS a configurar em batch */
+  osList?: Array<{ id?: number | string; osMantenedor?: any[]; osTipos?: any[]; recurso?: { nome?: string }; descricaoDoProblema?: string }> | null
   viewModel: IPickMantenedorTipoViewModel
-  onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null) => void
+  onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null, osIds: Array<number | string>) => void
   onError?: (err: unknown) => void
 }
+
+const isMissingMaintainers = (os: any): boolean =>
+  !os?.osMantenedor || os.osMantenedor.length === 0 || !os.osMantenedor.some((m: any) => m.active)
+
+const isMissingType = (os: any): boolean =>
+  !os?.osTipos || os.osTipos.length === 0
 
 export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = ({
   show,
   onHide,
   os,
+  osList,
   viewModel,
   onAssigned,
   onError,
 }) => {
+  const isMulti = Array.isArray(osList) && osList.length > 0
+  const targetList = useMemo(
+    () => (isMulti ? (osList as any[]) : os ? [os] : []),
+    [isMulti, osList, os],
+  )
+
   const [selectedIds, setSelectedIds] = useState<Array<number | string>>([])
   const [selectedTipoId, setSelectedTipoId] = useState<string>('')
+  const [selectedOsIds, setSelectedOsIds] = useState<Array<number | string>>([])
 
   const { mantenedores, tiposDeOrdem, loading, assigning } = viewModel
 
-  const missingMaintainers = !os?.osMantenedor || os.osMantenedor.length === 0 || !os.osMantenedor.some((m: any) => m.active)
-  const missingType = !os?.osTipos || os.osTipos.length === 0
+  // OS selecionadas (no modo single, sempre a única)
+  const selectedOs = useMemo(
+    () => targetList.filter((o: any) => isMulti ? selectedOsIds.includes(o.id) : true),
+    [targetList, selectedOsIds, isMulti],
+  )
+
+  const missingMaintainers = useMemo(
+    () => selectedOs.some((o: any) => isMissingMaintainers(o)),
+    [selectedOs],
+  )
+  const missingType = useMemo(
+    () => selectedOs.some((o: any) => isMissingType(o)),
+    [selectedOs],
+  )
 
   useEffect(() => {
     if (show) {
       viewModel.loadOptions()
       setSelectedIds([])
       setSelectedTipoId('')
+      // No modo multi, default = todas as OS marcadas
+      setSelectedOsIds(isMulti ? targetList.map((o: any) => o.id) : [])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show])
 
-  const toggleSelection = (id: number | string) => {
+  const toggleMantenedor = (id: number | string) => {
     if (assigning) return
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     )
   }
 
+  const toggleOs = (osId: number | string) => {
+    if (assigning) return
+    setSelectedOsIds((prev) =>
+      prev.includes(osId) ? prev.filter((i) => i !== osId) : [...prev, osId]
+    )
+  }
+
   const isFormValid = (): boolean => {
+    if (isMulti && selectedOsIds.length === 0) return false
     if (missingMaintainers && selectedIds.length === 0) return false
     if (missingType && !selectedTipoId) return false
+    if (!missingMaintainers && !missingType) return false
     return true
   }
 
   const handleConfirm = async () => {
-    if (assigning || !isFormValid() || !os?.id) return
+    if (assigning || !isFormValid()) return
     try {
       const selectedMantenedores = mantenedores.filter((m) => selectedIds.includes(m.id))
-      if (missingMaintainers && selectedMantenedores.length > 0) {
-        await viewModel.assignMantenedores(os.id, selectedMantenedores)
-      }
       let assignedTipo: PickTipoDeOrdemOption | null = null
-      if (missingType && selectedTipoId) {
-        await viewModel.assignTipo(os.id, selectedTipoId)
-        assignedTipo = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId)) ?? null
+
+      if (isMulti) {
+        const osIds = selectedOsIds
+        if (missingMaintainers && selectedMantenedores.length > 0) {
+          await viewModel.assignMantenedoresMultiOs(osIds, selectedMantenedores)
+        }
+        if (missingType && selectedTipoId) {
+          await viewModel.assignTipoMultiOs(osIds, selectedTipoId)
+          assignedTipo = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId)) ?? null
+        }
+        onAssigned?.(selectedMantenedores, assignedTipo, osIds)
+      } else {
+        const singleId = os?.id
+        if (!singleId) return
+        if (missingMaintainers && selectedMantenedores.length > 0) {
+          await viewModel.assignMantenedores(singleId, selectedMantenedores)
+        }
+        if (missingType && selectedTipoId) {
+          await viewModel.assignTipo(singleId, selectedTipoId)
+          assignedTipo = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId)) ?? null
+        }
+        onAssigned?.(selectedMantenedores, assignedTipo, [singleId])
       }
-      onAssigned?.(selectedMantenedores, assignedTipo)
       onHide()
     } catch (err) {
       onError?.(err)
@@ -83,15 +145,20 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
   }
 
   const defaultActiveKeys: string[] = []
+  if (isMulti) defaultActiveKeys.push('os')
   if (missingType) defaultActiveKeys.push('tipo')
   if (missingMaintainers) defaultActiveKeys.push('mantenedores')
+
+  const headerSubtitle = isMulti
+    ? `Configure mantenedor e tipo em batch para as OS selecionadas (${selectedOsIds.length}/${targetList.length})`
+    : `Preencha os requisitos pendentes para iniciar a OS #${os?.id}`
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered scrollable className="pick-mantenedor-tipo-modal">
       <Modal.Header closeButton className="border-0 pb-0">
         <Modal.Title>
           <div className="fw-bold">Configuração da Ordem de Serviço</div>
-          <div className="text-muted small">Preencha os requisitos pendentes para iniciar a OS #{os?.id}</div>
+          <div className="text-muted small">{headerSubtitle}</div>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="pt-3">
@@ -102,18 +169,79 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
           </div>
         ) : (
           <Accordion alwaysOpen defaultActiveKey={defaultActiveKeys}>
+            {isMulti && (
+              <Accordion.Item eventKey="os" className="mb-3 border-0 shadow-sm rounded">
+                <Accordion.Header>
+                  <div className="d-flex align-items-center">
+                    <span className="fw-bold">Aplicar a quais OS?</span>
+                    <span className="badge bg-info ms-2">{selectedOsIds.length} de {targetList.length}</span>
+                  </div>
+                </Accordion.Header>
+                <Accordion.Body>
+                  <div className="d-flex justify-content-end mb-2 gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-secondary"
+                      disabled={assigning}
+                      onClick={() => setSelectedOsIds(targetList.map((o: any) => o.id))}
+                    >
+                      Marcar todas
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline-secondary"
+                      disabled={assigning}
+                      onClick={() => setSelectedOsIds([])}
+                    >
+                      Desmarcar todas
+                    </Button>
+                  </div>
+                  <div className="d-flex flex-column gap-2">
+                    {targetList.map((o: any) => {
+                      const checked = selectedOsIds.includes(o.id)
+                      const recursoNome = o.recurso?.nome ?? ''
+                      const desc = (o.descricaoDoProblema ?? '').slice(0, 80)
+                      const tagMissing = []
+                      if (isMissingMaintainers(o)) tagMissing.push('Sem executor')
+                      if (isMissingType(o)) tagMissing.push('Sem tipo')
+                      return (
+                        <Form.Check
+                          key={o.id}
+                          type="checkbox"
+                          id={`pmt-os-${o.id}`}
+                          checked={checked}
+                          disabled={assigning}
+                          onChange={() => toggleOs(o.id)}
+                          label={
+                            <span>
+                              <strong>OS #{o.id}</strong>
+                              {recursoNome && <span className="text-muted ms-2">{recursoNome}</span>}
+                              {desc && <span className="text-muted ms-2">— {desc}</span>}
+                              {tagMissing.length > 0 && (
+                                <span className="badge bg-warning text-dark ms-2">{tagMissing.join(' · ')}</span>
+                              )}
+                            </span>
+                          }
+                        />
+                      )
+                    })}
+                  </div>
+                </Accordion.Body>
+              </Accordion.Item>
+            )}
+
             {missingType && (
               <Accordion.Item eventKey="tipo" className="mb-3 border-0 shadow-sm rounded">
                 <Accordion.Header>
                   <div className="d-flex align-items-center">
-                    <span className="fw-bold">1. Selecionar Tipo de Ordem</span>
+                    <span className="fw-bold">{isMulti ? '2.' : '1.'} Selecionar Tipo de Ordem</span>
                     {!selectedTipoId && <span className="badge bg-warning text-dark ms-2">Obrigatório</span>}
                     {selectedTipoId && <span className="badge bg-success ms-2">Selecionado</span>}
                   </div>
                 </Accordion.Header>
                 <Accordion.Body>
                   <Form.Group>
-                    <Form.Label className="text-muted small">Selecione o tipo que melhor descreve esta OS</Form.Label>
+                    <Form.Label className="text-muted small">Tipo aplicado a {isMulti ? 'todas as OS marcadas' : 'esta OS'}</Form.Label>
                     <Form.Select
                       value={selectedTipoId}
                       onChange={(e) => setSelectedTipoId(e.target.value)}
@@ -133,7 +261,7 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
               <Accordion.Item eventKey="mantenedores" className="border-0 shadow-sm rounded">
                 <Accordion.Header>
                   <div className="d-flex align-items-center">
-                    <span className="fw-bold">{missingType ? '2.' : '1.'} Selecionar Executores</span>
+                    <span className="fw-bold">{isMulti ? '3.' : missingType ? '2.' : '1.'} Selecionar Executores</span>
                     {selectedIds.length === 0 && <span className="badge bg-warning text-dark ms-2">Obrigatório</span>}
                     {selectedIds.length > 0 && <span className="badge bg-success ms-2">{selectedIds.length} Selecionado(s)</span>}
                   </div>
@@ -150,7 +278,7 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
                         return (
                           <Col md={6} lg={4} key={m.id as React.Key}>
                             <div
-                              onClick={() => toggleSelection(m.id)}
+                              onClick={() => toggleMantenedor(m.id)}
                               style={{
                                 cursor: assigning ? 'not-allowed' : 'pointer',
                                 opacity: assigning ? 0.7 : 1,

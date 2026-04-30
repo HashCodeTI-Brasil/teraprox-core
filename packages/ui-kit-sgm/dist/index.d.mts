@@ -654,9 +654,10 @@ declare const OsCard: React.NamedExoticComponent<OsCardProps>;
 interface PickMantenedorTipoModalProps {
     show: boolean;
     onHide: () => void;
-    os: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null;
+    os?: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null;
+    osList?: Array<{ id?: number | string; osMantenedor?: any[]; osTipos?: any[]; recurso?: { nome?: string }; descricaoDoProblema?: string }> | null;
     viewModel: IPickMantenedorTipoViewModel;
-    onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null) => void;
+    onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null, osIds: Array<number | string>) => void;
     onError?: (err: unknown) => void;
 }
 declare const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps>;

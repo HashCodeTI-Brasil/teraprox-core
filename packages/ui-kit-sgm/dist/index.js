@@ -2451,79 +2451,192 @@ OsCard.displayName = "OsCard";
 var import_react9 = require("react");
 var import_react_bootstrap13 = require("react-bootstrap");
 var import_jsx_runtime19 = require("react/jsx-runtime");
+var isMissingMaintainers = (os) => !(os == null ? void 0 : os.osMantenedor) || os.osMantenedor.length === 0 || !os.osMantenedor.some((m) => m.active);
+var isMissingType = (os) => !(os == null ? void 0 : os.osTipos) || os.osTipos.length === 0;
 var PickMantenedorTipoModal = ({
   show,
   onHide,
   os,
+  osList,
   viewModel,
   onAssigned,
   onError
 }) => {
+  const isMulti = Array.isArray(osList) && osList.length > 0;
+  const targetList = (0, import_react9.useMemo)(
+    () => isMulti ? osList : os ? [os] : [],
+    [isMulti, osList, os]
+  );
   const [selectedIds, setSelectedIds] = (0, import_react9.useState)([]);
   const [selectedTipoId, setSelectedTipoId] = (0, import_react9.useState)("");
+  const [selectedOsIds, setSelectedOsIds] = (0, import_react9.useState)([]);
   const { mantenedores, tiposDeOrdem, loading, assigning } = viewModel;
-  const missingMaintainers = !(os == null ? void 0 : os.osMantenedor) || os.osMantenedor.length === 0 || !os.osMantenedor.some((m) => m.active);
-  const missingType = !(os == null ? void 0 : os.osTipos) || os.osTipos.length === 0;
+  const selectedOs = (0, import_react9.useMemo)(
+    () => targetList.filter((o) => isMulti ? selectedOsIds.includes(o.id) : true),
+    [targetList, selectedOsIds, isMulti]
+  );
+  const missingMaintainers = (0, import_react9.useMemo)(
+    () => selectedOs.some((o) => isMissingMaintainers(o)),
+    [selectedOs]
+  );
+  const missingType = (0, import_react9.useMemo)(
+    () => selectedOs.some((o) => isMissingType(o)),
+    [selectedOs]
+  );
   (0, import_react9.useEffect)(() => {
     if (show) {
       viewModel.loadOptions();
       setSelectedIds([]);
       setSelectedTipoId("");
+      setSelectedOsIds(isMulti ? targetList.map((o) => o.id) : []);
     }
   }, [show]);
-  const toggleSelection = (id) => {
+  const toggleMantenedor = (id) => {
     if (assigning) return;
     setSelectedIds(
       (prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+  const toggleOs = (osId) => {
+    if (assigning) return;
+    setSelectedOsIds(
+      (prev) => prev.includes(osId) ? prev.filter((i) => i !== osId) : [...prev, osId]
+    );
+  };
   const isFormValid = () => {
+    if (isMulti && selectedOsIds.length === 0) return false;
     if (missingMaintainers && selectedIds.length === 0) return false;
     if (missingType && !selectedTipoId) return false;
+    if (!missingMaintainers && !missingType) return false;
     return true;
   };
   const handleConfirm = async () => {
-    var _a;
-    if (assigning || !isFormValid() || !(os == null ? void 0 : os.id)) return;
+    var _a, _b;
+    if (assigning || !isFormValid()) return;
     try {
       const selectedMantenedores = mantenedores.filter((m) => selectedIds.includes(m.id));
-      if (missingMaintainers && selectedMantenedores.length > 0) {
-        await viewModel.assignMantenedores(os.id, selectedMantenedores);
-      }
       let assignedTipo = null;
-      if (missingType && selectedTipoId) {
-        await viewModel.assignTipo(os.id, selectedTipoId);
-        assignedTipo = (_a = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId))) != null ? _a : null;
+      if (isMulti) {
+        const osIds = selectedOsIds;
+        if (missingMaintainers && selectedMantenedores.length > 0) {
+          await viewModel.assignMantenedoresMultiOs(osIds, selectedMantenedores);
+        }
+        if (missingType && selectedTipoId) {
+          await viewModel.assignTipoMultiOs(osIds, selectedTipoId);
+          assignedTipo = (_a = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId))) != null ? _a : null;
+        }
+        onAssigned == null ? void 0 : onAssigned(selectedMantenedores, assignedTipo, osIds);
+      } else {
+        const singleId = os == null ? void 0 : os.id;
+        if (!singleId) return;
+        if (missingMaintainers && selectedMantenedores.length > 0) {
+          await viewModel.assignMantenedores(singleId, selectedMantenedores);
+        }
+        if (missingType && selectedTipoId) {
+          await viewModel.assignTipo(singleId, selectedTipoId);
+          assignedTipo = (_b = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId))) != null ? _b : null;
+        }
+        onAssigned == null ? void 0 : onAssigned(selectedMantenedores, assignedTipo, [singleId]);
       }
-      onAssigned == null ? void 0 : onAssigned(selectedMantenedores, assignedTipo);
       onHide();
     } catch (err) {
       onError == null ? void 0 : onError(err);
     }
   };
   const defaultActiveKeys = [];
+  if (isMulti) defaultActiveKeys.push("os");
   if (missingType) defaultActiveKeys.push("tipo");
   if (missingMaintainers) defaultActiveKeys.push("mantenedores");
+  const headerSubtitle = isMulti ? `Configure mantenedor e tipo em batch para as OS selecionadas (${selectedOsIds.length}/${targetList.length})` : `Preencha os requisitos pendentes para iniciar a OS #${os == null ? void 0 : os.id}`;
   return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Modal, { show, onHide, size: "lg", centered: true, scrollable: true, className: "pick-mantenedor-tipo-modal", children: [
     /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Modal.Header, { closeButton: true, className: "border-0 pb-0", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Modal.Title, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "fw-bold", children: "Configura\xE7\xE3o da Ordem de Servi\xE7o" }),
-      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "text-muted small", children: [
-        "Preencha os requisitos pendentes para iniciar a OS #",
-        os == null ? void 0 : os.id
-      ] })
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "text-muted small", children: headerSubtitle })
     ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Modal.Body, { className: "pt-3", children: loading ? /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "text-center p-5", children: [
       /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Spinner, { animation: "border", variant: "primary" }),
       /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "mt-2 text-muted", children: "Carregando op\xE7\xF5es..." })
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Accordion, { alwaysOpen: true, defaultActiveKey: defaultActiveKeys, children: [
+      isMulti && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Accordion.Item, { eventKey: "os", className: "mb-3 border-0 shadow-sm rounded", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Accordion.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "d-flex align-items-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "fw-bold", children: "Aplicar a quais OS?" }),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("span", { className: "badge bg-info ms-2", children: [
+            selectedOsIds.length,
+            " de ",
+            targetList.length
+          ] })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Accordion.Body, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "d-flex justify-content-end mb-2 gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              import_react_bootstrap13.Button,
+              {
+                size: "sm",
+                variant: "outline-secondary",
+                disabled: assigning,
+                onClick: () => setSelectedOsIds(targetList.map((o) => o.id)),
+                children: "Marcar todas"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              import_react_bootstrap13.Button,
+              {
+                size: "sm",
+                variant: "outline-secondary",
+                disabled: assigning,
+                onClick: () => setSelectedOsIds([]),
+                children: "Desmarcar todas"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "d-flex flex-column gap-2", children: targetList.map((o) => {
+            var _a, _b, _c;
+            const checked = selectedOsIds.includes(o.id);
+            const recursoNome = (_b = (_a = o.recurso) == null ? void 0 : _a.nome) != null ? _b : "";
+            const desc = ((_c = o.descricaoDoProblema) != null ? _c : "").slice(0, 80);
+            const tagMissing = [];
+            if (isMissingMaintainers(o)) tagMissing.push("Sem executor");
+            if (isMissingType(o)) tagMissing.push("Sem tipo");
+            return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              import_react_bootstrap13.Form.Check,
+              {
+                type: "checkbox",
+                id: `pmt-os-${o.id}`,
+                checked,
+                disabled: assigning,
+                onChange: () => toggleOs(o.id),
+                label: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("span", { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("strong", { children: [
+                    "OS #",
+                    o.id
+                  ] }),
+                  recursoNome && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "text-muted ms-2", children: recursoNome }),
+                  desc && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("span", { className: "text-muted ms-2", children: [
+                    "\u2014 ",
+                    desc
+                  ] }),
+                  tagMissing.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "badge bg-warning text-dark ms-2", children: tagMissing.join(" \xB7 ") })
+                ] })
+              },
+              o.id
+            );
+          }) })
+        ] })
+      ] }),
       missingType && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Accordion.Item, { eventKey: "tipo", className: "mb-3 border-0 shadow-sm rounded", children: [
         /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Accordion.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "d-flex align-items-center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "fw-bold", children: "1. Selecionar Tipo de Ordem" }),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("span", { className: "fw-bold", children: [
+            isMulti ? "2." : "1.",
+            " Selecionar Tipo de Ordem"
+          ] }),
           !selectedTipoId && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "badge bg-warning text-dark ms-2", children: "Obrigat\xF3rio" }),
           selectedTipoId && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "badge bg-success ms-2", children: "Selecionado" })
         ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Accordion.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Form.Group, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Form.Label, { className: "text-muted small", children: "Selecione o tipo que melhor descreve esta OS" }),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Form.Label, { className: "text-muted small", children: [
+            "Tipo aplicado a ",
+            isMulti ? "todas as OS marcadas" : "esta OS"
+          ] }),
           /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
             import_react_bootstrap13.Form.Select,
             {
@@ -2541,7 +2654,7 @@ var PickMantenedorTipoModal = ({
       missingMaintainers && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(import_react_bootstrap13.Accordion.Item, { eventKey: "mantenedores", className: "border-0 shadow-sm rounded", children: [
         /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Accordion.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "d-flex align-items-center", children: [
           /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("span", { className: "fw-bold", children: [
-            missingType ? "2." : "1.",
+            isMulti ? "3." : missingType ? "2." : "1.",
             " Selecionar Executores"
           ] }),
           selectedIds.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("span", { className: "badge bg-warning text-dark ms-2", children: "Obrigat\xF3rio" }),
@@ -2555,7 +2668,7 @@ var PickMantenedorTipoModal = ({
           return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_react_bootstrap13.Col, { md: 6, lg: 4, children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
             "div",
             {
-              onClick: () => toggleSelection(m.id),
+              onClick: () => toggleMantenedor(m.id),
               style: {
                 cursor: assigning ? "not-allowed" : "pointer",
                 opacity: assigning ? 0.7 : 1,

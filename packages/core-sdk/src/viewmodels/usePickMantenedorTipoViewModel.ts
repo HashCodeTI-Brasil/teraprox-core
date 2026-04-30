@@ -98,6 +98,41 @@ export function usePickMantenedorTipoViewModel(): IPickMantenedorTipoViewModel {
     [dispatch, core]
   )
 
+  const assignMantenedoresMultiOs = useCallback(
+    async (osIds: Array<number | string>, items: PickMantenedorOption[]) => {
+      if (!osIds.length || !items.length) return
+      dispatch(setPickMantenedorTipoAssigning(true))
+      try {
+        const ctl = core.createController('ordemDeServico')
+        // 1 chamada bulk por mantenedor (backend aceita 1 mantenedorId por chamada).
+        for (const m of items) {
+          await ctl.post('atribuirMantenedorBulk', {
+            osIds,
+            mantenedorId: m.id,
+            userId: m.userId,
+          })
+        }
+      } finally {
+        dispatch(setPickMantenedorTipoAssigning(false))
+      }
+    },
+    [dispatch, core]
+  )
+
+  const assignTipoMultiOs = useCallback(
+    async (osIds: Array<number | string>, tipoId: number | string) => {
+      if (!osIds.length) return
+      dispatch(setPickMantenedorTipoAssigning(true))
+      try {
+        const ctl = core.createController('ordemDeServico')
+        await ctl.put('updateTipoBulk', { osIds, tipoId })
+      } finally {
+        dispatch(setPickMantenedorTipoAssigning(false))
+      }
+    },
+    [dispatch, core]
+  )
+
   const reset = useCallback(() => {
     dispatch(resetPickMantenedorTipo())
   }, [dispatch])
@@ -112,8 +147,10 @@ export function usePickMantenedorTipoViewModel(): IPickMantenedorTipoViewModel {
       loadOptions,
       assignMantenedores,
       assignTipo,
+      assignMantenedoresMultiOs,
+      assignTipoMultiOs,
       reset,
     }),
-    [mantenedores, tiposDeOrdem, loading, assigning, error, loadOptions, assignMantenedores, assignTipo, reset]
+    [mantenedores, tiposDeOrdem, loading, assigning, error, loadOptions, assignMantenedores, assignTipo, assignMantenedoresMultiOs, assignTipoMultiOs, reset]
   )
 }
