@@ -1,6 +1,6 @@
 import React from 'react';
 import * as teraprox_core_sdk from 'teraprox-core-sdk';
-import { UnidadeMaterialValue, IUnidadeMaterialViewModel, InspecaoValue, IInspecaoModalViewModel, IRecursoDisplayerViewModel, IFindRecursoByTagViewModel, HttpController, ITarefaItemViewModel, TarefaItemMode, IMantenedorPickerViewModel, MantenedorOption } from 'teraprox-core-sdk';
+import { UnidadeMaterialValue, IUnidadeMaterialViewModel, InspecaoValue, IInspecaoModalViewModel, IRecursoDisplayerViewModel, IFindRecursoByTagViewModel, HttpController, ITarefaItemViewModel, TarefaItemMode, IMantenedorPickerViewModel, MantenedorOption, IPickMantenedorTipoViewModel, PickMantenedorOption, PickTipoDeOrdemOption } from 'teraprox-core-sdk';
 import * as react_jsx_runtime from 'react/jsx-runtime';
 
 /**
@@ -608,4 +608,61 @@ interface MantenedorPickerProps {
 }
 declare const MantenedorPicker: React.FC<MantenedorPickerProps>;
 
-export { AcaoPicker, type AcaoPickerProps, type AcaoRef, BranchDropDisplay, type BranchDropDisplayProps, FindRecursoByTagField, type FindRecursoByTagFieldProps, InspecaoModal, type InspecaoModalProps, type MaintainerAssignment, MantenedorPicker, type MantenedorPickerProps, MantenedorRender, MantenedorRenderCompact, type MantenedorRenderCompactProps, type MantenedorRenderProps, type MantenedorVM, ManutentorCard, ManutentorCardCompact, type ManutentorCardCompactProps, type ManutentorCardProps, type ManutentorEntry, ManutentoresDisplay, type ManutentoresDisplayProps, MetricasDisplay, type MetricasDisplayProps, type ObservacaoMessage, ObservacaoModal, type ObservacaoModalProps, RecursoDisplayer, type RecursoDisplayerProps, TarefaCard, type TarefaCardProps, TarefaItem, type TarefaItemInspecaoExtras, type TarefaItemProps, UnidadeMaterialModal, type UnidadeMaterialModalProps, UnidadeMaterialPicker, type UnidadeMaterialPickerProps };
+// Sprint 2026-04-30 pick-mantenedor-os-card-unified — types appended
+// manualmente por bypass do DTS-build pré-existente broken (compass).
+interface OsCardOrdem {
+    id?: number | string;
+    status?: string;
+    isLate?: boolean;
+    isVirtual?: boolean;
+    modelId?: number | string | null;
+    recorrenciaId?: number | string | null;
+    agregadorId?: number | string | null;
+    recurso?: { nome?: string } | null;
+    father?: string | null;
+    descricaoDoProblema?: string | null;
+    osMantenedor?: Array<{ mantenedor?: { nomeUsuario?: string; nome?: string }; nome?: string }>;
+    osTipos?: Array<{ tipoDeOrdem?: { tipo?: string } }>;
+    dataPlanejada?: string | Date | null;
+    dataDeEncerramento?: string | Date | null;
+    setor?: string | null;
+    setorDestino?: string | null;
+    tarefas?: Array<unknown>;
+    realizado?: number;
+    valorPlanejado?: number;
+    warn?: number;
+    eficienciaDoAgregador?: number | null;
+}
+interface OsCardProps {
+    ordem: OsCardOrdem;
+    onView?: (id: number | string) => void;
+    onEdit?: (ordem: OsCardOrdem) => void;
+    onEditModel?: (modelId: number | string | null | undefined) => void;
+    onCardAction?: (ordem: OsCardOrdem) => void;
+    onViewAgregador?: (agregadorId: number | string) => void;
+    onViewRecorrencia?: (recorrenciaId: number | string) => void;
+    onIniciar?: (ordem: OsCardOrdem) => void | Promise<void>;
+    onContinuar?: (ordem: OsCardOrdem) => void;
+    isSelectable?: boolean;
+    isSelected?: boolean;
+    onToggleSelect?: (ordem: OsCardOrdem) => void;
+    disableStatusIndicator?: boolean;
+    loading?: boolean;
+}
+declare const OsCard: React.NamedExoticComponent<OsCardProps>;
+
+interface PickMantenedorTipoModalProps {
+    show: boolean;
+    onHide: () => void;
+    os: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null;
+    viewModel: IPickMantenedorTipoViewModel;
+    onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null) => void;
+    onError?: (err: unknown) => void;
+}
+declare const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps>;
+
+interface OsStatusMeta { color: string; label: string }
+declare const OS_STATUS_PALETTE: Record<string, OsStatusMeta>;
+declare function getOsStatusMeta(status?: string): OsStatusMeta;
+
+export { AcaoPicker, type AcaoPickerProps, type AcaoRef, BranchDropDisplay, type BranchDropDisplayProps, FindRecursoByTagField, type FindRecursoByTagFieldProps, InspecaoModal, type InspecaoModalProps, type MaintainerAssignment, MantenedorPicker, type MantenedorPickerProps, MantenedorRender, MantenedorRenderCompact, type MantenedorRenderCompactProps, type MantenedorRenderProps, type MantenedorVM, ManutentorCard, ManutentorCardCompact, type ManutentorCardCompactProps, type ManutentorCardProps, type ManutentorEntry, ManutentoresDisplay, type ManutentoresDisplayProps, MetricasDisplay, type MetricasDisplayProps, type ObservacaoMessage, ObservacaoModal, type ObservacaoModalProps, RecursoDisplayer, type RecursoDisplayerProps, TarefaCard, type TarefaCardProps, TarefaItem, type TarefaItemInspecaoExtras, type TarefaItemProps, UnidadeMaterialModal, type UnidadeMaterialModalProps, UnidadeMaterialPicker, type UnidadeMaterialPickerProps, OsCard, type OsCardProps, type OsCardOrdem, PickMantenedorTipoModal, type PickMantenedorTipoModalProps, OS_STATUS_PALETTE, getOsStatusMeta, type OsStatusMeta };

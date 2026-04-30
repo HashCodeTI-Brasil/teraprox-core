@@ -184,6 +184,25 @@ export type {
 
 export { useObservacoesTarefaViewModel } from './ReduxObservacoesTarefaAdapter'
 
+// PickMantenedorTipo (sprint 2026-04-30 pick-mantenedor-os-card-unified)
+export type {
+  IPickMantenedorTipoViewModel,
+  PickMantenedorOption,
+  PickTipoDeOrdemOption,
+} from './IPickMantenedorTipoViewModel'
+
+export { usePickMantenedorTipoViewModel } from './usePickMantenedorTipoViewModel'
+
+export {
+  default as pickMantenedorTipoReducer,
+  setPickMantenedorTipoOptions,
+  setPickMantenedorTipoLoading,
+  setPickMantenedorTipoAssigning,
+  setPickMantenedorTipoError,
+  resetPickMantenedorTipo,
+} from './pickMantenedorTipoSlice'
+export type { PickMantenedorTipoSliceState } from './pickMantenedorTipoSlice'
+
 // TarefaItem umbrella (sprint 2026-04-29 tarefa-item-unified — Phase 1)
 export type {
   ITarefaItemViewModel,

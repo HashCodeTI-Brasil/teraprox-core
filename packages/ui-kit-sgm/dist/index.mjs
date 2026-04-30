@@ -26,7 +26,7 @@ var UnidadeMaterialModal = ({
       show,
       onClose,
       title: title != null ? title : "Adicionar Material",
-      size: "md",
+      size: "lg",
       isValid: vm.isValid,
       isLoading: vm.isSubmitting,
       primaryAction: {
@@ -84,7 +84,7 @@ var InspecaoModal = ({
       show,
       onClose,
       title: title != null ? title : "Adicionar Inspe\xE7\xE3o",
-      size: "md",
+      size: "lg",
       isValid: vm.isValid,
       isLoading: vm.isSubmitting,
       primaryAction: {
@@ -1666,6 +1666,14 @@ var TarefaItem = ({
     }
     setShowObs(true);
   };
+  const handleOpenAnexo = async () => {
+    var _a2, _b2;
+    try {
+      await ((_b2 = (_a2 = vm.anexos) == null ? void 0 : _a2.loadAnexos) == null ? void 0 : _b2.call(_a2));
+    } catch (e) {
+    }
+    setShowAnexo(true);
+  };
   const handleSendObs = async (texto) => {
     if (onSaveObservacao) {
       onSaveObservacao(texto);
@@ -1791,7 +1799,7 @@ var TarefaItem = ({
                   title: "Anexos",
                   size: 25,
                   className: "hoverable-div",
-                  onClick: () => setShowAnexo(true)
+                  onClick: () => void handleOpenAnexo()
                 }
               ),
               content: anexoCount > 0 ? anexoCount : null
@@ -2136,6 +2144,416 @@ var MantenedorPicker = ({
     ) })
   ] });
 };
+
+// src/os/OsCard.tsx
+import { memo, useState as useState7 } from "react";
+import { Button as Button8, Card as Card5, Spinner as Spinner2 } from "react-bootstrap";
+import { FaExclamationTriangle, FaUser as FaUser2, FaClock, FaPlay } from "react-icons/fa";
+import { FaArrowRight, FaArrowsRotate, FaClipboardList as FaClipboardList2, FaPlus as FaPlus2 } from "react-icons/fa6";
+import dayjs from "dayjs";
+
+// src/os/statusPalette.ts
+var OS_STATUS_PALETTE = {
+  CONCLUIDO: { color: "#3DBE5B", label: "Conclu\xEDda" },
+  PENDENTE: { color: "#2D8CFF", label: "Pendente" },
+  ATRASADO: { color: "#FF4D4F", label: "Atrasado" },
+  EXECUTANDO: { color: "#FF9F1A", label: "Executando" },
+  AGUARDANDO_RECURSO: { color: "#FF7F50", label: "Aguardando Recurso" },
+  EM_DIA: { color: "#26A69A", label: "Em Dia" },
+  CANCELED: { color: "#9E9E9E", label: "Cancelada" },
+  DEFAULT: { color: "#BDBDBD", label: "Indefinido" }
+};
+function getOsStatusMeta(status) {
+  if (!status) return OS_STATUS_PALETTE.DEFAULT;
+  return OS_STATUS_PALETTE[status] || OS_STATUS_PALETTE.DEFAULT;
+}
+
+// src/os/OsCard.tsx
+import { jsx as jsx18, jsxs as jsxs15 } from "react/jsx-runtime";
+var IconButton = ({ icon, label, onClick }) => /* @__PURE__ */ jsx18(
+  "button",
+  {
+    type: "button",
+    className: "os-cta",
+    "aria-label": label,
+    title: label,
+    onClick,
+    children: icon
+  }
+);
+var OsCardImpl = ({
+  ordem,
+  onView,
+  onEdit,
+  onEditModel,
+  onCardAction,
+  onViewAgregador,
+  onViewRecorrencia,
+  onIniciar,
+  onContinuar,
+  isSelectable,
+  isSelected,
+  onToggleSelect,
+  disableStatusIndicator = false,
+  loading = false
+}) => {
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+  const [iniciando, setIniciando] = useState7(false);
+  const meta = getOsStatusMeta(ordem.isLate ? "ATRASADO" : ordem.status);
+  const statusUpper = ((_a = ordem.status) != null ? _a : "").toUpperCase();
+  const isPendente = statusUpper === "PENDENTE";
+  const isExecutando = statusUpper === "EXECUTANDO";
+  const isRec = Boolean(ordem.recorrenciaId);
+  const isAgg = Boolean(ordem.agregadorId);
+  const inAlert = isAgg && ((_b = ordem.realizado) != null ? _b : 0) >= ((_c = ordem.warn) != null ? _c : Infinity) && ((_d = ordem.realizado) != null ? _d : 0) < ((_e = ordem.valorPlanejado) != null ? _e : Infinity);
+  const isCritical = isAgg && ((_f = ordem.realizado) != null ? _f : 0) >= ((_g = ordem.valorPlanejado) != null ? _g : Infinity);
+  const isVirtual = Boolean(ordem.isVirtual);
+  const canIniciar = !isVirtual && isPendente && Boolean(ordem.id) && Boolean(onIniciar);
+  const canContinuar = !isVirtual && isExecutando && Boolean(ordem.id) && Boolean(onContinuar);
+  const handleIniciar = async (e) => {
+    e.stopPropagation();
+    if (!onIniciar || iniciando) return;
+    setIniciando(true);
+    try {
+      await onIniciar(ordem);
+    } finally {
+      setIniciando(false);
+    }
+  };
+  const handleContinuar = (e) => {
+    e.stopPropagation();
+    onContinuar == null ? void 0 : onContinuar(ordem);
+  };
+  const borderColor = !disableStatusIndicator && isCritical ? "#ef4444" : !disableStatusIndicator && inAlert ? "#f59e0b" : meta.color;
+  const cardClass = [
+    "mb-2 os-card",
+    isSelected ? "os-card--selected" : "",
+    isSelectable ? "os-card--selectable" : "",
+    !disableStatusIndicator && isCritical ? "os-card--critical" : "",
+    !disableStatusIndicator && inAlert ? "os-card--warn" : ""
+  ].filter(Boolean).join(" ");
+  const mantenedores = (ordem.osMantenedor || []).map((m) => {
+    var _a2, _b2;
+    return ((_a2 = m == null ? void 0 : m.mantenedor) == null ? void 0 : _a2.nomeUsuario) || ((_b2 = m == null ? void 0 : m.mantenedor) == null ? void 0 : _b2.nome) || (m == null ? void 0 : m.nome) || "";
+  }).filter(Boolean);
+  const counterPercent = isAgg && ((_h = ordem.valorPlanejado) != null ? _h : 0) > 0 ? Math.min(100, Math.round(((_i = ordem.realizado) != null ? _i : 0) / ordem.valorPlanejado * 100)) : 0;
+  return /* @__PURE__ */ jsx18(Card5, { className: cardClass, style: { borderLeftColor: borderColor }, children: /* @__PURE__ */ jsxs15(
+    Card5.Body,
+    {
+      className: "p-2 d-flex flex-column gap-1",
+      onClick: isSelectable ? () => onToggleSelect == null ? void 0 : onToggleSelect(ordem) : void 0,
+      children: [
+        /* @__PURE__ */ jsxs15("div", { className: "d-flex align-items-start justify-content-between gap-2", children: [
+          /* @__PURE__ */ jsxs15("div", { className: "d-flex align-items-center gap-2 flex-grow-1", style: { minWidth: 0 }, children: [
+            isVirtual ? /* @__PURE__ */ jsx18(
+              IconButton,
+              {
+                icon: /* @__PURE__ */ jsx18(FaClipboardList2, {}),
+                label: "A\xE7\xF5es para OS virtual",
+                onClick: (e) => {
+                  e.stopPropagation();
+                  onCardAction == null ? void 0 : onCardAction(ordem);
+                }
+              }
+            ) : /* @__PURE__ */ jsx18(
+              IconButton,
+              {
+                icon: /* @__PURE__ */ jsx18(FaArrowRight, {}),
+                label: "Ver OS",
+                onClick: (e) => {
+                  e.stopPropagation();
+                  onView == null ? void 0 : onView(ordem.id);
+                }
+              }
+            ),
+            /* @__PURE__ */ jsxs15("div", { style: { minWidth: 0, flex: 1 }, children: [
+              ordem.id && /* @__PURE__ */ jsxs15("div", { style: { fontSize: "0.72rem", color: "#9ca3af", lineHeight: 1.2 }, children: [
+                "#",
+                ordem.id
+              ] }),
+              /* @__PURE__ */ jsx18("div", { className: "os-card__title text-truncate", children: [ordem.father, (_j = ordem.recurso) == null ? void 0 : _j.nome].filter(Boolean).join(" \u203A ") || "Recurso" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx18(
+            "span",
+            {
+              className: "badge flex-shrink-0",
+              style: { backgroundColor: meta.color, color: "#fff", alignSelf: "flex-start", marginTop: "2px" },
+              children: meta.label
+            }
+          )
+        ] }),
+        ordem.descricaoDoProblema && /* @__PURE__ */ jsx18("div", { className: "os-card__muted os-card__desc", children: ordem.descricaoDoProblema }),
+        (isRec || isAgg || isVirtual) && /* @__PURE__ */ jsxs15("div", { className: "d-flex flex-wrap gap-1", children: [
+          isRec && /* @__PURE__ */ jsxs15(
+            "button",
+            {
+              type: "button",
+              className: "os-chip",
+              onClick: (e) => {
+                e.stopPropagation();
+                !isSelectable && (onViewRecorrencia == null ? void 0 : onViewRecorrencia(ordem.recorrenciaId));
+              },
+              title: "Ver hist\xF3rico de recorr\xEAncia",
+              style: { background: "#ede9fe", borderColor: "#c4b5fd", color: "#6d28d9", cursor: onViewRecorrencia ? "pointer" : "default" },
+              children: [
+                /* @__PURE__ */ jsx18(FaArrowsRotate, { size: 10 }),
+                " Recorrente"
+              ]
+            }
+          ),
+          isAgg && /* @__PURE__ */ jsxs15(
+            "button",
+            {
+              type: "button",
+              className: "os-chip",
+              onClick: (e) => {
+                e.stopPropagation();
+                !isSelectable && (onViewAgregador == null ? void 0 : onViewAgregador(ordem.agregadorId));
+              },
+              title: "Ver hist\xF3rico do contador",
+              style: { background: "#d1fae5", borderColor: "#6ee7b7", color: "#065f46", cursor: onViewAgregador ? "pointer" : "default" },
+              children: [
+                /* @__PURE__ */ jsx18(FaPlus2, { size: 10 }),
+                " Contador"
+              ]
+            }
+          ),
+          isVirtual && /* @__PURE__ */ jsxs15("span", { className: "os-chip", style: { background: "#e0e7ff", borderColor: "#a5b4fc", color: "#3730a3" }, children: [
+            /* @__PURE__ */ jsx18(FaClipboardList2, { size: 10 }),
+            " OS Virtual"
+          ] })
+        ] }),
+        isAgg && /* @__PURE__ */ jsxs15("div", { children: [
+          /* @__PURE__ */ jsxs15("div", { className: "d-flex justify-content-between align-items-center mb-1", children: [
+            /* @__PURE__ */ jsxs15("small", { className: "os-card__muted", children: [
+              (_k = ordem.realizado) != null ? _k : 0,
+              " / ",
+              (_l = ordem.valorPlanejado) != null ? _l : "-",
+              ordem.eficienciaDoAgregador != null && /* @__PURE__ */ jsxs15("span", { className: "ms-1", children: [
+                "(",
+                Number(ordem.eficienciaDoAgregador).toFixed(1),
+                "%)"
+              ] })
+            ] }),
+            isCritical && /* @__PURE__ */ jsxs15("span", { className: "os-card__alert-badge", children: [
+              /* @__PURE__ */ jsx18(FaExclamationTriangle, { size: 9 }),
+              " LIMITE ATINGIDO"
+            ] }),
+            inAlert && !isCritical && /* @__PURE__ */ jsxs15("span", { className: "os-card__alert-badge", children: [
+              /* @__PURE__ */ jsx18(FaExclamationTriangle, { size: 9 }),
+              " PR\xD3X. LIMITE"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsx18("div", { style: { height: "4px", borderRadius: "2px", background: "#e9ecef", overflow: "hidden" }, children: /* @__PURE__ */ jsx18("div", { style: {
+            height: "100%",
+            width: `${counterPercent}%`,
+            background: isCritical ? "#ef4444" : inAlert ? "#f59e0b" : meta.color,
+            transition: "width 0.3s ease"
+          } }) })
+        ] }),
+        mantenedores.length > 0 && /* @__PURE__ */ jsxs15("div", { className: "os-card__muted d-flex align-items-center gap-1 text-truncate", children: [
+          /* @__PURE__ */ jsx18(FaUser2, { size: 10, className: "flex-shrink-0" }),
+          /* @__PURE__ */ jsx18("span", { className: "text-truncate", children: mantenedores.join(", ") })
+        ] }),
+        !isSelectable && (canIniciar || canContinuar) && /* @__PURE__ */ jsxs15("div", { className: "d-flex justify-content-end", children: [
+          canIniciar && /* @__PURE__ */ jsxs15(
+            Button8,
+            {
+              size: "sm",
+              variant: "primary",
+              onClick: handleIniciar,
+              disabled: iniciando || loading,
+              className: "d-flex align-items-center gap-1",
+              children: [
+                iniciando ? /* @__PURE__ */ jsx18(Spinner2, { size: "sm", animation: "border", role: "status" }) : /* @__PURE__ */ jsx18(FaPlay, { size: 10 }),
+                "Iniciar"
+              ]
+            }
+          ),
+          canContinuar && /* @__PURE__ */ jsxs15(
+            Button8,
+            {
+              size: "sm",
+              variant: "warning",
+              onClick: handleContinuar,
+              disabled: loading,
+              className: "d-flex align-items-center gap-1",
+              children: [
+                /* @__PURE__ */ jsx18(FaPlay, { size: 10 }),
+                "Continuar"
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs15(
+          "div",
+          {
+            className: "d-flex align-items-center gap-2 os-card__muted",
+            style: { borderTop: "1px solid #f3f4f6", paddingTop: "4px", fontSize: "0.78rem" },
+            children: [
+              /* @__PURE__ */ jsxs15("span", { className: "d-flex align-items-center gap-1 flex-grow-1 text-truncate", children: [
+                /* @__PURE__ */ jsx18(FaClock, { size: 9, className: "flex-shrink-0" }),
+                ordem.dataPlanejada ? dayjs(ordem.dataPlanejada).format("DD/MM [\xE0s] HH:mm") : "\u2014",
+                ordem.status === "CONCLUIDO" && ordem.dataDeEncerramento && /* @__PURE__ */ jsxs15("span", { className: "text-success ms-1", children: [
+                  "\xB7 enc. ",
+                  dayjs(ordem.dataDeEncerramento).format("DD/MM")
+                ] })
+              ] }),
+              (ordem.setorDestino || ordem.setor) && /* @__PURE__ */ jsx18("span", { className: "text-truncate flex-shrink-0", style: { maxWidth: "110px" }, children: ordem.setorDestino || ordem.setor }),
+              Array.isArray(ordem.tarefas) && ordem.tarefas.length > 0 && /* @__PURE__ */ jsxs15("span", { className: "badge bg-secondary d-flex align-items-center gap-1 flex-shrink-0", style: { fontSize: "0.72rem" }, children: [
+                /* @__PURE__ */ jsx18(FaClipboardList2, { size: 9 }),
+                ordem.tarefas.length
+              ] })
+            ]
+          }
+        )
+      ]
+    }
+  ) });
+};
+var OsCard = memo(OsCardImpl);
+OsCard.displayName = "OsCard";
+
+// src/os/PickMantenedorTipoModal.tsx
+import { useEffect as useEffect6, useState as useState8 } from "react";
+import { Modal as Modal2, Button as Button9, Spinner as Spinner3, Row, Col as Col2, Accordion, Form as Form2 } from "react-bootstrap";
+import { Fragment as Fragment5, jsx as jsx19, jsxs as jsxs16 } from "react/jsx-runtime";
+var PickMantenedorTipoModal = ({
+  show,
+  onHide,
+  os,
+  viewModel,
+  onAssigned,
+  onError
+}) => {
+  const [selectedIds, setSelectedIds] = useState8([]);
+  const [selectedTipoId, setSelectedTipoId] = useState8("");
+  const { mantenedores, tiposDeOrdem, loading, assigning } = viewModel;
+  const missingMaintainers = !(os == null ? void 0 : os.osMantenedor) || os.osMantenedor.length === 0 || !os.osMantenedor.some((m) => m.active);
+  const missingType = !(os == null ? void 0 : os.osTipos) || os.osTipos.length === 0;
+  useEffect6(() => {
+    if (show) {
+      viewModel.loadOptions();
+      setSelectedIds([]);
+      setSelectedTipoId("");
+    }
+  }, [show]);
+  const toggleSelection = (id) => {
+    if (assigning) return;
+    setSelectedIds(
+      (prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+  const isFormValid = () => {
+    if (missingMaintainers && selectedIds.length === 0) return false;
+    if (missingType && !selectedTipoId) return false;
+    return true;
+  };
+  const handleConfirm = async () => {
+    var _a;
+    if (assigning || !isFormValid() || !(os == null ? void 0 : os.id)) return;
+    try {
+      const selectedMantenedores = mantenedores.filter((m) => selectedIds.includes(m.id));
+      if (missingMaintainers && selectedMantenedores.length > 0) {
+        await viewModel.assignMantenedores(os.id, selectedMantenedores);
+      }
+      let assignedTipo = null;
+      if (missingType && selectedTipoId) {
+        await viewModel.assignTipo(os.id, selectedTipoId);
+        assignedTipo = (_a = tiposDeOrdem.find((t) => String(t.id) === String(selectedTipoId))) != null ? _a : null;
+      }
+      onAssigned == null ? void 0 : onAssigned(selectedMantenedores, assignedTipo);
+      onHide();
+    } catch (err) {
+      onError == null ? void 0 : onError(err);
+    }
+  };
+  const defaultActiveKeys = [];
+  if (missingType) defaultActiveKeys.push("tipo");
+  if (missingMaintainers) defaultActiveKeys.push("mantenedores");
+  return /* @__PURE__ */ jsxs16(Modal2, { show, onHide, size: "lg", centered: true, scrollable: true, className: "pick-mantenedor-tipo-modal", children: [
+    /* @__PURE__ */ jsx19(Modal2.Header, { closeButton: true, className: "border-0 pb-0", children: /* @__PURE__ */ jsxs16(Modal2.Title, { children: [
+      /* @__PURE__ */ jsx19("div", { className: "fw-bold", children: "Configura\xE7\xE3o da Ordem de Servi\xE7o" }),
+      /* @__PURE__ */ jsxs16("div", { className: "text-muted small", children: [
+        "Preencha os requisitos pendentes para iniciar a OS #",
+        os == null ? void 0 : os.id
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsx19(Modal2.Body, { className: "pt-3", children: loading ? /* @__PURE__ */ jsxs16("div", { className: "text-center p-5", children: [
+      /* @__PURE__ */ jsx19(Spinner3, { animation: "border", variant: "primary" }),
+      /* @__PURE__ */ jsx19("div", { className: "mt-2 text-muted", children: "Carregando op\xE7\xF5es..." })
+    ] }) : /* @__PURE__ */ jsxs16(Accordion, { alwaysOpen: true, defaultActiveKey: defaultActiveKeys, children: [
+      missingType && /* @__PURE__ */ jsxs16(Accordion.Item, { eventKey: "tipo", className: "mb-3 border-0 shadow-sm rounded", children: [
+        /* @__PURE__ */ jsx19(Accordion.Header, { children: /* @__PURE__ */ jsxs16("div", { className: "d-flex align-items-center", children: [
+          /* @__PURE__ */ jsx19("span", { className: "fw-bold", children: "1. Selecionar Tipo de Ordem" }),
+          !selectedTipoId && /* @__PURE__ */ jsx19("span", { className: "badge bg-warning text-dark ms-2", children: "Obrigat\xF3rio" }),
+          selectedTipoId && /* @__PURE__ */ jsx19("span", { className: "badge bg-success ms-2", children: "Selecionado" })
+        ] }) }),
+        /* @__PURE__ */ jsx19(Accordion.Body, { children: /* @__PURE__ */ jsxs16(Form2.Group, { children: [
+          /* @__PURE__ */ jsx19(Form2.Label, { className: "text-muted small", children: "Selecione o tipo que melhor descreve esta OS" }),
+          /* @__PURE__ */ jsxs16(
+            Form2.Select,
+            {
+              value: selectedTipoId,
+              onChange: (e) => setSelectedTipoId(e.target.value),
+              disabled: assigning,
+              children: [
+                /* @__PURE__ */ jsx19("option", { value: "", children: "-- Selecione um tipo --" }),
+                tiposDeOrdem.map((t) => /* @__PURE__ */ jsx19("option", { value: t.id, children: t.tipo }, t.id))
+              ]
+            }
+          )
+        ] }) })
+      ] }),
+      missingMaintainers && /* @__PURE__ */ jsxs16(Accordion.Item, { eventKey: "mantenedores", className: "border-0 shadow-sm rounded", children: [
+        /* @__PURE__ */ jsx19(Accordion.Header, { children: /* @__PURE__ */ jsxs16("div", { className: "d-flex align-items-center", children: [
+          /* @__PURE__ */ jsxs16("span", { className: "fw-bold", children: [
+            missingType ? "2." : "1.",
+            " Selecionar Executores"
+          ] }),
+          selectedIds.length === 0 && /* @__PURE__ */ jsx19("span", { className: "badge bg-warning text-dark ms-2", children: "Obrigat\xF3rio" }),
+          selectedIds.length > 0 && /* @__PURE__ */ jsxs16("span", { className: "badge bg-success ms-2", children: [
+            selectedIds.length,
+            " Selecionado(s)"
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsx19(Accordion.Body, { children: /* @__PURE__ */ jsx19(Row, { className: "g-3", children: !Array.isArray(mantenedores) || mantenedores.length === 0 ? /* @__PURE__ */ jsx19(Col2, { xs: 12, className: "text-center py-5 text-muted", children: "Nenhum mantenedor encontrado." }) : mantenedores.map((m) => {
+          const isSelected = selectedIds.includes(m.id);
+          return /* @__PURE__ */ jsx19(Col2, { md: 6, lg: 4, children: /* @__PURE__ */ jsx19(
+            "div",
+            {
+              onClick: () => toggleSelection(m.id),
+              style: {
+                cursor: assigning ? "not-allowed" : "pointer",
+                opacity: assigning ? 0.7 : 1,
+                transform: isSelected ? "scale(1.02)" : "scale(1)",
+                transition: "transform 0.2s"
+              },
+              children: /* @__PURE__ */ jsx19("div", { className: isSelected ? "rounded-3 p-1 bg-primary bg-opacity-10 border border-primary" : "", children: /* @__PURE__ */ jsx19(ManutentorCardCompact, { mantenedor: m }) })
+            }
+          ) }, m.id);
+        }) }) })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxs16(Modal2.Footer, { className: "border-0", children: [
+      /* @__PURE__ */ jsx19(Button9, { variant: "outline-secondary", onClick: onHide, disabled: assigning, children: "Cancelar" }),
+      /* @__PURE__ */ jsx19(
+        Button9,
+        {
+          variant: "primary",
+          onClick: handleConfirm,
+          disabled: assigning || !isFormValid(),
+          className: "px-4",
+          children: assigning ? /* @__PURE__ */ jsxs16(Fragment5, { children: [
+            /* @__PURE__ */ jsx19(Spinner3, { size: "sm", animation: "border", className: "me-2" }),
+            "Salvando..."
+          ] }) : "Confirmar"
+        }
+      )
+    ] })
+  ] });
+};
 export {
   AcaoPicker,
   BranchDropDisplay,
@@ -2148,10 +2566,14 @@ export {
   ManutentorCardCompact,
   ManutentoresDisplay,
   MetricasDisplay,
+  OS_STATUS_PALETTE,
   ObservacaoModal,
+  OsCard,
+  PickMantenedorTipoModal,
   RecursoDisplayer,
   TarefaCard,
   TarefaItem,
   UnidadeMaterialModal,
-  UnidadeMaterialPicker
+  UnidadeMaterialPicker,
+  getOsStatusMeta
 };

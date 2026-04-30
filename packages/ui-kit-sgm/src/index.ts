@@ -102,3 +102,18 @@ export {
   MantenedorPicker,
   type MantenedorPickerProps,
 } from './mantenedor/MantenedorPicker'
+
+// Sprint 2026-04-30 pick-mantenedor-os-card-unified — promovidos do
+// teraprox-SGM-OS/Components/.../OsPlanejada para uso em SGM-OS + SGM-OM.
+// OsCard: props-driven puro. PickMantenedorTipoModal: consome
+// IPickMantenedorTipoViewModel (Port no core-sdk).
+export {
+  OsCard,
+  type OsCardProps,
+  type OsCardOrdem,
+  PickMantenedorTipoModal,
+  type PickMantenedorTipoModalProps,
+  OS_STATUS_PALETTE,
+  getOsStatusMeta,
+  type OsStatusMeta,
+} from './os'
