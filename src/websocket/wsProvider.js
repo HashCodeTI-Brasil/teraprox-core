@@ -20,6 +20,7 @@ import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
 import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
 import { createAsyncResponseClient } from "./asyncResponseFirebaseClient"
 import { createMoFirebaseClient } from "./moFirebaseClient"
+import { registerPresence } from "./presenceClient"
 import { createRateLimitFirebaseClient } from "./rateLimitFirebaseClient"
 import { store } from "../store"
 
@@ -163,16 +164,21 @@ export default function WebProviderComponent({ children }) {
     }, [dispatch]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        if (token && company) {
-            console.log(`[Core][MO] Conectando listener de matchingObjects: company=${company}`)
-            const moSocket = createMoFirebaseClient(company, onMessageReceive)
+        if (token && company && userId) {
+            console.log(`[Core][MO] Conectando listener de matchingObjects: company=${company}, userId=${userId}`)
+            // Registra presence ANTES do listener: garante que o fanout
+            // (Cloud Function mo-fanout) já tenha o userId nos ativos quando
+            // o backend disparar o primeiro MO desta sessão.
+            const unregisterPresence = registerPresence(company, userId)
+            const moSocket = createMoFirebaseClient(company, userId, onMessageReceive)
             setSocket(moSocket)
             return () => {
                 moSocket.disconnect()
+                unregisterPresence()
             }
         }
-        console.log(`[Core][MO] Listener nao iniciado (token=${!!token}, company=${!!company})`)
-    }, [token, company]) // eslint-disable-line react-hooks/exhaustive-deps
+        console.log(`[Core][MO] Listener nao iniciado (token=${!!token}, company=${!!company}, userId=${!!userId})`)
+    }, [token, company, userId]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleLogout = useCallback(async () => {
         if (socket) socket.disconnect()

@@ -1,9 +1,17 @@
 /**
- * Escuta matching objects no Firebase RTDB para uma empresa.
- * Mesmo padrão do notificationFirebaseClient.js.
+ * Escuta matching objects no Firebase RTDB para um usuário dentro de um tenant.
  *
- * RTDB path: {company}/matchingObjects/{timestamp}
- * O backend publica um array de MOs em cada chave timestamp.
+ * Estrutura RTDB (sprint 2026-05-01-mo-fanout-per-user-channel):
+ *   - Backend escreve em /{company}/matchingObjects/{ts} (1 entry por request,
+ *     com array de MOs no value — batching feito pelo Sentinel do @onroad/core).
+ *   - Cloud Function `mo-fanout` (RTDB onCreate trigger) copia o entry para
+ *     /{company}/users/{userId}/matchingObjects/{ts} para CADA user com presença
+ *     ativa naquele tenant.
+ *   - Este client escuta APENAS o path do user — sem broadcast, sem replay
+ *     de atividade alheia.
+ *
+ * Compat: se userId for undefined/null (versão antiga sem migração de presence),
+ * cai no path legado /{company}/matchingObjects para não quebrar.
  */
 import { initializeApp, getApps } from "firebase/app"
 import { getDatabase, ref, onChildAdded, off } from "firebase/database"
@@ -29,24 +37,29 @@ function getFirebaseDb() {
 
 /**
  * @param {string} company - Tenant/empresa
+ * @param {string|number} userId - ID do user logado (canal individual)
  * @param {function} onMessage - Callback(mo, socketType, source)
  * @returns {{ connected: boolean, disconnect: () => void }}
  */
-export function createMoFirebaseClient(company, onMessage) {
+export function createMoFirebaseClient(company, userId, onMessage) {
     const database = getFirebaseDb()
-    const moRef = ref(database, `${company}/matchingObjects`)
 
-    console.log(`[MoFirebase] Listening for matching objects on /${company}/matchingObjects`)
+    // Path por usuário (preferido). Cai no legado se userId ausente — defensive
+    // para tolerar callers antigos enquanto migração propaga.
+    const path = userId
+        ? `${company}/users/${userId}/matchingObjects`
+        : `${company}/matchingObjects`
+
+    const moRef = ref(database, path)
+
+    console.log(`[MoFirebase] Listening for matching objects on /${path}`)
 
     const unsub = onChildAdded(moRef, (snapshot) => {
-        console.log(`[MoFirebase] child_added em key=${snapshot.key}`)
         const data = snapshot.val()
         if (!data) return
         if (Array.isArray(data)) {
-            console.log(`[MoFirebase] Payload array com ${data.length} item(ns)`)
             data.forEach((mo) => onMessage(mo, true, "firebase"))
         } else {
-            console.log("[MoFirebase] Payload objeto unico")
             onMessage(data, true, "firebase")
         }
     })
@@ -55,7 +68,7 @@ export function createMoFirebaseClient(company, onMessage) {
         connected: true,
         disconnect: () => {
             off(moRef, "child_added", unsub)
-            console.log("[MoFirebase] Unsubscribed from matching objects")
+            console.log(`[MoFirebase] Unsubscribed from /${path}`)
         },
     }
 }
