@@ -57,13 +57,20 @@ export const routesConfig = [
             { configuration: { context: "acao", path: paths.acoes, endPoint: endPointManutencao } },
             { configuration: { context: "tarefa", path: "/ordemDeServico/tarefa", endPoint: endPointManutencao } },
             { configuration: { context: "tarefa", path: "/ordemDeServico/tarefa", endPoint: endPointManutencao } },
+            // tarefaUnidadeMaterial é consumido pelo `useUnidadeMaterialViewModel`
+            // do core-sdk (PUT quantidade) e por `tarefaService.removeTarefaUM` —
+            // sem esta rota o resolveEndpoint retorna undefined e o controller
+            // dispara contra a origin (localhost:3000) → 404. Sprint /os/execucao 2026-05-01.
+            { configuration: { context: "tarefaUnidadeMaterial", endPoint: endPointManutencao } },
             { configuration: { context: "mantenedor", path: paths.mantenedores, endPoint: endPointManutencao } },
             { configuration: { context: "mantenedor", path: paths.mantenedorForm, endPoint: endPointManutencao } },
+            { configuration: { context: "turno", endPoint: endPointManutencao } },
             { configuration: { context: "tipoDeOrdem", path: paths.tiposDeOrdem, endPoint: endPointManutencao } },
             { configuration: { context: "tipoDeOrdem", path: paths.tipoDeOrdemForm, endPoint: endPointManutencao } },
             { configuration: { context: "unidade", path: paths.unidades, endPoint: endPointManutencao } },
             { configuration: { context: "unidade", path: paths.unidadeForm, endPoint: endPointManutencao } },
             { configuration: { context: "materiais", path: paths.materiais, endPoint: endPointManutencao } },
+            { configuration: { context: "material", path: paths.materiais, endPoint: endPointManutencao } },
             { configuration: { context: "material", path: paths.materialForm, endPoint: endPointManutencao } },
             { configuration: { context: "inspecao", path: "/ordemDeServico/inspecao", endPoint: endPointManutencao } },
             { configuration: { context: "monitoramentoRecursos", path: paths.monitoramentoRecursos } },
@@ -82,6 +89,7 @@ export const routesConfig = [
         service: "user",
         routes: [
             { configuration: { context: "user", path: paths.usuarios, endPoint: endPointUser } },
+            { configuration: { context: "users", endPoint: endPointUser } },
             { configuration: { context: "setor", path: paths.setores, endPoint: endPointUser } },
             { configuration: { context: "company", path: paths.empresas, endPoint: endPointUser } },
             { configuration: { context: "permissao", path: paths.permissoes, endPoint: endPointUser } },
