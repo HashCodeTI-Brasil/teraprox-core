@@ -23,6 +23,23 @@ import { createMoFirebaseClient } from "./moFirebaseClient"
 import { createRateLimitFirebaseClient } from "./rateLimitFirebaseClient"
 import { store } from "../store"
 
+/**
+ * Logs verbosos do canal de Matching Objects são gatekept por flag pra evitar
+ * 3 `console.log` por mensagem recebida — com devtools aberto e backend
+ * publicando rajadas (osMantenedor, ordemDeServico…), isso degradava notavelmente
+ * a tela de login e o dashboard. Habilita ligando `localStorage.setItem(
+ * 'teraprox-debug-mo','1')` ou via env REACT_APP_DEBUG_MO=1.
+ */
+const isMoDebugEnabled = () => {
+    if (typeof window === 'undefined') return false
+    if (process.env.REACT_APP_DEBUG_MO === '1') return true
+    try {
+        return window.localStorage?.getItem('teraprox-debug-mo') === '1'
+    } catch {
+        return false
+    }
+}
+
 const WebProvider = createContext(null)
 export { WebProvider }
 
@@ -99,8 +116,20 @@ export default function WebProviderComponent({ children }) {
     const onMessageReceive = useCallback((incomingMatchingObject, socketType = true, source) => {
         if (typeof incomingMatchingObject !== "object") return
         const subscribers = matchingObjectsRef.current || []
-        console.log("[Core][MO] Mensagem recebida:", incomingMatchingObject)
-        console.log(`[Core][MO] Subscribers ativos: ${subscribers.length}`)
+        const debug = isMoDebugEnabled()
+        // Fast path: sem subscribers e sem debug, descarta sem alocar/iterar.
+        // Backend publica MOs em broadcast — o cliente que estiver na tela de
+        // login ou em screens sem subscribe não tem o que fazer com eles.
+        if (subscribers.length === 0) {
+            if (debug) {
+                console.log("[Core][MO] Mensagem recebida (sem subscribers):", incomingMatchingObject)
+            }
+            return
+        }
+        if (debug) {
+            console.log("[Core][MO] Mensagem recebida:", incomingMatchingObject)
+            console.log(`[Core][MO] Subscribers ativos: ${subscribers.length}`)
+        }
         const matches = subscribers.filter((mO) => {
             const sameContext = mO.context === incomingMatchingObject.context
             const subscriberLocation = mO.location
@@ -113,7 +142,9 @@ export default function WebProviderComponent({ children }) {
                 !incomingLocation
             return sameContext && sameLocation
         })
-        console.log(`[Core][MO] Matches encontrados: ${matches.length}`)
+        if (debug) {
+            console.log(`[Core][MO] Matches encontrados: ${matches.length}`)
+        }
         for (const mO of matches) {
             try {
                 if (mO.refresher) {
@@ -337,8 +368,10 @@ export default function WebProviderComponent({ children }) {
         const current = matchingObjectsRef.current || []
         if (!current.find((mO) => mO.context === matchingObject.context && mO.location === matchingObject.location)) {
             matchingObjectsRef.current = [...current, matchingObject]
-            console.log(`[Core][MO] Subscreveu ${matchingObject.context}${matchingObject.location}`)
-            console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
+            if (isMoDebugEnabled()) {
+                console.log(`[Core][MO] Subscreveu ${matchingObject.context}${matchingObject.location}`)
+                console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
+            }
         }
     }, [userId])
 
@@ -346,8 +379,10 @@ export default function WebProviderComponent({ children }) {
         matchingObjectsRef.current = (matchingObjectsRef.current || []).filter(
             (c) => c.context !== matchingObject.context
         )
-        console.log(`[Core][MO] Unsubscribe ${matchingObject.context}${matchingObject.location || ""}`)
-        console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
+        if (isMoDebugEnabled()) {
+            console.log(`[Core][MO] Unsubscribe ${matchingObject.context}${matchingObject.location || ""}`)
+            console.log(`[Core][MO] Total de subscribers: ${matchingObjectsRef.current.length}`)
+        }
     }, [])
     const subscribeEvent = useCallback((context, location, eventHandler) => {
         const eventName = context + location
