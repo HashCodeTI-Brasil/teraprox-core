@@ -60,7 +60,23 @@ interface CachedEntry<T> {
 
 const STORAGE_PREFIX = 'teraprox.screen.'
 
-/** Cache em memória (fallback quando scope='memory' ou sessionStorage indisponível). */
+/**
+ * Cache em memória primário, vivo enquanto o JS module estiver carregado.
+ * Sobrevive a navegação cross-MF (árvore React desmonta mas o módulo
+ * persiste). Perde-se em F5/refresh — aceitável (usuário prefere dados
+ * frescos após reload).
+ *
+ * Por que primário e não fallback: sessionStorage tem limite de 5MB.
+ * Listas grandes (ex: 4914 OS × ~10KB ≈ 50MB) jogam QuotaExceededError
+ * em setItem, e o try/catch engole silenciosamente — o cache fica com
+ * o último valor que coube, geralmente um Array(0) inicial. Memória JS
+ * não tem esse limite; só estoura mesmo em datasets absurdos (>100k itens).
+ *
+ * sessionStorage é mantido como BEST-EFFORT (small-state e pós-reload):
+ * sempre tentamos escrever em ambos; se sessionStorage falhar (quota),
+ * memória continua válida. Reads preferem memória (mais rápida) e caem
+ * para sessionStorage só se memória estiver vazia (após F5).
+ */
 const memoryStore = new Map<string, string>()
 
 function isWindowAvailable(): boolean {
@@ -79,55 +95,101 @@ function buildStorageKey(path: string, key: string): string {
   return `${STORAGE_PREFIX}${path}.${key}`
 }
 
+/**
+ * Leitura em duas camadas: memória primeiro (rápida e sem limite),
+ * sessionStorage como fallback (só ativa após F5, antes do primeiro write
+ * a memória ficou limpa). `scope: 'memory'` desliga sessionStorage
+ * completamente (testes ou modos de privacidade extrema).
+ */
 function readEntry<T>(
   storageKey: string,
   scope: 'session' | 'memory',
 ): CachedEntry<T> | null {
-  try {
-    const raw = scope === 'memory'
-      ? memoryStore.get(storageKey) ?? null
-      : isWindowAvailable() ? window.sessionStorage.getItem(storageKey) : null
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as CachedEntry<T>
-    // Schema mínimo: precisa ter `t` (number) e `v` (qualquer coisa).
-    if (typeof parsed?.t !== 'number') return null
-    return parsed
-  } catch {
-    return null
+  // 1. Memória (sempre tentada primeiro)
+  const memRaw = memoryStore.get(storageKey)
+  if (memRaw != null) {
+    try {
+      const parsed = JSON.parse(memRaw) as CachedEntry<T>
+      if (typeof parsed?.t === 'number') return parsed
+    } catch {
+      // memória corrompida — segue para sessionStorage
+    }
   }
+  // 2. sessionStorage (fallback pós-reload, só se scope permitir)
+  if (scope !== 'memory' && isWindowAvailable()) {
+    try {
+      const raw = window.sessionStorage.getItem(storageKey)
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as CachedEntry<T>
+      if (typeof parsed?.t !== 'number') return null
+      // Promove para memória — próximas leituras evitam JSON.parse de sessionStorage.
+      memoryStore.set(storageKey, raw)
+      return parsed
+    } catch {
+      return null
+    }
+  }
+  return null
 }
 
+/**
+ * Escrita em duas camadas: memória sempre (primária, sem limite de quota),
+ * sessionStorage best-effort (falha silenciosa em QuotaExceededError mas
+ * loga warn no console p/ visibilidade). Memória garante consistência;
+ * sessionStorage é só p/ sobreviver F5.
+ */
 function writeEntry<T>(
   storageKey: string,
   entry: CachedEntry<T>,
   scope: 'session' | 'memory',
 ): void {
+  let raw: string
   try {
-    const raw = JSON.stringify(entry)
-    if (scope === 'memory') {
-      memoryStore.set(storageKey, raw)
-      return
-    }
-    if (isWindowAvailable()) {
+    raw = JSON.stringify(entry)
+  } catch (err) {
+    // Cyclic/non-serializable — não tem como cachear.
+    // eslint-disable-next-line no-console
+    console.warn('[useScreenCachedState] JSON.stringify falhou', storageKey, err)
+    return
+  }
+  // 1. Memória (sempre escreve, sem limite de quota)
+  memoryStore.set(storageKey, raw)
+  // 2. sessionStorage (best-effort)
+  if (scope !== 'memory' && isWindowAvailable()) {
+    try {
       window.sessionStorage.setItem(storageKey, raw)
+    } catch (err) {
+      // QuotaExceededError típico p/ payloads > 5MB. Loga 1x por key
+      // para visibilidade — memória continua válida, app não quebra.
+      logQuotaWarnOnce(storageKey, raw.length)
     }
-  } catch {
-    // QuotaExceededError, JSON cyclic, etc — falha silenciosa.
-    // Cache é otimização: app continua funcionando, só sem persistência.
   }
 }
 
+/**
+ * Throttle do warn de quota: 1x por storageKey por sessão, evita
+ * flood de console quando setter dispara várias vezes.
+ */
+const quotaWarnedKeys = new Set<string>()
+function logQuotaWarnOnce(storageKey: string, byteSize: number): void {
+  if (quotaWarnedKeys.has(storageKey)) return
+  quotaWarnedKeys.add(storageKey)
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[useScreenCachedState] sessionStorage quota exceeded para "${storageKey}" ` +
+    `(~${(byteSize / 1024 / 1024).toFixed(1)}MB). Cache mantido em memória — ` +
+    `sobrevive cross-MF nav, mas perde em F5/refresh.`,
+  )
+}
+
 function removeEntry(storageKey: string, scope: 'session' | 'memory'): void {
-  try {
-    if (scope === 'memory') {
-      memoryStore.delete(storageKey)
-      return
-    }
-    if (isWindowAvailable()) {
+  memoryStore.delete(storageKey)
+  if (scope !== 'memory' && isWindowAvailable()) {
+    try {
       window.sessionStorage.removeItem(storageKey)
+    } catch {
+      // ignore
     }
-  } catch {
-    // ignore
   }
 }
 
