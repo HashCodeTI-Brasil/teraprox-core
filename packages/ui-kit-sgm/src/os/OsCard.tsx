@@ -2,7 +2,7 @@
 import React, { memo, useState } from 'react'
 import { Button, Card, Spinner } from 'react-bootstrap'
 import { FaExclamationTriangle, FaUser, FaClock, FaPlay } from 'react-icons/fa'
-import { FaArrowRight, FaArrowsRotate, FaClipboardList, FaPlus } from 'react-icons/fa6'
+import { FaArrowRight, FaArrowsRotate, FaClipboardList, FaPlus, FaPaperPlane } from 'react-icons/fa6'
 import dayjs from 'dayjs'
 import './OsCard.css'
 import { getOsStatusMeta } from './statusPalette'
@@ -31,6 +31,9 @@ export interface OsCardOrdem {
   modelId?: number | string | null
   recorrenciaId?: number | string | null
   agregadorId?: number | string | null
+  /** Id da solicitação de serviço que originou esta OS, quando aplicável.
+   *  Quando ausente, considera-se que a OS foi criada manualmente. */
+  solicitacaoOrigemId?: number | string | null
   recurso?: { nome?: string } | null
   father?: string | null
   descricaoDoProblema?: string | null
@@ -55,6 +58,8 @@ export interface OsCardProps {
   onCardAction?: (ordem: OsCardOrdem) => void
   onViewAgregador?: (agregadorId: number | string) => void
   onViewRecorrencia?: (recorrenciaId: number | string) => void
+  /** Navega para a SS de origem (chip "Origem: SS #X"). Se omitido, o chip vira label não-clicável. */
+  onViewSolicitacao?: (solicitacaoId: number | string) => void
   onIniciar?: (ordem: OsCardOrdem) => void | Promise<void>
   onContinuar?: (ordem: OsCardOrdem) => void
   isSelectable?: boolean
@@ -88,6 +93,7 @@ const OsCardImpl: React.FC<OsCardProps> = ({
   onCardAction,
   onViewAgregador,
   onViewRecorrencia,
+  onViewSolicitacao,
   onIniciar,
   onContinuar,
   isSelectable,
@@ -107,6 +113,10 @@ const OsCardImpl: React.FC<OsCardProps> = ({
   const inAlert = isAgg && (ordem.realizado ?? 0) >= (ordem.warn ?? Infinity) && (ordem.realizado ?? 0) < (ordem.valorPlanejado ?? Infinity)
   const isCritical = isAgg && (ordem.realizado ?? 0) >= (ordem.valorPlanejado ?? Infinity)
   const isVirtual = Boolean(ordem.isVirtual)
+  const ssOrigemId = ordem.solicitacaoOrigemId
+  const hasSsOrigem = ssOrigemId !== undefined && ssOrigemId !== null && ssOrigemId !== ''
+  // OS é "direta" quando não vem de SS, recorrência, agregador, nem é modelo virtual.
+  const isDireta = !hasSsOrigem && !isRec && !isAgg && !isVirtual && Boolean(ordem.id)
   const canIniciar = !isVirtual && isPendente && Boolean(ordem.id) && Boolean(onIniciar)
   const canContinuar = !isVirtual && isExecutando && Boolean(ordem.id) && Boolean(onContinuar)
 
@@ -192,8 +202,38 @@ const OsCardImpl: React.FC<OsCardProps> = ({
           <div className="os-card__muted os-card__desc">{ordem.descricaoDoProblema}</div>
         )}
 
-        {(isRec || isAgg || isVirtual) && (
+        {(isRec || isAgg || isVirtual || hasSsOrigem || isDireta) && (
           <div className="d-flex flex-wrap gap-1">
+            {hasSsOrigem && (
+              <button
+                type="button"
+                className="os-chip"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!isSelectable && onViewSolicitacao) {
+                    onViewSolicitacao(ssOrigemId as number)
+                  }
+                }}
+                title={`Originada da Solicitação #${ssOrigemId}`}
+                style={{
+                  background: '#fef3c7',
+                  borderColor: '#fcd34d',
+                  color: '#92400e',
+                  cursor: onViewSolicitacao && !isSelectable ? 'pointer' : 'default',
+                }}
+              >
+                <FaPaperPlane size={10} /> SS #{ssOrigemId}
+              </button>
+            )}
+            {isDireta && (
+              <span
+                className="os-chip"
+                title="OS criada diretamente, sem solicitação de origem"
+                style={{ background: '#f1f5f9', borderColor: '#cbd5e1', color: '#475569' }}
+              >
+                <FaClipboardList size={10} /> Direta
+              </span>
+            )}
             {isRec && (
               <button
                 type="button"

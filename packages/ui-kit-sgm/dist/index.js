@@ -2245,6 +2245,7 @@ var OsCardImpl = ({
   onCardAction,
   onViewAgregador,
   onViewRecorrencia,
+  onViewSolicitacao,
   onIniciar,
   onContinuar,
   isSelectable,
@@ -2264,6 +2265,9 @@ var OsCardImpl = ({
   const inAlert = isAgg && ((_b = ordem.realizado) != null ? _b : 0) >= ((_c = ordem.warn) != null ? _c : Infinity) && ((_d = ordem.realizado) != null ? _d : 0) < ((_e = ordem.valorPlanejado) != null ? _e : Infinity);
   const isCritical = isAgg && ((_f = ordem.realizado) != null ? _f : 0) >= ((_g = ordem.valorPlanejado) != null ? _g : Infinity);
   const isVirtual = Boolean(ordem.isVirtual);
+  const ssOrigemId = ordem.solicitacaoOrigemId;
+  const hasSsOrigem = ssOrigemId !== void 0 && ssOrigemId !== null && ssOrigemId !== "";
+  const isDireta = !hasSsOrigem && !isRec && !isAgg && !isVirtual && Boolean(ordem.id);
   const canIniciar = !isVirtual && isPendente && Boolean(ordem.id) && Boolean(onIniciar);
   const canContinuar = !isVirtual && isExecutando && Boolean(ordem.id) && Boolean(onContinuar);
   const handleIniciar = async (e) => {
@@ -2340,7 +2344,44 @@ var OsCardImpl = ({
           )
         ] }),
         ordem.descricaoDoProblema && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "os-card__muted os-card__desc", children: ordem.descricaoDoProblema }),
-        (isRec || isAgg || isVirtual) && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "d-flex flex-wrap gap-1", children: [
+        (isRec || isAgg || isVirtual || hasSsOrigem || isDireta) && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "d-flex flex-wrap gap-1", children: [
+          hasSsOrigem && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
+            "button",
+            {
+              type: "button",
+              className: "os-chip",
+              onClick: (e) => {
+                e.stopPropagation();
+                if (!isSelectable && onViewSolicitacao) {
+                  onViewSolicitacao(ssOrigemId);
+                }
+              },
+              title: `Originada da Solicita\xE7\xE3o #${ssOrigemId}`,
+              style: {
+                background: "#fef3c7",
+                borderColor: "#fcd34d",
+                color: "#92400e",
+                cursor: onViewSolicitacao && !isSelectable ? "pointer" : "default"
+              },
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_fa63.FaPaperPlane, { size: 10 }),
+                " SS #",
+                ssOrigemId
+              ]
+            }
+          ),
+          isDireta && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
+            "span",
+            {
+              className: "os-chip",
+              title: "OS criada diretamente, sem solicita\xE7\xE3o de origem",
+              style: { background: "#f1f5f9", borderColor: "#cbd5e1", color: "#475569" },
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(import_fa63.FaClipboardList, { size: 10 }),
+                " Direta"
+              ]
+            }
+          ),
           isRec && /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
             "button",
             {
