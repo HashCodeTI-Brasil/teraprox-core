@@ -265,6 +265,57 @@ export const UnifiedPeriodSelector: React.FC<UnifiedPeriodSelectorProps> = ({
     [selectedYear, selectedMonths, onSelect]
   )
 
+  // ── Quick month dropdown ──
+  // Lista os 12 meses do ano atual + 12 meses do ano anterior, mais recentes primeiro.
+  const quickMonthOptions = useMemo(() => {
+    const now = new Date()
+    const opts: { value: string; label: string; year: number; month: number }[] = []
+    for (let yearOffset = 0; yearOffset <= 1; yearOffset++) {
+      const year = now.getFullYear() - yearOffset
+      const lastMonth = yearOffset === 0 ? now.getMonth() : 11
+      for (let m = lastMonth; m >= 0; m--) {
+        opts.push({
+          value: `${year}-${pad2(m + 1)}`,
+          label: `${MONTHS_FULL[m]} ${year}`,
+          year,
+          month: m,
+        })
+      }
+    }
+    return opts
+  }, [])
+
+  // Valor atual do dropdown — espelha dataInicio/dataFim quando representam mês cheio.
+  const quickMonthValue = useMemo(() => {
+    const s = parseDate(dataInicio)
+    const e = parseDate(dataFim)
+    if (!s || !e) return ''
+    if (
+      s.getFullYear() === e.getFullYear() &&
+      s.getMonth() === e.getMonth() &&
+      s.getDate() === 1
+    ) {
+      return `${s.getFullYear()}-${pad2(s.getMonth() + 1)}`
+    }
+    return ''
+  }, [dataInicio, dataFim])
+
+  const handleQuickMonthChange = useCallback(
+    (value: string) => {
+      if (disabled || !value) return
+      const opt = quickMonthOptions.find((o) => o.value === value)
+      if (!opt) return
+      setActivePresetKey(null)
+      setSelectedYear(opt.year)
+      setSelectedMonths(new Set([opt.month]))
+      onSelect({
+        dataInicio: startOfMonthISO(opt.year, opt.month),
+        dataFim: endOfMonthISO(opt.year, opt.month),
+      })
+    },
+    [disabled, onSelect, quickMonthOptions]
+  )
+
   // ── Custom range handler ──
   const handleCustomApply = useCallback(() => {
     if (!customStart || !customEnd) return
@@ -359,20 +410,39 @@ export const UnifiedPeriodSelector: React.FC<UnifiedPeriodSelectorProps> = ({
         <div className="ups-content">
           {/* ═══ Quick presets ═══ */}
           {activeTab === "quick" && (
-            <div className="ups-quick-grid">
-              {presets.map((p) => (
-                <Button
-                  key={p.key}
+            <>
+              <div className="ups-quick-grid">
+                {presets.map((p) => (
+                  <Button
+                    key={p.key}
+                    size="sm"
+                    variant={activePresetKey === p.key ? "primary" : "outline-secondary"}
+                    className="ups-quick-btn"
+                    onClick={() => handlePreset(p)}
+                    disabled={disabled}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+              <div className="ups-quick-month">
+                <Form.Label className="small text-muted mb-1">Mês exato</Form.Label>
+                <Form.Select
                   size="sm"
-                  variant={activePresetKey === p.key ? "primary" : "outline-secondary"}
-                  className="ups-quick-btn"
-                  onClick={() => handlePreset(p)}
+                  value={quickMonthValue}
+                  onChange={(e) => handleQuickMonthChange(e.target.value)}
                   disabled={disabled}
+                  aria-label="Selecionar mês exato"
                 >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
+                  <option value="">Escolha um mês…</option>
+                  {quickMonthOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </Form.Select>
+              </div>
+            </>
           )}
 
           {/* ═══ Month selector ═══ */}

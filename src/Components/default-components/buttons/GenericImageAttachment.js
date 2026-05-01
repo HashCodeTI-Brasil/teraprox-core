@@ -23,6 +23,7 @@ import ImageViewModal from "../modals/ImageViewModal"
  * @prop {boolean}  disableExclusion
  * @prop {boolean}  disableView
  * @prop {boolean}  disableUpload
+ * @prop {boolean}  hideDefaultTrigger — esconde o clip/badge nativo; use ref.openManager() para abrir o modal (ex.: TarefaItem).
  */
 const GenericImageAttachment = forwardRef(({
 	filesData = [],
@@ -35,6 +36,7 @@ const GenericImageAttachment = forwardRef(({
 	disableUpload = false,
 	onUpload = null,
 	apiEndpoint = null,
+	hideDefaultTrigger = false,
 }, ref) => {
 	const [showManager, setShowManager] = useState(false)
 	const [showPreview, setShowPreview] = useState(false)
@@ -337,6 +339,7 @@ const GenericImageAttachment = forwardRef(({
 
 	return (
 		<>
+			{!hideDefaultTrigger && (
 			<div
 				data-attachment-trigger="true"
 				onClick={(e) => {
@@ -362,6 +365,7 @@ const GenericImageAttachment = forwardRef(({
 					content={hasFiles ? validFiles.length : null}
 				/>
 			</div>
+			)}
 
 			{renderManagerModal()}
 

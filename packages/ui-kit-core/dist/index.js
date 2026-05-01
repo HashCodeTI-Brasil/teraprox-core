@@ -35,6 +35,8 @@ __export(index_exports, {
   ColorPicker: () => ColorPicker,
   CombineModeToggle: () => CombineModeToggle,
   ContadorPicker: () => ContadorPicker,
+  DeleteConfirm: () => DeleteConfirm,
+  FormActionButtons: () => FormActionButtons,
   FormModal: () => FormModal,
   FrequenciaFormV2: () => FrequenciaFormV2,
   IconWithBadge: () => IconWithBadge
@@ -1086,9 +1088,214 @@ function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label
   ] });
 }
 
-// src/icons/IconWithBadge.tsx
+// src/buttons/FormActionButtons.tsx
+var import_react4 = require("react");
+var import_react_bootstrap6 = require("react-bootstrap");
+var import_fi2 = require("react-icons/fi");
+
+// src/buttons/DeleteConfirm.tsx
+var import_react3 = require("react");
 var import_react_bootstrap5 = require("react-bootstrap");
 var import_jsx_runtime8 = require("react/jsx-runtime");
+var DeleteConfirm = ({
+  show,
+  onHide,
+  onConfirm,
+  title = "Confirma\xE7\xE3o de Exclus\xE3o",
+  dialogText,
+  payload,
+  needExclusionDetails = false,
+  minDetailsLength = 8
+}) => {
+  const [details, setDetails] = (0, import_react3.useState)("");
+  const resolveDialog = () => {
+    if (typeof dialogText === "function") return dialogText(payload);
+    return dialogText != null ? dialogText : "Voc\xEA tem certeza que deseja excluir este item?";
+  };
+  const canConfirm = !needExclusionDetails || details.length >= minDetailsLength;
+  const handleConfirm = () => {
+    onConfirm(details);
+    setDetails("");
+    onHide(false);
+  };
+  const handleHide = () => {
+    setDetails("");
+    onHide(false);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap5.Modal, { show, onHide: handleHide, centered: true, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap5.Modal.Header, { closeButton: true, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap5.Modal.Title, { children: title }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap5.Modal.Body, { children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "d-flex flex-column gap-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { children: resolveDialog() }),
+      needExclusionDetails && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap5.Form.Group, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap5.Form.Label, { children: [
+          "Motivo da Exclus\xE3o (m\xEDn. ",
+          minDetailsLength,
+          " caracteres)"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+          import_react_bootstrap5.Form.Control,
+          {
+            as: "textarea",
+            rows: 3,
+            value: details,
+            onChange: (e) => setDetails(e.target.value),
+            placeholder: "Descreva o motivo...",
+            autoFocus: true
+          }
+        )
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_react_bootstrap5.Modal.Footer, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap5.Button, { variant: "secondary", onClick: handleHide, children: "Cancelar" }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(import_react_bootstrap5.Button, { variant: "danger", disabled: !canConfirm, onClick: handleConfirm, children: "Confirmar Exclus\xE3o" })
+    ] })
+  ] });
+};
+
+// src/buttons/FormActionButtons.tsx
+var import_jsx_runtime9 = require("react/jsx-runtime");
+var visible = (callback, flag) => Boolean(callback) && flag !== false;
+var FormActionButtons = ({
+  onSave,
+  saveLabel = "Salvar",
+  saveVariant = "primary",
+  showSave,
+  onDelete,
+  deleteLabel = "Excluir",
+  deleteConfirmMsg,
+  needExclusionDetails = false,
+  showDelete,
+  onBack,
+  backLabel = "Voltar",
+  showBack,
+  onCancelEdit,
+  cancelEditLabel = "Cancelar",
+  showCancelEdit,
+  onCopy,
+  copyLabel = "Copiar Formul\xE1rio",
+  showCopy,
+  isEditing = false,
+  disabled = false,
+  useDelayedDelete = false,
+  delayedDeleteTimeout = 3e3,
+  PermissionWrapper,
+  className
+}) => {
+  const [showConfirm, setShowConfirm] = (0, import_react4.useState)(false);
+  const [holding, setHolding] = (0, import_react4.useState)(false);
+  const [progress, setProgress] = (0, import_react4.useState)(0);
+  const timeoutRef = (0, import_react4.useRef)(null);
+  const intervalRef = (0, import_react4.useRef)(null);
+  const stopHold = () => {
+    setHolding(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setProgress(0);
+  };
+  const startHold = () => {
+    if (disabled || !onDelete) return;
+    setHolding(true);
+    setProgress(0);
+    const step = 2;
+    const tickTime = delayedDeleteTimeout / (100 / step);
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => prev >= 100 ? 100 : prev + step);
+    }, tickTime);
+    timeoutRef.current = setTimeout(() => {
+      stopHold();
+      onDelete();
+    }, delayedDeleteTimeout);
+  };
+  const renderDeleteButton = () => {
+    if (!isEditing || !visible(onDelete, showDelete)) return null;
+    if (useDelayedDelete) {
+      return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { style: { position: "relative", display: "inline-block", margin: 2 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+          import_react_bootstrap6.Button,
+          {
+            variant: "outline-danger",
+            onMouseDown: startHold,
+            onMouseUp: stopHold,
+            onMouseLeave: stopHold,
+            onTouchStart: startHold,
+            onTouchEnd: stopHold,
+            disabled,
+            style: { minWidth: "120px" },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiTrash2, { className: "me-2" }),
+              holding ? "Segure..." : deleteLabel
+            ]
+          }
+        ),
+        holding && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+          import_react_bootstrap6.ProgressBar,
+          {
+            now: progress,
+            variant: "danger",
+            style: {
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "4px",
+              borderRadius: "0 0 4px 4px"
+            }
+          }
+        )
+      ] });
+    }
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+      import_react_bootstrap6.Button,
+      {
+        variant: "danger",
+        onClick: () => setShowConfirm(true),
+        disabled,
+        style: { margin: 2 },
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiTrash2, { className: "me-2" }),
+          deleteLabel
+        ]
+      }
+    );
+  };
+  const deleteButton = renderDeleteButton();
+  const wrappedDelete = deleteButton && PermissionWrapper ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PermissionWrapper, { children: deleteButton }) : deleteButton;
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_jsx_runtime9.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+      DeleteConfirm,
+      {
+        show: showConfirm,
+        onHide: setShowConfirm,
+        onConfirm: (details) => onDelete == null ? void 0 : onDelete(details),
+        dialogText: deleteConfirmMsg,
+        needExclusionDetails
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap6.Form.Group, { className: `d-flex flex-wrap align-items-center mt-3 gap-1 ${className != null ? className : ""}`.trim(), children: [
+      visible(onBack, showBack) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap6.Button, { variant: "outline-secondary", onClick: onBack, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiChevronLeft, { className: "me-2" }),
+        backLabel
+      ] }),
+      isEditing && visible(onCancelEdit, showCancelEdit) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap6.Button, { variant: "warning", onClick: onCancelEdit, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiRotateCcw, { className: "me-2" }),
+        cancelEditLabel
+      ] }),
+      wrappedDelete,
+      visible(onSave, showSave) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap6.Button, { variant: saveVariant, onClick: onSave, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiSave, { className: "me-2" }),
+        saveLabel
+      ] }),
+      isEditing && visible(onCopy, showCopy) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_react_bootstrap6.Button, { variant: "outline-primary", onClick: onCopy, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(import_fi2.FiCopy, { className: "me-2" }),
+        copyLabel
+      ] })
+    ] })
+  ] });
+};
+
+// src/icons/IconWithBadge.tsx
+var import_react_bootstrap7 = require("react-bootstrap");
+var import_jsx_runtime10 = require("react/jsx-runtime");
 var IconWithBadge = ({
   icon,
   content,
@@ -1097,7 +1304,7 @@ var IconWithBadge = ({
 }) => {
   const showBadge = content !== null && content !== void 0 && content !== 0 && content !== "";
   if (mode === "inline") {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
       "div",
       {
         style: {
@@ -1107,8 +1314,8 @@ var IconWithBadge = ({
         },
         children: [
           icon,
-          showBadge ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-            import_react_bootstrap5.Badge,
+          showBadge ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+            import_react_bootstrap7.Badge,
             {
               bg,
               pill: true,
@@ -1127,10 +1334,10 @@ var IconWithBadge = ({
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { position: "relative", display: "inline-block" }, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { style: { position: "relative", display: "inline-block" }, children: [
     icon,
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-      import_react_bootstrap5.Badge,
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      import_react_bootstrap7.Badge,
       {
         bg,
         style: {
@@ -1158,6 +1365,8 @@ var IconWithBadge = ({
   ColorPicker,
   CombineModeToggle,
   ContadorPicker,
+  DeleteConfirm,
+  FormActionButtons,
   FormModal,
   FrequenciaFormV2,
   IconWithBadge

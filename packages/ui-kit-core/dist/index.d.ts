@@ -244,6 +244,86 @@ interface ColorPickerProps {
 declare function ColorPicker({ defaultColor, setCor, disabled, label }: ColorPickerProps): react_jsx_runtime.JSX.Element;
 
 /**
+ * FormActionButtons — @teraprox/ui-kit-core
+ *
+ * Agrupamento padrão de botões de ação para formulários (Cancelar, Excluir, Salvar
+ * + opcionais Voltar e Copiar). Props-driven (zero Redux, zero useCoreService).
+ *
+ * Cada botão renderiza apenas se seu callback for fornecido E sua flag `show*`
+ * não estiver explicitamente em `false` — permitindo esconder botões pontualmente
+ * sem remover o callback (útil para alternar visibilidade por permissão/estado).
+ *
+ * Inclui:
+ *   - Confirmação modal de exclusão (DeleteConfirm)
+ *   - Variante "hold-to-delete" (manter pressionado por N ms) para ações destrutivas
+ *   - Wrapper opcional de permissão para o botão Excluir
+ *
+ * Promovido de teraprox-ui-kit/buttons/ActionButtons para ui-kit-core em 2026-04-30
+ * para virar padrão de todo formulário do ecossistema.
+ */
+
+interface FormActionButtonsProps {
+    /** Callback Salvar — botão renderiza se callback presente e showSave !== false. */
+    onSave?: () => void;
+    saveLabel?: string;
+    saveVariant?: string;
+    showSave?: boolean;
+    /** Callback Excluir — botão só renderiza em modo edição (isEditing). */
+    onDelete?: (details?: string) => void;
+    deleteLabel?: string;
+    deleteConfirmMsg?: string;
+    needExclusionDetails?: boolean;
+    showDelete?: boolean;
+    /** Callback Voltar (chevron). */
+    onBack?: () => void;
+    backLabel?: string;
+    showBack?: boolean;
+    /** Callback Cancelar Edição (rotate-icon, variant warning). */
+    onCancelEdit?: () => void;
+    cancelEditLabel?: string;
+    showCancelEdit?: boolean;
+    /** Callback Copiar Formulário (só em modo edição). */
+    onCopy?: () => void;
+    copyLabel?: string;
+    showCopy?: boolean;
+    /** Estado meta — habilita Excluir/Cancelar/Copiar. */
+    isEditing?: boolean;
+    /** Desabilita todos os botões. */
+    disabled?: boolean;
+    /** Hold-to-delete (segurar N ms) ao invés de modal de confirmação. */
+    useDelayedDelete?: boolean;
+    delayedDeleteTimeout?: number;
+    /** Wrapper opcional de permissão envolvendo o botão Excluir. */
+    PermissionWrapper?: React.ComponentType<{
+        children: React.ReactNode;
+        id?: string;
+    }>;
+    /** Classe adicional no Form.Group container. */
+    className?: string;
+}
+declare const FormActionButtons: React.FC<FormActionButtonsProps>;
+
+/**
+ * DeleteConfirm — @teraprox/ui-kit-core
+ *
+ * Modal de confirmação de exclusão padronizado, props-driven (zero Redux).
+ * Promovido de teraprox-ui-kit/forms/DeleteConfirm para ui-kit-core em 2026-04-30
+ * como dependência interna do FormActionButtons.
+ */
+
+interface DeleteConfirmProps {
+    show: boolean;
+    onHide: (show: boolean) => void;
+    onConfirm: (details: string) => void;
+    title?: string;
+    dialogText?: string | ((payload: unknown) => string);
+    payload?: unknown;
+    needExclusionDetails?: boolean;
+    minDetailsLength?: number;
+}
+declare const DeleteConfirm: React.FC<DeleteConfirmProps>;
+
+/**
  * IconWithBadge — ícone com badge numérico opcional (ex.: contagem de itens).
  *
  * Promovido de `teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx`
@@ -268,4 +348,4 @@ interface IconWithBadgeProps {
 }
 declare const IconWithBadge: React.FC<IconWithBadgeProps>;
 
-export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, ColorPicker, type ColorPickerProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, IconWithBadge, type IconWithBadgeBg, type IconWithBadgeMode, type IconWithBadgeProps, type RecorrenciaEscala, type RecorrenciaValue };
+export { type AnexoLocalItem, AnexoManager, type AnexoManagerProps, type AnexoPersistedItem, ClickToWriteField, type ClickToWriteFieldProps, ColorPicker, type ColorPickerProps, type CombineMode, CombineModeToggle, type CombineModeToggleProps, type ContadorBoundRule, type ContadorLimite, ContadorPicker, type ContadorPickerProps, type ContadorPickerValue, DeleteConfirm, type DeleteConfirmProps, FormActionButtons, type FormActionButtonsProps, FormModal, type FormModalProps, FrequenciaFormV2, type FrequenciaFormV2Props, IconWithBadge, type IconWithBadgeBg, type IconWithBadgeMode, type IconWithBadgeProps, type RecorrenciaEscala, type RecorrenciaValue };

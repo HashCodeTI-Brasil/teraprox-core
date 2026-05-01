@@ -1428,7 +1428,7 @@ import {
 } from "react-icons/fa";
 import dayjs4 from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { jsx as jsx30, jsxs as jsxs22 } from "react/jsx-runtime";
+import { Fragment as Fragment8, jsx as jsx30, jsxs as jsxs22 } from "react/jsx-runtime";
 dayjs4.extend(isoWeek);
 var MONTHS = [
   "Jan",
@@ -1619,6 +1619,47 @@ var UnifiedPeriodSelector = ({
     },
     [selectedYear, selectedMonths, onSelect]
   );
+  const quickMonthOptions = useMemo2(() => {
+    const now = /* @__PURE__ */ new Date();
+    const opts = [];
+    for (let yearOffset = 0; yearOffset <= 1; yearOffset++) {
+      const year = now.getFullYear() - yearOffset;
+      const lastMonth = yearOffset === 0 ? now.getMonth() : 11;
+      for (let m = lastMonth; m >= 0; m--) {
+        opts.push({
+          value: `${year}-${pad2(m + 1)}`,
+          label: `${MONTHS_FULL[m]} ${year}`,
+          year,
+          month: m
+        });
+      }
+    }
+    return opts;
+  }, []);
+  const quickMonthValue = useMemo2(() => {
+    const s = parseDate(dataInicio);
+    const e = parseDate(dataFim);
+    if (!s || !e) return "";
+    if (s.getFullYear() === e.getFullYear() && s.getMonth() === e.getMonth() && s.getDate() === 1) {
+      return `${s.getFullYear()}-${pad2(s.getMonth() + 1)}`;
+    }
+    return "";
+  }, [dataInicio, dataFim]);
+  const handleQuickMonthChange = useCallback(
+    (value) => {
+      if (disabled || !value) return;
+      const opt = quickMonthOptions.find((o) => o.value === value);
+      if (!opt) return;
+      setActivePresetKey(null);
+      setSelectedYear(opt.year);
+      setSelectedMonths(/* @__PURE__ */ new Set([opt.month]));
+      onSelect({
+        dataInicio: startOfMonthISO(opt.year, opt.month),
+        dataFim: endOfMonthISO(opt.year, opt.month)
+      });
+    },
+    [disabled, onSelect, quickMonthOptions]
+  );
   const handleCustomApply = useCallback(() => {
     if (!customStart || !customEnd) return;
     setActivePresetKey(null);
@@ -1697,18 +1738,37 @@ var UnifiedPeriodSelector = ({
       tab.key
     )) }),
     /* @__PURE__ */ jsxs22("div", { className: "ups-content", children: [
-      activeTab === "quick" && /* @__PURE__ */ jsx30("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ jsx30(
-        Button12,
-        {
-          size: "sm",
-          variant: activePresetKey === p.key ? "primary" : "outline-secondary",
-          className: "ups-quick-btn",
-          onClick: () => handlePreset(p),
-          disabled,
-          children: p.label
-        },
-        p.key
-      )) }),
+      activeTab === "quick" && /* @__PURE__ */ jsxs22(Fragment8, { children: [
+        /* @__PURE__ */ jsx30("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ jsx30(
+          Button12,
+          {
+            size: "sm",
+            variant: activePresetKey === p.key ? "primary" : "outline-secondary",
+            className: "ups-quick-btn",
+            onClick: () => handlePreset(p),
+            disabled,
+            children: p.label
+          },
+          p.key
+        )) }),
+        /* @__PURE__ */ jsxs22("div", { className: "ups-quick-month", children: [
+          /* @__PURE__ */ jsx30(Form6.Label, { className: "small text-muted mb-1", children: "M\xEAs exato" }),
+          /* @__PURE__ */ jsxs22(
+            Form6.Select,
+            {
+              size: "sm",
+              value: quickMonthValue,
+              onChange: (e) => handleQuickMonthChange(e.target.value),
+              disabled,
+              "aria-label": "Selecionar m\xEAs exato",
+              children: [
+                /* @__PURE__ */ jsx30("option", { value: "", children: "Escolha um m\xEAs\u2026" }),
+                quickMonthOptions.map((o) => /* @__PURE__ */ jsx30("option", { value: o.value, children: o.label }, o.value))
+              ]
+            }
+          )
+        ] })
+      ] }),
       activeTab === "month" && /* @__PURE__ */ jsxs22("div", { className: "ups-month-section", children: [
         /* @__PURE__ */ jsxs22("div", { className: "ups-year-nav", children: [
           /* @__PURE__ */ jsx30(
@@ -1816,7 +1876,7 @@ import {
   InputGroup as InputGroup2
 } from "react-bootstrap";
 import { FiMail, FiSearch, FiUser, FiX, FiPlus, FiSend } from "react-icons/fi";
-import { Fragment as Fragment8, jsx as jsx31, jsxs as jsxs23 } from "react/jsx-runtime";
+import { Fragment as Fragment9, jsx as jsx31, jsxs as jsxs23 } from "react/jsx-runtime";
 var MailSender = ({
   htmlContent,
   companyName,
@@ -1961,10 +2021,10 @@ var MailSender = ({
                       minWidth: "130px",
                       height: "40px"
                     },
-                    children: postLoading ? /* @__PURE__ */ jsxs23(Fragment8, { children: [
+                    children: postLoading ? /* @__PURE__ */ jsxs23(Fragment9, { children: [
                       /* @__PURE__ */ jsx31(Spinner4, { size: "sm", className: "me-2" }),
                       "Enviando..."
-                    ] }) : /* @__PURE__ */ jsxs23(Fragment8, { children: [
+                    ] }) : /* @__PURE__ */ jsxs23(Fragment9, { children: [
                       /* @__PURE__ */ jsx31(FiSend, { className: "me-2", size: 14 }),
                       "Enviar E-mail"
                     ] })
@@ -2011,10 +2071,10 @@ var MailSender = ({
                   onClick: () => setAddingEmail(!addingEmail),
                   disabled: postLoading,
                   style: { borderRadius: "8px" },
-                  children: addingEmail ? /* @__PURE__ */ jsxs23(Fragment8, { children: [
+                  children: addingEmail ? /* @__PURE__ */ jsxs23(Fragment9, { children: [
                     /* @__PURE__ */ jsx31(FiX, { className: "me-1", size: 14 }),
                     "Cancelar"
-                  ] }) : /* @__PURE__ */ jsxs23(Fragment8, { children: [
+                  ] }) : /* @__PURE__ */ jsxs23(Fragment9, { children: [
                     /* @__PURE__ */ jsx31(FiPlus, { className: "me-1", size: 14 }),
                     "E-mail Personalizado"
                   ] })
@@ -2175,7 +2235,7 @@ var MailSender = ({
 // src/forms/AutoComplete.tsx
 import { useEffect as useEffect5, useMemo as useMemo3, useState as useState13 } from "react";
 import { FloatingLabel, Form as Form8, InputGroup as InputGroup3, ListGroup as ListGroup2, Spinner as Spinner5 } from "react-bootstrap";
-import { Fragment as Fragment9, jsx as jsx32, jsxs as jsxs24 } from "react/jsx-runtime";
+import { Fragment as Fragment10, jsx as jsx32, jsxs as jsxs24 } from "react/jsx-runtime";
 var AutoComplete = ({
   className,
   ops = [],
@@ -2331,7 +2391,7 @@ var AutoComplete = ({
       },
       onMouseLeave: () => setHide(true),
       children: [
-        !hideComponent && /* @__PURE__ */ jsxs24(Fragment9, { children: [
+        !hideComponent && /* @__PURE__ */ jsxs24(Fragment10, { children: [
           labelPosition === "top" && title && /* @__PURE__ */ jsx32(Form8.Label, { className: "fw-semibold small mb-1", children: title }),
           /* @__PURE__ */ jsxs24(InputGroup3, { children: [
             labelPosition === "floating" ? /* @__PURE__ */ jsx32(FloatingLabel, { controlId: "floatingInput", label: title, style: { zIndex: 0, flex: 1 }, children: /* @__PURE__ */ jsx32(
@@ -2516,7 +2576,7 @@ var GenericForm_default = GenericForm;
 // src/forms/GenericSelect.tsx
 import { useEffect as useEffect6, useState as useState15 } from "react";
 import { Form as Form10, InputGroup as InputGroup4 } from "react-bootstrap";
-import { Fragment as Fragment10, jsx as jsx34, jsxs as jsxs26 } from "react/jsx-runtime";
+import { Fragment as Fragment11, jsx as jsx34, jsxs as jsxs26 } from "react/jsx-runtime";
 var GenericSelectOps = class {
   constructor(noLabel, title, onChange, ops, selection, returnType, displayType, filter, filterField, valueType, loadFunc, loadCondition, actionClick, locked) {
     this.noLabel = noLabel;
@@ -2602,7 +2662,7 @@ var GenericSelect = ({
     }
   );
   if (actionClick) {
-    return /* @__PURE__ */ jsxs26(Fragment10, { children: [
+    return /* @__PURE__ */ jsxs26(Fragment11, { children: [
       /* @__PURE__ */ jsx34(Form10.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
       /* @__PURE__ */ jsxs26(InputGroup4, { children: [
         selectContent,
@@ -2610,7 +2670,7 @@ var GenericSelect = ({
       ] })
     ] });
   }
-  return /* @__PURE__ */ jsxs26(Fragment10, { children: [
+  return /* @__PURE__ */ jsxs26(Fragment11, { children: [
     /* @__PURE__ */ jsx34(Form10.Label, { style: { fontWeight: isBold ? "bold" : void 0 }, hidden: noLabel, children: title }),
     selectContent
   ] });
@@ -2888,7 +2948,7 @@ var Switch = ({
 import { useCallback as useCallback2 } from "react";
 import { useDropzone } from "react-dropzone";
 import { FiUploadCloud, FiCheckCircle } from "react-icons/fi";
-import { Fragment as Fragment11, jsx as jsx39, jsxs as jsxs30 } from "react/jsx-runtime";
+import { Fragment as Fragment12, jsx as jsx39, jsxs as jsxs30 } from "react/jsx-runtime";
 var UploadArea = ({
   onFilePut,
   anexo,
@@ -2922,10 +2982,10 @@ var UploadArea = ({
         /* @__PURE__ */ jsx39("input", { ...getInputProps() }),
         /* @__PURE__ */ jsxs30("div", { className: "upload-content", children: [
           /* @__PURE__ */ jsx39("span", { className: "upload-icon", children: hasAnexo ? /* @__PURE__ */ jsx39(FiCheckCircle, { size: 24 }) : /* @__PURE__ */ jsx39(FiUploadCloud, { size: 24 }) }),
-          hasAnexo ? /* @__PURE__ */ jsxs30(Fragment11, { children: [
+          hasAnexo ? /* @__PURE__ */ jsxs30(Fragment12, { children: [
             /* @__PURE__ */ jsx39("p", { className: "upload-link", children: "Arquivo anexado" }),
             /* @__PURE__ */ jsx39("p", { className: "upload-info", children: anexo == null ? void 0 : anexo.name })
-          ] }) : /* @__PURE__ */ jsxs30(Fragment11, { children: [
+          ] }) : /* @__PURE__ */ jsxs30(Fragment12, { children: [
             /* @__PURE__ */ jsxs30("p", { children: [
               /* @__PURE__ */ jsx39("span", { className: "upload-link", children: "Adicione" }),
               " ou arraste arquivos aqui"
@@ -3117,7 +3177,7 @@ import { useState as useState18 } from "react";
 import { Modal as Modal4, Button as Button17, OverlayTrigger, Tooltip as Tooltip3 } from "react-bootstrap";
 import { FiClock, FiCheck, FiTrash2 as FiTrash23 } from "react-icons/fi";
 import dayjs5 from "dayjs";
-import { Fragment as Fragment12, jsx as jsx44, jsxs as jsxs34 } from "react/jsx-runtime";
+import { Fragment as Fragment13, jsx as jsx44, jsxs as jsxs34 } from "react/jsx-runtime";
 var NotificationItem = ({
   notification,
   onRead,
@@ -3140,7 +3200,7 @@ var NotificationItem = ({
     onDismiss(notification);
   };
   const displayTitle = contextId ? `${context} - ${contextId}` : context || "Notifica\xE7\xE3o";
-  return /* @__PURE__ */ jsxs34(Fragment12, { children: [
+  return /* @__PURE__ */ jsxs34(Fragment13, { children: [
     /* @__PURE__ */ jsxs34(
       "div",
       {
@@ -3151,7 +3211,7 @@ var NotificationItem = ({
           /* @__PURE__ */ jsxs34("div", { className: "notification-main-content", children: [
             /* @__PURE__ */ jsx44("div", { className: "notification-header-row", children: /* @__PURE__ */ jsxs34("div", { className: "notification-title-modern", children: [
               /* @__PURE__ */ jsx44("span", { className: "notification-context", children: context }),
-              contextId && /* @__PURE__ */ jsxs34(Fragment12, { children: [
+              contextId && /* @__PURE__ */ jsxs34(Fragment13, { children: [
                 /* @__PURE__ */ jsx44("span", { className: "notification-separator", children: "/" }),
                 /* @__PURE__ */ jsx44("span", { className: "notification-context-id", children: contextId })
               ] })
@@ -3747,7 +3807,7 @@ var QrCodeScanButton = ({ callback, size = 25 }) => {
 // src/tables/ReusableTableWithModal.tsx
 import { useState as useState24, useEffect as useEffect12 } from "react";
 import { Table, Button as Button22, Modal as Modal8 } from "react-bootstrap";
-import { Fragment as Fragment13, jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
+import { Fragment as Fragment14, jsx as jsx52, jsxs as jsxs42 } from "react/jsx-runtime";
 var ReusableTableWithModal = ({
   fetchDataCallback,
   modalButtonCallback,
@@ -3788,7 +3848,7 @@ var ReusableTableWithModal = ({
     setShowModal(false);
     setSelectedItem(null);
   };
-  return /* @__PURE__ */ jsxs42(Fragment13, { children: [
+  return /* @__PURE__ */ jsxs42(Fragment14, { children: [
     /* @__PURE__ */ jsxs42(Table, { striped: true, bordered: true, hover: true, responsive: true, children: [
       /* @__PURE__ */ jsx52("thead", { children: /* @__PURE__ */ jsx52("tr", { children: headers.map((col, index) => /* @__PURE__ */ jsx52("th", { children: col }, index)) }) }),
       /* @__PURE__ */ jsx52("tbody", { children: loading ? /* @__PURE__ */ jsx52("tr", { children: /* @__PURE__ */ jsx52("td", { colSpan: headers.length, className: "text-center py-4", children: "Carregando..." }) }) : tableDataRows.length > 0 ? tableDataRows.map((td, index) => /* @__PURE__ */ jsx52(
@@ -3825,7 +3885,7 @@ var ReusableTableWithModal = ({
 // src/text/TextWithMore.tsx
 import { useState as useState25 } from "react";
 import { Button as Button23 } from "react-bootstrap";
-import { Fragment as Fragment14, jsx as jsx53, jsxs as jsxs43 } from "react/jsx-runtime";
+import { Fragment as Fragment15, jsx as jsx53, jsxs as jsxs43 } from "react/jsx-runtime";
 var TextWithMore = ({
   text = "Carregando...",
   maxLength,
@@ -3838,7 +3898,7 @@ var TextWithMore = ({
   };
   const isTruncated = text.length > maxLength;
   const displayText = isTruncated && !expanded ? text.slice(0, maxLength) + "\u2026" : text;
-  return /* @__PURE__ */ jsxs43(Fragment14, { children: [
+  return /* @__PURE__ */ jsxs43(Fragment15, { children: [
     /* @__PURE__ */ jsx53("span", { className: "text-with-more-content", children: displayText }),
     isTruncated && /* @__PURE__ */ jsx53(
       Button23,

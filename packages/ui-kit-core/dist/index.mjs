@@ -1053,9 +1053,214 @@ function ColorPicker({ defaultColor = "#3498db", setCor, disabled = false, label
   ] });
 }
 
+// src/buttons/FormActionButtons.tsx
+import { useRef as useRef2, useState as useState3 } from "react";
+import { Button as Button5, Form as Form5, ProgressBar } from "react-bootstrap";
+import { FiChevronLeft, FiCopy, FiRotateCcw, FiSave, FiTrash2 as FiTrash22 } from "react-icons/fi";
+
+// src/buttons/DeleteConfirm.tsx
+import { useState as useState2 } from "react";
+import { Button as Button4, Form as Form4, Modal as Modal2 } from "react-bootstrap";
+import { jsx as jsx8, jsxs as jsxs8 } from "react/jsx-runtime";
+var DeleteConfirm = ({
+  show,
+  onHide,
+  onConfirm,
+  title = "Confirma\xE7\xE3o de Exclus\xE3o",
+  dialogText,
+  payload,
+  needExclusionDetails = false,
+  minDetailsLength = 8
+}) => {
+  const [details, setDetails] = useState2("");
+  const resolveDialog = () => {
+    if (typeof dialogText === "function") return dialogText(payload);
+    return dialogText != null ? dialogText : "Voc\xEA tem certeza que deseja excluir este item?";
+  };
+  const canConfirm = !needExclusionDetails || details.length >= minDetailsLength;
+  const handleConfirm = () => {
+    onConfirm(details);
+    setDetails("");
+    onHide(false);
+  };
+  const handleHide = () => {
+    setDetails("");
+    onHide(false);
+  };
+  return /* @__PURE__ */ jsxs8(Modal2, { show, onHide: handleHide, centered: true, children: [
+    /* @__PURE__ */ jsx8(Modal2.Header, { closeButton: true, children: /* @__PURE__ */ jsx8(Modal2.Title, { children: title }) }),
+    /* @__PURE__ */ jsx8(Modal2.Body, { children: /* @__PURE__ */ jsxs8("div", { className: "d-flex flex-column gap-3", children: [
+      /* @__PURE__ */ jsx8("strong", { children: resolveDialog() }),
+      needExclusionDetails && /* @__PURE__ */ jsxs8(Form4.Group, { children: [
+        /* @__PURE__ */ jsxs8(Form4.Label, { children: [
+          "Motivo da Exclus\xE3o (m\xEDn. ",
+          minDetailsLength,
+          " caracteres)"
+        ] }),
+        /* @__PURE__ */ jsx8(
+          Form4.Control,
+          {
+            as: "textarea",
+            rows: 3,
+            value: details,
+            onChange: (e) => setDetails(e.target.value),
+            placeholder: "Descreva o motivo...",
+            autoFocus: true
+          }
+        )
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxs8(Modal2.Footer, { children: [
+      /* @__PURE__ */ jsx8(Button4, { variant: "secondary", onClick: handleHide, children: "Cancelar" }),
+      /* @__PURE__ */ jsx8(Button4, { variant: "danger", disabled: !canConfirm, onClick: handleConfirm, children: "Confirmar Exclus\xE3o" })
+    ] })
+  ] });
+};
+
+// src/buttons/FormActionButtons.tsx
+import { Fragment as Fragment2, jsx as jsx9, jsxs as jsxs9 } from "react/jsx-runtime";
+var visible = (callback, flag) => Boolean(callback) && flag !== false;
+var FormActionButtons = ({
+  onSave,
+  saveLabel = "Salvar",
+  saveVariant = "primary",
+  showSave,
+  onDelete,
+  deleteLabel = "Excluir",
+  deleteConfirmMsg,
+  needExclusionDetails = false,
+  showDelete,
+  onBack,
+  backLabel = "Voltar",
+  showBack,
+  onCancelEdit,
+  cancelEditLabel = "Cancelar",
+  showCancelEdit,
+  onCopy,
+  copyLabel = "Copiar Formul\xE1rio",
+  showCopy,
+  isEditing = false,
+  disabled = false,
+  useDelayedDelete = false,
+  delayedDeleteTimeout = 3e3,
+  PermissionWrapper,
+  className
+}) => {
+  const [showConfirm, setShowConfirm] = useState3(false);
+  const [holding, setHolding] = useState3(false);
+  const [progress, setProgress] = useState3(0);
+  const timeoutRef = useRef2(null);
+  const intervalRef = useRef2(null);
+  const stopHold = () => {
+    setHolding(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setProgress(0);
+  };
+  const startHold = () => {
+    if (disabled || !onDelete) return;
+    setHolding(true);
+    setProgress(0);
+    const step = 2;
+    const tickTime = delayedDeleteTimeout / (100 / step);
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => prev >= 100 ? 100 : prev + step);
+    }, tickTime);
+    timeoutRef.current = setTimeout(() => {
+      stopHold();
+      onDelete();
+    }, delayedDeleteTimeout);
+  };
+  const renderDeleteButton = () => {
+    if (!isEditing || !visible(onDelete, showDelete)) return null;
+    if (useDelayedDelete) {
+      return /* @__PURE__ */ jsxs9("div", { style: { position: "relative", display: "inline-block", margin: 2 }, children: [
+        /* @__PURE__ */ jsxs9(
+          Button5,
+          {
+            variant: "outline-danger",
+            onMouseDown: startHold,
+            onMouseUp: stopHold,
+            onMouseLeave: stopHold,
+            onTouchStart: startHold,
+            onTouchEnd: stopHold,
+            disabled,
+            style: { minWidth: "120px" },
+            children: [
+              /* @__PURE__ */ jsx9(FiTrash22, { className: "me-2" }),
+              holding ? "Segure..." : deleteLabel
+            ]
+          }
+        ),
+        holding && /* @__PURE__ */ jsx9(
+          ProgressBar,
+          {
+            now: progress,
+            variant: "danger",
+            style: {
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "4px",
+              borderRadius: "0 0 4px 4px"
+            }
+          }
+        )
+      ] });
+    }
+    return /* @__PURE__ */ jsxs9(
+      Button5,
+      {
+        variant: "danger",
+        onClick: () => setShowConfirm(true),
+        disabled,
+        style: { margin: 2 },
+        children: [
+          /* @__PURE__ */ jsx9(FiTrash22, { className: "me-2" }),
+          deleteLabel
+        ]
+      }
+    );
+  };
+  const deleteButton = renderDeleteButton();
+  const wrappedDelete = deleteButton && PermissionWrapper ? /* @__PURE__ */ jsx9(PermissionWrapper, { children: deleteButton }) : deleteButton;
+  return /* @__PURE__ */ jsxs9(Fragment2, { children: [
+    /* @__PURE__ */ jsx9(
+      DeleteConfirm,
+      {
+        show: showConfirm,
+        onHide: setShowConfirm,
+        onConfirm: (details) => onDelete == null ? void 0 : onDelete(details),
+        dialogText: deleteConfirmMsg,
+        needExclusionDetails
+      }
+    ),
+    /* @__PURE__ */ jsxs9(Form5.Group, { className: `d-flex flex-wrap align-items-center mt-3 gap-1 ${className != null ? className : ""}`.trim(), children: [
+      visible(onBack, showBack) && /* @__PURE__ */ jsxs9(Button5, { variant: "outline-secondary", onClick: onBack, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ jsx9(FiChevronLeft, { className: "me-2" }),
+        backLabel
+      ] }),
+      isEditing && visible(onCancelEdit, showCancelEdit) && /* @__PURE__ */ jsxs9(Button5, { variant: "warning", onClick: onCancelEdit, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ jsx9(FiRotateCcw, { className: "me-2" }),
+        cancelEditLabel
+      ] }),
+      wrappedDelete,
+      visible(onSave, showSave) && /* @__PURE__ */ jsxs9(Button5, { variant: saveVariant, onClick: onSave, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ jsx9(FiSave, { className: "me-2" }),
+        saveLabel
+      ] }),
+      isEditing && visible(onCopy, showCopy) && /* @__PURE__ */ jsxs9(Button5, { variant: "outline-primary", onClick: onCopy, disabled, style: { margin: 2 }, children: [
+        /* @__PURE__ */ jsx9(FiCopy, { className: "me-2" }),
+        copyLabel
+      ] })
+    ] })
+  ] });
+};
+
 // src/icons/IconWithBadge.tsx
 import { Badge } from "react-bootstrap";
-import { jsx as jsx8, jsxs as jsxs8 } from "react/jsx-runtime";
+import { jsx as jsx10, jsxs as jsxs10 } from "react/jsx-runtime";
 var IconWithBadge = ({
   icon,
   content,
@@ -1064,7 +1269,7 @@ var IconWithBadge = ({
 }) => {
   const showBadge = content !== null && content !== void 0 && content !== 0 && content !== "";
   if (mode === "inline") {
-    return /* @__PURE__ */ jsxs8(
+    return /* @__PURE__ */ jsxs10(
       "div",
       {
         style: {
@@ -1074,7 +1279,7 @@ var IconWithBadge = ({
         },
         children: [
           icon,
-          showBadge ? /* @__PURE__ */ jsx8(
+          showBadge ? /* @__PURE__ */ jsx10(
             Badge,
             {
               bg,
@@ -1094,9 +1299,9 @@ var IconWithBadge = ({
       }
     );
   }
-  return /* @__PURE__ */ jsxs8("div", { style: { position: "relative", display: "inline-block" }, children: [
+  return /* @__PURE__ */ jsxs10("div", { style: { position: "relative", display: "inline-block" }, children: [
     icon,
-    /* @__PURE__ */ jsx8(
+    /* @__PURE__ */ jsx10(
       Badge,
       {
         bg,
@@ -1124,6 +1329,8 @@ export {
   ColorPicker,
   CombineModeToggle,
   ContadorPicker,
+  DeleteConfirm,
+  FormActionButtons,
   FormModal,
   FrequenciaFormV2,
   IconWithBadge

@@ -1699,6 +1699,47 @@ var UnifiedPeriodSelector = ({
     },
     [selectedYear, selectedMonths, onSelect]
   );
+  const quickMonthOptions = (0, import_react13.useMemo)(() => {
+    const now = /* @__PURE__ */ new Date();
+    const opts = [];
+    for (let yearOffset = 0; yearOffset <= 1; yearOffset++) {
+      const year = now.getFullYear() - yearOffset;
+      const lastMonth = yearOffset === 0 ? now.getMonth() : 11;
+      for (let m = lastMonth; m >= 0; m--) {
+        opts.push({
+          value: `${year}-${pad2(m + 1)}`,
+          label: `${MONTHS_FULL[m]} ${year}`,
+          year,
+          month: m
+        });
+      }
+    }
+    return opts;
+  }, []);
+  const quickMonthValue = (0, import_react13.useMemo)(() => {
+    const s = parseDate(dataInicio);
+    const e = parseDate(dataFim);
+    if (!s || !e) return "";
+    if (s.getFullYear() === e.getFullYear() && s.getMonth() === e.getMonth() && s.getDate() === 1) {
+      return `${s.getFullYear()}-${pad2(s.getMonth() + 1)}`;
+    }
+    return "";
+  }, [dataInicio, dataFim]);
+  const handleQuickMonthChange = (0, import_react13.useCallback)(
+    (value) => {
+      if (disabled || !value) return;
+      const opt = quickMonthOptions.find((o) => o.value === value);
+      if (!opt) return;
+      setActivePresetKey(null);
+      setSelectedYear(opt.year);
+      setSelectedMonths(/* @__PURE__ */ new Set([opt.month]));
+      onSelect({
+        dataInicio: startOfMonthISO(opt.year, opt.month),
+        dataFim: endOfMonthISO(opt.year, opt.month)
+      });
+    },
+    [disabled, onSelect, quickMonthOptions]
+  );
   const handleCustomApply = (0, import_react13.useCallback)(() => {
     if (!customStart || !customEnd) return;
     setActivePresetKey(null);
@@ -1777,18 +1818,37 @@ var UnifiedPeriodSelector = ({
       tab.key
     )) }),
     /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-content", children: [
-      activeTab === "quick" && /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
-        import_react_bootstrap19.Button,
-        {
-          size: "sm",
-          variant: activePresetKey === p.key ? "primary" : "outline-secondary",
-          className: "ups-quick-btn",
-          onClick: () => handlePreset(p),
-          disabled,
-          children: p.label
-        },
-        p.key
-      )) }),
+      activeTab === "quick" && /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(import_jsx_runtime30.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("div", { className: "ups-quick-grid", children: presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(
+          import_react_bootstrap19.Button,
+          {
+            size: "sm",
+            variant: activePresetKey === p.key ? "primary" : "outline-secondary",
+            className: "ups-quick-btn",
+            onClick: () => handlePreset(p),
+            disabled,
+            children: p.label
+          },
+          p.key
+        )) }),
+        /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-quick-month", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(import_react_bootstrap19.Form.Label, { className: "small text-muted mb-1", children: "M\xEAs exato" }),
+          /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)(
+            import_react_bootstrap19.Form.Select,
+            {
+              size: "sm",
+              value: quickMonthValue,
+              onChange: (e) => handleQuickMonthChange(e.target.value),
+              disabled,
+              "aria-label": "Selecionar m\xEAs exato",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("option", { value: "", children: "Escolha um m\xEAs\u2026" }),
+                quickMonthOptions.map((o) => /* @__PURE__ */ (0, import_jsx_runtime30.jsx)("option", { value: o.value, children: o.label }, o.value))
+              ]
+            }
+          )
+        ] })
+      ] }),
       activeTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-month-section", children: [
         /* @__PURE__ */ (0, import_jsx_runtime30.jsxs)("div", { className: "ups-year-nav", children: [
           /* @__PURE__ */ (0, import_jsx_runtime30.jsx)(

@@ -322,6 +322,7 @@ var MantenedorRenderCompact = ({
   readOnly = false,
   maintainers = [],
   onDesatribuir,
+  onAtribuirClick,
   renderAtribuirForm
 }) => {
   const executoresAtivos = (maintainers == null ? void 0 : maintainers.filter((m) => m.active)) || [];
@@ -361,7 +362,19 @@ var MantenedorRenderCompact = ({
         m.mantenedorId || index
       );
     }) }),
-    renderAtribuirForm && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    onAtribuirClick ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
+      import_react_bootstrap3.Button,
+      {
+        variant: "outline-primary",
+        size: "sm",
+        className: "d-flex align-items-center gap-1",
+        onClick: onAtribuirClick,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(import_fa.FaPlus, { size: 12 }),
+          executoresAtivos.length === 0 ? "Atribuir" : "Adicionar"
+        ]
+      }
+    ) : renderAtribuirForm ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       import_teraprox_ui_kit4.SwitchOnClick,
       {
         placeHolder: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
@@ -378,7 +391,7 @@ var MantenedorRenderCompact = ({
         ),
         children: ({ handleClose }) => renderAtribuirForm({ handleClose })
       }
-    )
+    ) : null
   ] });
 };
 
@@ -1963,58 +1976,69 @@ var TarefaItem = ({
         show: showMat,
         setShow: setShowMat,
         children: [
-          !isMobile ? /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_react_bootstrap10.Table, { bordered: true, size: "sm", className: "mt-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("tr", { style: { textAlign: "center" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "N\u02DA" }),
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Material" }),
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Planejada" }),
-              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("th", { children: "Utilizada" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
-              "tbody",
-              {
-                style: {
-                  verticalAlign: "middle",
-                  textAlign: "center",
-                  fontSize: "1.2rem"
-                },
-                children: tarefaUM.map((tum, i) => {
-                  var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2;
-                  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("tr", { children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: i + 1 }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: (_d2 = (_c2 = (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) != null ? _c2 : tum.nomeMaterial) != null ? _d2 : "-" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("td", { children: [
-                      (_f2 = (_e2 = tum.unidadeMaterial) == null ? void 0 : _e2.quantidade) != null ? _f2 : tum.quantidade,
-                      " ",
-                      (_i2 = (_h2 = (_g2 = tum.unidadeMaterial) == null ? void 0 : _g2.labelUnidade) != null ? _h2 : tum.labelUnidade) != null ? _i2 : ""
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("td", { children: isExecute ? conditionalMaterialUtilizadoFieldRender(tum, i) : `${(_j2 = tum.quantidade) != null ? _j2 : "-"}` })
-                  ] }, (_a2 = tum.id) != null ? _a2 : i);
-                })
-              }
-            )
-          ] }) : tarefaUM.map((tum, i) => {
-            var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2;
-            return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
-              import_teraprox_ui_kit7.ExpandableCard,
-              {
-                items: [
+          /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+            "div",
+            {
+              style: {
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: 12,
+                marginTop: 12
+              },
+              children: tarefaUM.map((tum, i) => {
+                var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2;
+                const nomeMaterial = (_c2 = (_b2 = (_a2 = tum.unidadeMaterial) == null ? void 0 : _a2.nomeMaterial) != null ? _b2 : tum.nomeMaterial) != null ? _c2 : "-";
+                const labelUnidade = (_f2 = (_e2 = (_d2 = tum.unidadeMaterial) == null ? void 0 : _d2.labelUnidade) != null ? _e2 : tum.labelUnidade) != null ? _f2 : "";
+                const qtdPlanejada = (_i2 = (_h2 = (_g2 = tum.unidadeMaterial) == null ? void 0 : _g2.quantidade) != null ? _h2 : tum.quantidade) != null ? _i2 : "-";
+                return /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                  import_react_bootstrap10.Card,
                   {
-                    content: (_d2 = (_c2 = (_b2 = tum.unidadeMaterial) == null ? void 0 : _b2.nomeMaterial) != null ? _c2 : tum.nomeMaterial) != null ? _d2 : "-",
-                    label: "Nome"
+                    style: {
+                      border: "1px solid #e3e6f0",
+                      borderRadius: 8,
+                      backgroundColor: "#fdfdfe",
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
+                    },
+                    children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)(import_react_bootstrap10.Card.Body, { style: { padding: "1rem" }, children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "d-flex align-items-center gap-2 mb-3", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(import_fa4.FaCubes, { style: { color: "#17a2b8", fontSize: "1rem" } }),
+                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                          import_react_bootstrap10.Card.Title,
+                          {
+                            className: "mb-0",
+                            style: { fontSize: "1rem", color: "#2c3e50" },
+                            children: nomeMaterial
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+                        "div",
+                        {
+                          className: "mb-3 p-2",
+                          style: { backgroundColor: "#f8f9fa", borderRadius: 6 },
+                          children: /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "d-flex justify-content-between align-items-center", children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "d-flex align-items-center gap-2", children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("small", { className: "text-muted fw-bold", children: "UNIDADE" }),
+                              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "text-dark fw-semibold", children: labelUnidade || "-" })
+                            ] }),
+                            /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "d-flex align-items-center gap-2", children: [
+                              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("small", { className: "text-muted fw-bold", children: "QTD. PLANEJADA" }),
+                              /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "text-dark fw-semibold", children: qtdPlanejada })
+                            ] })
+                          ] })
+                        }
+                      ),
+                      /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("small", { className: "text-muted fw-bold d-block mb-1", children: "QTD. UTILIZADA" }),
+                        isExecute ? conditionalMaterialUtilizadoFieldRender(tum, i) : /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { style: { fontSize: "1.1rem", fontWeight: 500 }, children: (_k2 = tum.quantidade) != null ? _k2 : "-" })
+                      ] })
+                    ] })
                   },
-                  {
-                    content: `${(_g2 = (_f2 = (_e2 = tum.unidadeMaterial) == null ? void 0 : _e2.quantidade) != null ? _f2 : tum.quantidade) != null ? _g2 : ""} ${(_j2 = (_i2 = (_h2 = tum.unidadeMaterial) == null ? void 0 : _h2.labelUnidade) != null ? _i2 : tum.labelUnidade) != null ? _j2 : ""}`,
-                    label: "Qtd planejada"
-                  },
-                  {
-                    content: isExecute ? conditionalMaterialUtilizadoFieldRender(tum, i) : `${(_k2 = tum.quantidade) != null ? _k2 : "-"}`,
-                    label: "Utilizado"
-                  }
-                ]
-              }
-            ) }, (_a2 = tum.id) != null ? _a2 : i);
-          }),
+                  (_j2 = tum.id) != null ? _j2 : i
+                );
+              })
+            }
+          ),
           !isReadOnly && /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "mt-3", children: [
             /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
               "button",
@@ -2460,7 +2484,9 @@ var PickMantenedorTipoModal = ({
   osList,
   viewModel,
   onAssigned,
-  onError
+  onError,
+  forceShowMantenedores,
+  forceShowTipo
 }) => {
   const isMulti = Array.isArray(osList) && osList.length > 0;
   const targetList = (0, import_react9.useMemo)(
@@ -2476,12 +2502,12 @@ var PickMantenedorTipoModal = ({
     [targetList, selectedOsIds, isMulti]
   );
   const missingMaintainers = (0, import_react9.useMemo)(
-    () => selectedOs.some((o) => isMissingMaintainers(o)),
-    [selectedOs]
+    () => forceShowMantenedores || selectedOs.some((o) => isMissingMaintainers(o)),
+    [selectedOs, forceShowMantenedores]
   );
   const missingType = (0, import_react9.useMemo)(
-    () => selectedOs.some((o) => isMissingType(o)),
-    [selectedOs]
+    () => forceShowTipo || selectedOs.some((o) => isMissingType(o)),
+    [selectedOs, forceShowTipo]
   );
   (0, import_react9.useEffect)(() => {
     if (show) {

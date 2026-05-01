@@ -109,6 +109,15 @@
   font-weight: 500;
   transition: all 0.15s ease;
 }
+.ups-quick-month {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e9ecef;
+}
+.ups-quick-month .form-select-sm {
+  font-size: 0.82rem;
+  border-radius: 8px;
+}
 
 /* Month selector */
 .ups-month-section {

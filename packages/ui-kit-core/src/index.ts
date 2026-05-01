@@ -56,6 +56,17 @@ export type {
 export { ColorPicker } from './color-picker/ColorPicker'
 export type { ColorPickerProps } from './color-picker/ColorPicker'
 
+// FormActionButtons — agrupamento padrão de botões de formulário (Cancelar /
+// Excluir / Salvar + opcionais Voltar / Copiar). Props-driven; cada botão
+// renderiza conforme presença do callback e flag `show*` (default true).
+// Inclui DeleteConfirm embutido (com motivo opcional) e variante hold-to-delete.
+// Promovido de teraprox-ui-kit/buttons/ActionButtons para ui-kit-core em
+// 2026-04-30 para virar padrão de todo formulário do ecossistema.
+export { FormActionButtons } from './buttons/FormActionButtons'
+export type { FormActionButtonsProps } from './buttons/FormActionButtons'
+export { DeleteConfirm } from './buttons/DeleteConfirm'
+export type { DeleteConfirmProps } from './buttons/DeleteConfirm'
+
 // IconWithBadge — ícone com badge numérico opcional, cross-domain (SGM/SGP).
 // Promovido de teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx
 // na sprint 2026-04-29 (tarefa-item-unified, Phase 2). Apresentacional puro.

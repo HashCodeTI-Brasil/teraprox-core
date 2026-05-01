@@ -167,6 +167,13 @@ interface MantenedorRenderCompactProps {
     /** Chamado ao clicar no X de um badge (desatribuir) */
     onDesatribuir?: (assignment: MaintainerAssignment) => void;
     /**
+     * Quando fornecido, o botão Atribuir/Adicionar dispara este callback
+     * em vez de abrir o popover SwitchOnClick + renderAtribuirForm.
+     * Use para casos em que o caller quer abrir um modal externo
+     * (ex.: PickMantenedorTipoModal em /os/execucao).
+     */
+    onAtribuirClick?: () => void;
+    /**
      * Render prop para formulário de atribuição (normalmente um
      * GenericAutoCompleteForm vindo do SGM-OS). Recebe `handleClose`
      * do SwitchOnClick para fechar o popover após submit.
@@ -608,8 +615,21 @@ interface MantenedorPickerProps {
 }
 declare const MantenedorPicker: React.FC<MantenedorPickerProps>;
 
-// Sprint 2026-04-30 pick-mantenedor-os-card-unified — types appended
-// manualmente por bypass do DTS-build pré-existente broken (compass).
+/**
+ * OsCard — promovido do teraprox-SGM-OS/Components/.../OsPlanejada/OsCard.js.
+ *
+ * Componente puramente apresentacional, props-driven. Usado por:
+ *  - SGM-OS Planejamento (com features de virtual/recorrencia/agregador)
+ *  - SGM-OM Executar Ordem (sem features extras — passa undefined nos handlers)
+ *
+ * As features planejamento-only (OS virtual, recorrência, agregador, edição
+ * de model) são acionadas por **callbacks opcionais**: se `onCardAction`,
+ * `onViewAgregador`, `onViewRecorrencia`, `onEditModel`, `onEdit` não forem
+ * fornecidos, os botões/chips correspondentes não aparecem ou ficam mudos.
+ *
+ * O modal de OS virtual (OsVirtualActionModal) NÃO é mais embutido aqui —
+ * o consumer deve renderizá-lo externamente quando `onCardAction` é chamado.
+ */
 interface OsCardOrdem {
     id?: number | string;
     status?: string;
@@ -618,11 +638,23 @@ interface OsCardOrdem {
     modelId?: number | string | null;
     recorrenciaId?: number | string | null;
     agregadorId?: number | string | null;
-    recurso?: { nome?: string } | null;
+    recurso?: {
+        nome?: string;
+    } | null;
     father?: string | null;
     descricaoDoProblema?: string | null;
-    osMantenedor?: Array<{ mantenedor?: { nomeUsuario?: string; nome?: string }; nome?: string }>;
-    osTipos?: Array<{ tipoDeOrdem?: { tipo?: string } }>;
+    osMantenedor?: Array<{
+        mantenedor?: {
+            nomeUsuario?: string;
+            nome?: string;
+        };
+        nome?: string;
+    }>;
+    osTipos?: Array<{
+        tipoDeOrdem?: {
+            tipo?: string;
+        };
+    }>;
     dataPlanejada?: string | Date | null;
     dataDeEncerramento?: string | Date | null;
     setor?: string | null;
@@ -651,19 +683,66 @@ interface OsCardProps {
 }
 declare const OsCard: React.NamedExoticComponent<OsCardProps>;
 
+/**
+ * PickMantenedorTipoModal — promovido do
+ * teraprox-SGM-OS/Components/.../OsPlanejada/PickMantenedorModal.js.
+ *
+ * Modos de uso:
+ *  - **Single OS**: passar prop `os` (legacy SGM-OS). Modal exibe e
+ *    atribui apenas para essa OS.
+ *  - **Multi OS**: passar prop `osList` (>1 item). Modal exibe lista de
+ *    OS com checkboxes (default todas selecionadas) e usa rotas bulk
+ *    do core-sdk: PUT updateTipoBulk + POST atribuirMantenedorBulk.
+ *
+ * Em modo multi, missingMaintainers/missingType são derivados das OS
+ * selecionadas (true se ALGUMA OS marcada está faltando o campo).
+ */
 interface PickMantenedorTipoModalProps {
     show: boolean;
     onHide: () => void;
-    os?: { id?: number | string; osMantenedor?: any[]; osTipos?: any[] } | null;
-    osList?: Array<{ id?: number | string; osMantenedor?: any[]; osTipos?: any[]; recurso?: { nome?: string }; descricaoDoProblema?: string }> | null;
+    /** Modo single-OS (legacy SGM-OS). Ignorado se `osList` é fornecido. */
+    os?: {
+        id?: number | string;
+        osMantenedor?: any[];
+        osTipos?: any[];
+    } | null;
+    /** Modo multi-OS — lista de OS a configurar em batch */
+    osList?: Array<{
+        id?: number | string;
+        osMantenedor?: any[];
+        osTipos?: any[];
+        recurso?: {
+            nome?: string;
+        };
+        descricaoDoProblema?: string;
+    }> | null;
     viewModel: IPickMantenedorTipoViewModel;
     onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null, osIds: Array<number | string>) => void;
     onError?: (err: unknown) => void;
+    /**
+     * Força a exibição da seção de mantenedores mesmo quando a OS já tem
+     * executores ativos. Usado em /os/execucao para "Adicionar mantenedor"
+     * sobre OS que já tem alguém atribuído.
+     */
+    forceShowMantenedores?: boolean;
+    /**
+     * Força a exibição da seção de tipo mesmo quando a OS já tem tipo.
+     * Usado em /os/execucao para "Alterar tipo" sobre OS que já tem tipo.
+     */
+    forceShowTipo?: boolean;
 }
 declare const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps>;
 
-interface OsStatusMeta { color: string; label: string }
+/**
+ * Paleta canônica de status de Ordem de Serviço — promovida do
+ * teraprox-SGM-OS/src/ui/statusPalette.js para uso compartilhado em
+ * componentes do ui-kit-sgm (OsCard, etc).
+ */
+interface OsStatusMeta {
+    color: string;
+    label: string;
+}
 declare const OS_STATUS_PALETTE: Record<string, OsStatusMeta>;
 declare function getOsStatusMeta(status?: string): OsStatusMeta;
 
-export { AcaoPicker, type AcaoPickerProps, type AcaoRef, BranchDropDisplay, type BranchDropDisplayProps, FindRecursoByTagField, type FindRecursoByTagFieldProps, InspecaoModal, type InspecaoModalProps, type MaintainerAssignment, MantenedorPicker, type MantenedorPickerProps, MantenedorRender, MantenedorRenderCompact, type MantenedorRenderCompactProps, type MantenedorRenderProps, type MantenedorVM, ManutentorCard, ManutentorCardCompact, type ManutentorCardCompactProps, type ManutentorCardProps, type ManutentorEntry, ManutentoresDisplay, type ManutentoresDisplayProps, MetricasDisplay, type MetricasDisplayProps, type ObservacaoMessage, ObservacaoModal, type ObservacaoModalProps, RecursoDisplayer, type RecursoDisplayerProps, TarefaCard, type TarefaCardProps, TarefaItem, type TarefaItemInspecaoExtras, type TarefaItemProps, UnidadeMaterialModal, type UnidadeMaterialModalProps, UnidadeMaterialPicker, type UnidadeMaterialPickerProps, OsCard, type OsCardProps, type OsCardOrdem, PickMantenedorTipoModal, type PickMantenedorTipoModalProps, OS_STATUS_PALETTE, getOsStatusMeta, type OsStatusMeta };
+export { AcaoPicker, type AcaoPickerProps, type AcaoRef, BranchDropDisplay, type BranchDropDisplayProps, FindRecursoByTagField, type FindRecursoByTagFieldProps, InspecaoModal, type InspecaoModalProps, type MaintainerAssignment, MantenedorPicker, type MantenedorPickerProps, MantenedorRender, MantenedorRenderCompact, type MantenedorRenderCompactProps, type MantenedorRenderProps, type MantenedorVM, ManutentorCard, ManutentorCardCompact, type ManutentorCardCompactProps, type ManutentorCardProps, type ManutentorEntry, ManutentoresDisplay, type ManutentoresDisplayProps, MetricasDisplay, type MetricasDisplayProps, OS_STATUS_PALETTE, type ObservacaoMessage, ObservacaoModal, type ObservacaoModalProps, OsCard, type OsCardOrdem, type OsCardProps, type OsStatusMeta, PickMantenedorTipoModal, type PickMantenedorTipoModalProps, RecursoDisplayer, type RecursoDisplayerProps, TarefaCard, type TarefaCardProps, TarefaItem, type TarefaItemInspecaoExtras, type TarefaItemProps, UnidadeMaterialModal, type UnidadeMaterialModalProps, UnidadeMaterialPicker, type UnidadeMaterialPickerProps, getOsStatusMeta };
