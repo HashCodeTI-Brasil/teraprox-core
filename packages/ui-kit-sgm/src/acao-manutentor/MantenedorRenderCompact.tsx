@@ -31,6 +31,13 @@ export interface MantenedorRenderCompactProps {
   /** Chamado ao clicar no X de um badge (desatribuir) */
   onDesatribuir?: (assignment: MaintainerAssignment) => void
   /**
+   * Quando fornecido, o botão Atribuir/Adicionar dispara este callback
+   * em vez de abrir o popover SwitchOnClick + renderAtribuirForm.
+   * Use para casos em que o caller quer abrir um modal externo
+   * (ex.: PickMantenedorTipoModal em /os/execucao).
+   */
+  onAtribuirClick?: () => void
+  /**
    * Render prop para formulário de atribuição (normalmente um
    * GenericAutoCompleteForm vindo do SGM-OS). Recebe `handleClose`
    * do SwitchOnClick para fechar o popover após submit.
@@ -42,6 +49,7 @@ export const MantenedorRenderCompact: React.FC<MantenedorRenderCompactProps> = (
   readOnly = false,
   maintainers = [],
   onDesatribuir,
+  onAtribuirClick,
   renderAtribuirForm,
 }) => {
   const executoresAtivos = maintainers?.filter((m) => m.active) || []
@@ -90,7 +98,17 @@ export const MantenedorRenderCompact: React.FC<MantenedorRenderCompactProps> = (
         </div>
       )}
 
-      {renderAtribuirForm && (
+      {onAtribuirClick ? (
+        <Button
+          variant="outline-primary"
+          size="sm"
+          className="d-flex align-items-center gap-1"
+          onClick={onAtribuirClick}
+        >
+          <FaPlus size={12} />
+          {executoresAtivos.length === 0 ? 'Atribuir' : 'Adicionar'}
+        </Button>
+      ) : renderAtribuirForm ? (
         <SwitchOnClick
           placeHolder={
             <Button
@@ -107,7 +125,7 @@ export const MantenedorRenderCompact: React.FC<MantenedorRenderCompactProps> = (
             renderAtribuirForm({ handleClose })
           }
         </SwitchOnClick>
-      )}
+      ) : null}
     </div>
   )
 }

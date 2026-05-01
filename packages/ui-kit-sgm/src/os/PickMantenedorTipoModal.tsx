@@ -33,6 +33,17 @@ export interface PickMantenedorTipoModalProps {
   viewModel: IPickMantenedorTipoViewModel
   onAssigned?: (mantenedores: PickMantenedorOption[], tipo: PickTipoDeOrdemOption | null, osIds: Array<number | string>) => void
   onError?: (err: unknown) => void
+  /**
+   * Força a exibição da seção de mantenedores mesmo quando a OS já tem
+   * executores ativos. Usado em /os/execucao para "Adicionar mantenedor"
+   * sobre OS que já tem alguém atribuído.
+   */
+  forceShowMantenedores?: boolean
+  /**
+   * Força a exibição da seção de tipo mesmo quando a OS já tem tipo.
+   * Usado em /os/execucao para "Alterar tipo" sobre OS que já tem tipo.
+   */
+  forceShowTipo?: boolean
 }
 
 const isMissingMaintainers = (os: any): boolean =>
@@ -49,6 +60,8 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
   viewModel,
   onAssigned,
   onError,
+  forceShowMantenedores,
+  forceShowTipo,
 }) => {
   const isMulti = Array.isArray(osList) && osList.length > 0
   const targetList = useMemo(
@@ -69,12 +82,12 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
   )
 
   const missingMaintainers = useMemo(
-    () => selectedOs.some((o: any) => isMissingMaintainers(o)),
-    [selectedOs],
+    () => forceShowMantenedores || selectedOs.some((o: any) => isMissingMaintainers(o)),
+    [selectedOs, forceShowMantenedores],
   )
   const missingType = useMemo(
-    () => selectedOs.some((o: any) => isMissingType(o)),
-    [selectedOs],
+    () => forceShowTipo || selectedOs.some((o: any) => isMissingType(o)),
+    [selectedOs, forceShowTipo],
   )
 
   useEffect(() => {
