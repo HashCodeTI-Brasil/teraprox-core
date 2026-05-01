@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Card, Spinner, Table } from 'react-bootstrap'
+import { Card, Spinner } from 'react-bootstrap'
 import {
   FaClipboardList,
   FaComments,
@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa'
 import { MdContentCopy } from 'react-icons/md'
 import {
-  ExpandableCard,
   FormField,
   ResponsiveContainer,
   StatusBadge,
@@ -573,84 +572,88 @@ export const TarefaItem: React.FC<TarefaItemProps> = ({
       )}
 
       {/* ─── Container: Materiais ───────────────────────────────────────── */}
+      {/* Card grid inspirado em teraprox-SGP-ordemDeCorrecao MaterialApontarCard
+          (sprint 2026-05-01: equiparação visual /os/execucao com SGP). */}
       <ResponsiveContainer
         title="Materiais"
         show={showMat}
         setShow={setShowMat}
       >
-        {!isMobile ? (
-          <Table bordered size="sm" className="mt-3">
-            <thead>
-              <tr style={{ textAlign: 'center' }}>
-                <th>N˚</th>
-                <th>Material</th>
-                <th>Planejada</th>
-                <th>Utilizada</th>
-              </tr>
-            </thead>
-            <tbody
-              style={{
-                verticalAlign: 'middle',
-                textAlign: 'center',
-                fontSize: '1.2rem',
-              }}
-            >
-              {tarefaUM.map((tum: any, i: number) => (
-                <tr key={tum.id ?? i}>
-                  <td>{i + 1}</td>
-                  <td>
-                    {tum.unidadeMaterial?.nomeMaterial ??
-                      tum.nomeMaterial ??
-                      '-'}
-                  </td>
-                  <td>
-                    {tum.unidadeMaterial?.quantidade ?? tum.quantidade}{' '}
-                    {tum.unidadeMaterial?.labelUnidade ??
-                      tum.labelUnidade ??
-                      ''}
-                  </td>
-                  <td>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: 12,
+            marginTop: 12,
+          }}
+        >
+          {tarefaUM.map((tum: any, i: number) => {
+            const nomeMaterial =
+              tum.unidadeMaterial?.nomeMaterial ?? tum.nomeMaterial ?? '-'
+            const labelUnidade =
+              tum.unidadeMaterial?.labelUnidade ?? tum.labelUnidade ?? ''
+            const qtdPlanejada =
+              tum.unidadeMaterial?.quantidade ?? tum.quantidade ?? '-'
+            return (
+              <Card
+                key={tum.id ?? i}
+                style={{
+                  border: '1px solid #e3e6f0',
+                  borderRadius: 8,
+                  backgroundColor: '#fdfdfe',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                }}
+              >
+                <Card.Body style={{ padding: '1rem' }}>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <FaCubes style={{ color: '#17a2b8', fontSize: '1rem' }} />
+                    <Card.Title
+                      className="mb-0"
+                      style={{ fontSize: '1rem', color: '#2c3e50' }}
+                    >
+                      {nomeMaterial}
+                    </Card.Title>
+                  </div>
+
+                  <div
+                    className="mb-3 p-2"
+                    style={{ backgroundColor: '#f8f9fa', borderRadius: 6 }}
+                  >
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex align-items-center gap-2">
+                        <small className="text-muted fw-bold">UNIDADE</small>
+                        <span className="text-dark fw-semibold">
+                          {labelUnidade || '-'}
+                        </span>
+                      </div>
+                      <div className="d-flex align-items-center gap-2">
+                        <small className="text-muted fw-bold">QTD. PLANEJADA</small>
+                        <span className="text-dark fw-semibold">
+                          {qtdPlanejada}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <small className="text-muted fw-bold d-block mb-1">
+                      QTD. UTILIZADA
+                    </small>
                     {isExecute
                       ? conditionalMaterialUtilizadoFieldRender(tum, i)
-                      : `${tum.quantidade ?? '-'}`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          tarefaUM.map((tum: any, i: number) => (
-            <div className="mb-3" key={tum.id ?? i}>
-              <ExpandableCard
-                items={[
-                  {
-                    content:
-                      tum.unidadeMaterial?.nomeMaterial ??
-                      tum.nomeMaterial ??
-                      '-',
-                    label: 'Nome',
-                  },
-                  {
-                    content: `${
-                      tum.unidadeMaterial?.quantidade ?? tum.quantidade ?? ''
-                    } ${
-                      tum.unidadeMaterial?.labelUnidade ??
-                      tum.labelUnidade ??
-                      ''
-                    }`,
-                    label: 'Qtd planejada',
-                  },
-                  {
-                    content: isExecute
-                      ? conditionalMaterialUtilizadoFieldRender(tum, i)
-                      : `${tum.quantidade ?? '-'}`,
-                    label: 'Utilizado',
-                  },
-                ]}
-              />
-            </div>
-          ))
-        )}
+                      : (
+                        <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>
+                          {tum.quantidade ?? '-'}
+                        </span>
+                      )}
+                  </div>
+                </Card.Body>
+              </Card>
+            )
+          })}
+        </div>
         {!isReadOnly && (
           <div className="mt-3">
             <button
