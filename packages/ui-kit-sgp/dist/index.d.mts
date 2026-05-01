@@ -1,6 +1,6 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { ReactNode } from 'react';
-export { FrequenciaFormV2, FrequenciaFormV2Props, RecorrenciaEscala, RecorrenciaValue } from '@teraprox/ui-kit-core';
+export { FrequenciaFormV2, FrequenciaFormV2Props, RecorrenciaEscala, RecorrenciaValue } from '@hashcodeti/ui-kit-core';
 
 interface CalculoVM {
     _id?: string | number;

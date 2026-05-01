@@ -273,7 +273,7 @@ declare const RecursoDisplayer: ({ selectedList, onSaveRecurso, singleReturn, vm
  * BranchDropDisplay — componente apresentacional puro do seletor-dropdown
  * de um nivel da arvore de recursos.
  *
- * Wave 2A: promovido do ui-kit legado para @teraprox/ui-kit-sgm/recurso/
+ * Wave 2A: promovido do ui-kit legado para @hashcodeti/ui-kit-sgm/recurso/
  * sem mudanca de comportamento. Consumidores historicos continuam importando
  * de `teraprox-ui-kit` via re-export.
  */
@@ -440,7 +440,7 @@ declare const TarefaCard: React.FC<TarefaCardProps>;
  *  - Zero `useDispatch`, `useSelector`, `useCoreService`, `useHttpController`,
  *    `endPointManutencao`. Toda IO via Port `vm`.
  *  - Zero imports de `teraprox-SGM-OS/...` (componente nao conhece o caller).
- *  - Imports permitidos: `teraprox-ui-kit`, `@teraprox/ui-kit-core`,
+ *  - Imports permitidos: `teraprox-ui-kit`, `@hashcodeti/ui-kit-core`,
  *    `teraprox-core-sdk` (apenas tipos), Bootstrap.
  *
  * Diferenciacao por modo:
@@ -544,7 +544,7 @@ declare const TarefaItem: React.FC<TarefaItemProps>;
  * ObservacaoModal — modal apresentacional de chat de observacoes/justificativas.
  *
  * Promovido de `teraprox-SGM-OS/Components/manutencao/ObservacaoModal.js` para
- * `@teraprox/ui-kit-sgm` na sprint 2026-04-29 (tarefa-item-unified, Phase 2),
+ * `@hashcodeti/ui-kit-sgm` na sprint 2026-04-29 (tarefa-item-unified, Phase 2),
  * sem dependencia de Redux ou ChatComponent legacy. Apresentacao + state local
  * apenas; IO via callbacks (`onSend`, `onUpdate`, `onRemove`).
  *

@@ -1,5 +1,5 @@
 // src/unidade-material/UnidadeMaterialModal.tsx
-import { FormModal } from "@teraprox/ui-kit-core";
+import { FormModal } from "@hashcodeti/ui-kit-core";
 import { UnidadeMaterialForm } from "teraprox-ui-kit";
 import { jsx } from "react/jsx-runtime";
 var UnidadeMaterialModal = ({
@@ -50,7 +50,7 @@ var UnidadeMaterialModal = ({
 };
 
 // src/inspecao/InspecaoModal.tsx
-import { FormModal as FormModal2 } from "@teraprox/ui-kit-core";
+import { FormModal as FormModal2 } from "@hashcodeti/ui-kit-core";
 import { AutoComplete } from "teraprox-ui-kit";
 import { jsx as jsx2, jsxs } from "react/jsx-runtime";
 var InspecaoModal = ({
@@ -1422,7 +1422,7 @@ import {
   ResponsiveContainer,
   StatusBadge
 } from "teraprox-ui-kit";
-import { AnexoManager, IconWithBadge } from "@teraprox/ui-kit-core";
+import { AnexoManager, IconWithBadge } from "@hashcodeti/ui-kit-core";
 
 // src/tarefa/ObservacaoModal.tsx
 import { useEffect as useEffect4, useMemo, useRef as useRef2, useState as useState5 } from "react";

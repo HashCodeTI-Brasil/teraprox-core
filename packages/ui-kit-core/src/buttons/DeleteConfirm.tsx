@@ -1,5 +1,5 @@
 /**
- * DeleteConfirm — @teraprox/ui-kit-core
+ * DeleteConfirm — @hashcodeti/ui-kit-core
  *
  * Modal de confirmação de exclusão padronizado, props-driven (zero Redux).
  * Promovido de teraprox-ui-kit/forms/DeleteConfirm para ui-kit-core em 2026-04-30

@@ -8,7 +8,7 @@ import { pickTextColorBasedOnBgColorAdvanced } from 'teraprox-core-sdk'
  * BranchDropDisplay — componente apresentacional puro do seletor-dropdown
  * de um nivel da arvore de recursos.
  *
- * Wave 2A: promovido do ui-kit legado para @teraprox/ui-kit-sgm/recurso/
+ * Wave 2A: promovido do ui-kit legado para @hashcodeti/ui-kit-sgm/recurso/
  * sem mudanca de comportamento. Consumidores historicos continuam importando
  * de `teraprox-ui-kit` via re-export.
  */

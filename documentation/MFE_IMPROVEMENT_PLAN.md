@@ -30,7 +30,7 @@
 | 8 | **FederatedBridge inconsistente** — SGM/SGP re-injetam WebProvider, Solicitação só marca flag | Comportamento diferente por módulo | Todos |
 | 9 | **Menu/rotas hardcoded no Core** — `remoteRegistry.js` com ~70 entradas manuais + `federatedXxxScreens.js` | Adicionar tela = alterar Core + Remote | Core |
 | 10 | **Reducers comuns duplicados** — globalError, notification, picker, timer existem em múltiplos repos | Estado inconsistente | SGM, SGP |
-| 11 | **Nenhum pacote de UI compartilhado** — Sem `@teraprox/ui` ou similar | Impossível reusar componentes sem copiar | — |
+| 11 | **Nenhum pacote de UI compartilhado** — Sem `@hashcodeti/ui` ou similar | Impossível reusar componentes sem copiar | — |
 | 12 | **Zero type safety nos remotes** — Todo JS puro, sem JSDoc | Integração com SDK é guesswork | SGM, SGP |
 
 ---
@@ -157,7 +157,7 @@ DEPOIS (claro):
 
 #### 1.5 Forçar adoção no SGP
 
-SGP tem `@teraprox/core-sdk` no shared config do webpack mas **zero imports no código**. 
+SGP tem `@hashcodeti/core-sdk` no shared config do webpack mas **zero imports no código**. 
 
 **Ação:** Criar PR que substitui:
 - `useWebProvider()` → `useCoreService()` em todos os hooks/components
@@ -166,7 +166,7 @@ SGP tem `@teraprox/core-sdk` no shared config do webpack mas **zero imports no c
 
 ---
 
-### FASE 2 — Criar @teraprox/ui-kit (Biblioteca de Componentes)
+### FASE 2 — Criar @hashcodeti/ui-kit (Biblioteca de Componentes)
 
 **Prioridade:** ALTA  
 **Esforço:** 2-3 semanas  
@@ -202,7 +202,7 @@ Componentes que existem IDÊNTICOS (ou quase) em SGM e SGP `default-components/`
 
 ```
 packages/ui-kit/
-├── package.json          # name: "@teraprox/ui-kit", peerDeps: react, react-bootstrap
+├── package.json          # name: "@hashcodeti/ui-kit", peerDeps: react, react-bootstrap
 ├── tsconfig.json
 ├── src/
 │   ├── index.ts          # Barrel export
@@ -239,7 +239,7 @@ packages/ui-kit/
 ```javascript
 // Core webpack.config.js
 shared: {
-  '@teraprox/ui-kit': { singleton: true, eager: true },
+  '@hashcodeti/ui-kit': { singleton: true, eager: true },
   // ...
 }
 ```
@@ -250,7 +250,7 @@ shared: {
 2. Para cada componente movido:
    - Copiar para ui-kit com TypeScript
    - Adicionar export no barrel
-   - No remote: substituir import local por `import { X } from '@teraprox/ui-kit'`
+   - No remote: substituir import local por `import { X } from '@hashcodeti/ui-kit'`
    - Deletar o arquivo local
 3. **GenericListScreen** é o mais valioso — é o template base de ~30 telas de listagem
 
@@ -495,7 +495,7 @@ Semana 3-4:   FASE 3 — Runtime padronizado
               ├── 3.2  StandaloneProvider no SDK
               └── 3.3  ReducersBundle factory
 
-Semana 4-7:   FASE 2 — @teraprox/ui-kit
+Semana 4-7:   FASE 2 — @hashcodeti/ui-kit
               ├── Sprint 1: buttons, forms, modals (10 componentes)
               ├── Sprint 2: table, displays, containers (10 componentes)
               ├── Sprint 3: charts, Date, overlays (10 componentes)
@@ -529,7 +529,7 @@ Contínuo:     FASE 5 — Limpeza de legado
 
 ```
 Preciso adicionar um componente visual (botão, input, modal)?
-  → @teraprox/ui-kit
+  → @hashcodeti/ui-kit
 
 Preciso de um hook para HTTP, toast, subscribe, navigate?
   → teraprox-core-sdk (hooks/)
@@ -564,7 +564,7 @@ Preciso de uma tela/screen?
 2. **NUNCA importe diretamente do Core via Module Federation (`teraprox_core/SharedHooks`).** Use o SDK.
 3. **NUNCA crie um novo `basicController.js`.** Use `useHttpController(context)` do SDK.
 4. **NUNCA crie um novo `wsProvider.js`.** Use `useCoreService()` para subscribe/unsubscribe.
-5. **Componentes visuais genéricos vão para `@teraprox/ui-kit`.** Componentes de domínio ficam no remote.
+5. **Componentes visuais genéricos vão para `@hashcodeti/ui-kit`.** Componentes de domínio ficam no remote.
 6. **Todo novo hook/componente compartilhado deve ser TypeScript** com docs e exports tipados.
 7. **Standalone mode usa `StandaloneProvider` do SDK.** Sem provider customizado por remote.
 8. **Cada remote exporta `Manifest` com suas rotas.** Core não hardcoda rotas de remotes.
@@ -620,7 +620,7 @@ Preciso de uma tela/screen?
 - [ ] Substituir `basicController` local por `useHttpController()` do SDK
 - [ ] Remover `wsProvider.js` — usar `StandaloneProvider` do SDK
 - [ ] Deletar `hooks/defaults/_local/` (fallbacks não mais necessários)
-- [ ] Migrar `default-components/` para imports de `@teraprox/ui-kit`
+- [ ] Migrar `default-components/` para imports de `@hashcodeti/ui-kit`
 - [ ] Remover `FederatedBridge.js` local — importar do SDK
 - [ ] Converter `reducersBundle.js` para usar `createReducersBundle()` do SDK
 - [ ] Remover `StandaloneCoreServiceProvider.js` — usar do SDK
@@ -631,12 +631,12 @@ Preciso de uma tela/screen?
 - [ ] Adicionar imports do `teraprox-core-sdk` (hoje: 0 imports)
 - [ ] Substituir `useWebProvider()` por `useCoreService()` (todos os hooks)
 - [ ] Mesmo checklist do SGM acima
-- [ ] Corrigir shared config: `@teraprox/core-sdk` → `teraprox-core-sdk` (nome inconsistente)
+- [ ] Corrigir shared config: `@hashcodeti/core-sdk` → `teraprox-core-sdk` (nome inconsistente)
 
 ### Solicitação de Serviço (Menor esforço — já usa SDK)
 - [ ] Atualizar `FederatedBridge` para versão do SDK (hoje só marca flag, não injeta contexto)
 - [ ] Remover `StandaloneCoreServiceProvider.js` local — usar do SDK
-- [ ] Migrar UI components (poucos) para `@teraprox/ui-kit`
+- [ ] Migrar UI components (poucos) para `@hashcodeti/ui-kit`
 - [ ] Exportar `Manifest` com rotas
 
 ---

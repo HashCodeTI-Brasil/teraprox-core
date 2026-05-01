@@ -706,8 +706,8 @@ var TarefaUnidadeForm = ({
 };
 
 // src/frequencia/FrequenciaFormV2.tsx
-var import_ui_kit_core = require("@teraprox/ui-kit-core");
-var import_ui_kit_core2 = require("@teraprox/ui-kit-core");
+var import_ui_kit_core = require("@hashcodeti/ui-kit-core");
+var import_ui_kit_core2 = require("@hashcodeti/ui-kit-core");
 
 // src/folha-verificacao/CampoDeVerificacaoV2.tsx
 var import_react20 = require("react");

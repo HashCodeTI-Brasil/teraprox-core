@@ -5,7 +5,7 @@ import { Badge } from 'react-bootstrap'
  * IconWithBadge — ícone com badge numérico opcional (ex.: contagem de itens).
  *
  * Promovido de `teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx`
- * para `@teraprox/ui-kit-core` na sprint 2026-04-29 (tarefa-item-unified, Phase 2).
+ * para `@hashcodeti/ui-kit-core` na sprint 2026-04-29 (tarefa-item-unified, Phase 2).
  * Cross-domain (SGM/SGP) e apresentacional puro — zero Redux, zero IO.
  *
  * Modos:

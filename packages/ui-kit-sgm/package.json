@@ -1,5 +1,5 @@
 {
-  "name": "@teraprox/ui-kit-sgm",
+  "name": "@hashcodeti/ui-kit-sgm",
   "version": "0.1.0",
   "description": "Widgets visuais do domínio SGM (Manutenção) — formulários, modais e displays específicos — skeleton Wave 0",
   "main": "dist/index.js",
@@ -63,7 +63,7 @@
     "react-google-charts": { "optional": true }
   },
   "dependencies": {
-    "@teraprox/ui-kit-core": "file:../ui-kit-core",
+    "@hashcodeti/ui-kit-core": "file:../ui-kit-core",
     "teraprox-ui-kit": "file:../ui-kit"
   },
   "devDependencies": {

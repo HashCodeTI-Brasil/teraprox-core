@@ -7,7 +7,7 @@ import { GrSend } from 'react-icons/gr'
  * ObservacaoModal — modal apresentacional de chat de observacoes/justificativas.
  *
  * Promovido de `teraprox-SGM-OS/Components/manutencao/ObservacaoModal.js` para
- * `@teraprox/ui-kit-sgm` na sprint 2026-04-29 (tarefa-item-unified, Phase 2),
+ * `@hashcodeti/ui-kit-sgm` na sprint 2026-04-29 (tarefa-item-unified, Phase 2),
  * sem dependencia de Redux ou ChatComponent legacy. Apresentacao + state local
  * apenas; IO via callbacks (`onSend`, `onUpdate`, `onRemove`).
  *

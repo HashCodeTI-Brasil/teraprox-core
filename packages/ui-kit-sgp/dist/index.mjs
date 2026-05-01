@@ -690,8 +690,8 @@ var TarefaUnidadeForm = ({
 // src/frequencia/FrequenciaFormV2.tsx
 import {
   FrequenciaFormV2
-} from "@teraprox/ui-kit-core";
-import { FrequenciaFormV2 as FrequenciaFormV22 } from "@teraprox/ui-kit-core";
+} from "@hashcodeti/ui-kit-core";
+import { FrequenciaFormV2 as FrequenciaFormV22 } from "@hashcodeti/ui-kit-core";
 
 // src/folha-verificacao/CampoDeVerificacaoV2.tsx
 import { useRef } from "react";

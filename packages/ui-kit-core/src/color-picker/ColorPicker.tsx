@@ -1,5 +1,5 @@
 /**
- * ColorPicker — @teraprox/ui-kit-core
+ * ColorPicker — @hashcodeti/ui-kit-core
  *
  * Seletor de cor props-driven (zero Redux, zero useCoreService).
  * Cross-domain: utilizado por SGP-planoDeControle (LimiteDeControle)

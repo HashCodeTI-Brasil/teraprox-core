@@ -1,4 +1,4 @@
-# @teraprox/ui-kit-sgm
+# @hashcodeti/ui-kit-sgm
 
 Widgets visuais do domínio SGM (Manutenção) — formulários, modais e displays específicos consumidos por `SGM-OS`, `SGM-SS`, `SGM-OM` e `SGM-UTILS`.
 

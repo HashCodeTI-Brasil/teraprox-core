@@ -1,5 +1,5 @@
 {
-  "name": "@teraprox/ui-kit-core",
+  "name": "@hashcodeti/ui-kit-core",
   "version": "0.1.0",
   "description": "Primitivos visuais cross-cutting (buttons, forms, displays) compartilhados entre os domínios SGM e SGP — skeleton Wave 0",
   "main": "dist/index.js",

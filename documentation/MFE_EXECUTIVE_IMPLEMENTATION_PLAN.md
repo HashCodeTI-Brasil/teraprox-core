@@ -1538,7 +1538,7 @@ mkdir -p ui-kit/src/{buttons,forms,displays,modals,table,layout,styles}
 **Criar:** `packages/ui-kit/package.json`
 ```json
 {
-  "name": "@teraprox/ui-kit",
+  "name": "@hashcodeti/ui-kit",
   "version": "0.1.0",
   "description": "Componentes visuais compartilhados entre módulos federados",
   "main": "dist/index.js",
@@ -1720,13 +1720,13 @@ import UuidPill from '../Components/default-components/UuidPill'
 import AddButton from '../Components/default-components/buttons/AddButton'
 
 // DEPOIS
-import { UuidPill, AddButton } from '@teraprox/ui-kit'
+import { UuidPill, AddButton } from '@hashcodeti/ui-kit'
 ```
 
 **No webpack (shared):**
 ```javascript
 shared: {
-  '@teraprox/ui-kit': { singleton: true, requiredVersion: false, eager: true },
+  '@hashcodeti/ui-kit': { singleton: true, requiredVersion: false, eager: true },
   // ...
 }
 ```
@@ -1737,17 +1737,17 @@ Para acelerar a substituição de imports nos remotes:
 ```bash
 #!/bin/bash
 # scripts/migrate-ui-imports.sh
-# Substitui imports de default-components por @teraprox/ui-kit
+# Substitui imports de default-components por @hashcodeti/ui-kit
 
 COMPONENT=$1  # ex: UuidPill
 REMOTE_DIR=$2 # ex: /path/to/teraprox-app-sgm
 
 # Find e replace imports
 find "$REMOTE_DIR/src" -name "*.js" -exec sed -i '' \
-  "s|from '.*default-components.*/${COMPONENT}'|from '@teraprox/ui-kit'|g" {} +
+  "s|from '.*default-components.*/${COMPONENT}'|from '@hashcodeti/ui-kit'|g" {} +
 
 find "$REMOTE_DIR/src" -name "*.js" -exec sed -i '' \
-  "s|from \".*default-components.*/${COMPONENT}\"|from '@teraprox/ui-kit'|g" {} +
+  "s|from \".*default-components.*/${COMPONENT}\"|from '@hashcodeti/ui-kit'|g" {} +
 
 echo "Migrated $COMPONENT imports in $REMOTE_DIR"
 ```
@@ -1827,7 +1827,7 @@ echo "Migrated $COMPONENT imports in $REMOTE_DIR"
 │    useMatchingObject('ctx', 'loc', refresher)       │
 │                                                     │
 │  REGRA 4: Preciso de um componente visual genérico? │
-│  → import { X } from '@teraprox/ui-kit'             │
+│  → import { X } from '@hashcodeti/ui-kit'             │
 │                                                     │
 │  REGRA 5: Preciso de validação?                     │
 │  → useValidation(rules) do SDK                      │

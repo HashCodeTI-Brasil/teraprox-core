@@ -12,18 +12,18 @@
 | 1 | **Federados não conhecem backend** | Zero axios, zero interceptors, zero HTTP factories nos remotes |
 | 2 | **Federados exportam apenas reducers** | FederatedBridge injeta contexto; ReducersBundle expõe slices |
 | 3 | **Providers vêm do Core** | Toast, Validation, DnD, Redux, WebProvider — tudo do Core |
-| 4 | **Contrato tipado via `@teraprox/core-sdk`** | Pacote npm TypeScript que define a interface Core↔Federado |
+| 4 | **Contrato tipado via `@hashcodeti/core-sdk`** | Pacote npm TypeScript que define a interface Core↔Federado |
 
 ---
 
-## 1. Pacote `@teraprox/core-sdk` (npm TypeScript)
+## 1. Pacote `@hashcodeti/core-sdk` (npm TypeScript)
 
 ### 1.1 Criar o pacote
 
 ```
 packages/
   core-sdk/
-    package.json        # @teraprox/core-sdk
+    package.json        # @hashcodeti/core-sdk
     tsconfig.json
     src/
       index.ts          # re-export tudo
@@ -166,12 +166,12 @@ O Core precisa prover a implementação concreta da interface `CoreService`.
 |---|------|---------|----------|
 | 2.1.1 | Criar `CoreServiceProvider.js` | `src/providers/CoreServiceProvider.js` | Wrapper que pega `useWebProvider()` + `useToasts()` e monta o objeto `CoreService` |
 | 2.1.2 | Montar na árvore de providers | `src/bootstrap.js` | Abaixo do `<WebProviderComponent>`, acima do `<App />` |
-| 2.1.3 | Expor como shared singleton | `webpack.config.js` | `@teraprox/core-sdk: { singleton: true, eager: true }` |
+| 2.1.3 | Expor como shared singleton | `webpack.config.js` | `@hashcodeti/core-sdk: { singleton: true, eager: true }` |
 
 **Implementação:**
 ```jsx
 // src/providers/CoreServiceProvider.js
-import { CoreServiceContext } from '@teraprox/core-sdk'
+import { CoreServiceContext } from '@hashcodeti/core-sdk'
 
 export default function CoreServiceProvider({ children }) {
   const wp = useWebProvider()
@@ -234,11 +234,11 @@ export default function CoreServiceProvider({ children }) {
 
 | # | Ação | Arquivo |
 |---|------|---------|
-| 2.4.1 | Adicionar `@teraprox/core-sdk` ao `shared` | `webpack.config.js` |
+| 2.4.1 | Adicionar `@hashcodeti/core-sdk` ao `shared` | `webpack.config.js` |
 
 ```js
 shared: {
-  '@teraprox/core-sdk': { singleton: true, eager: true, requiredVersion: false },
+  '@hashcodeti/core-sdk': { singleton: true, eager: true, requiredVersion: false },
   // ... demais deps existentes
 }
 ```
@@ -274,7 +274,7 @@ shared: {
 | # | Categoria | Arquivos | Ação |
 |---|-----------|----------|------|
 | 3.3.1 | Factories (20) | `CadernosFactory`, `ProcessoFormFactory`, etc. | Remover `import { useToasts }` → Screens internas usam `useToast()` do SDK |
-| 3.3.2 | Screens (12) | `OperacaoForm`, `ProcessoForm`, `FluxoDeProcessoForm`, etc. | `import { useToast } from '@teraprox/core-sdk'` |
+| 3.3.2 | Screens (12) | `OperacaoForm`, `ProcessoForm`, `FluxoDeProcessoForm`, etc. | `import { useToast } from '@hashcodeti/core-sdk'` |
 | 3.3.3 | Hooks (6) | `useValidationHook`, `useAnexo`, `useLogin`, etc. | Idem |
 | 3.3.4 | Components (7) | `RegistroDeCampoCard`, `FormulaEditor`, etc. | Idem |
 | 3.3.5 | HOCs (3) | `withWebContext`, `withGenericPicker`, `withMenuBar` | Idem |
@@ -282,7 +282,7 @@ shared: {
 **Migração mecânica:**
 ```diff
 - import { useToasts } from 'react-toast-notifications'
-+ import { useToast } from '@teraprox/core-sdk'
++ import { useToast } from '@hashcodeti/core-sdk'
 
 - const { addToast } = useToasts()
 - addToast("Sucesso", { appearance: "success", autoDismiss: true })
@@ -294,9 +294,9 @@ shared: {
 
 | # | Consumer | Ação |
 |---|----------|------|
-| 3.4.1 | Screens usando `useWebProvider().controller` | `import { useHttpController } from '@teraprox/core-sdk'` |
-| 3.4.2 | MatchingObject consumers (10 arquivos) | `import { useMatchingObject } from '@teraprox/core-sdk'` |
-| 3.4.3 | `useWebProvider().handleLogout` | `import { useCoreService } from '@teraprox/core-sdk'` |
+| 3.4.1 | Screens usando `useWebProvider().controller` | `import { useHttpController } from '@hashcodeti/core-sdk'` |
+| 3.4.2 | MatchingObject consumers (10 arquivos) | `import { useMatchingObject } from '@hashcodeti/core-sdk'` |
+| 3.4.3 | `useWebProvider().handleLogout` | `import { useCoreService } from '@hashcodeti/core-sdk'` |
 | 3.4.4 | `useWebProvider().subscribeEvent/unsubscribeEvent` | SDK hooks |
 
 ### 3.5 Simplificar `FederatedBridge.js`
@@ -415,7 +415,7 @@ O SGM tem um hook `useBasicService` que 10 services usam. Refatorar para usar o 
 ```diff
 // hooks/defaults/useBasicService.js
 - import { useWebProvider } from './useWebProvider'
-+ import { useHttpController } from '@teraprox/core-sdk'
++ import { useHttpController } from '@hashcodeti/core-sdk'
 
   export function useBasicService(context, baseEndPoint) {
 -   const { controller } = useWebProvider()
@@ -444,7 +444,7 @@ O SS já é o mais limpo — axios é standalone-only, sem imports estáticos do
 | 5.2.2 | Substituir `useWebProvider()` | Para `useCoreService()` / `useHttpController()` do SDK |
 | 5.2.3 | Simplificar `FederatedBridge.js` | Manter apenas flag (seção 3.5) |
 | 5.2.4 | Providers condicionais em `bootstrap.js` | `ToastProvider` etc. |
-| 5.2.5 | Adicionar `@teraprox/core-sdk` ao shared | `webpack.config.js` |
+| 5.2.5 | Adicionar `@hashcodeti/core-sdk` ao shared | `webpack.config.js` |
 
 ---
 
@@ -453,9 +453,9 @@ O SS já é o mais limpo — axios é standalone-only, sem imports estáticos do
 ### Fase 1 — Fundação (sem breaking changes)
 | Step | Ação | Risco |
 |------|------|-------|
-| 1 | Criar pacote `@teraprox/core-sdk` com interfaces + hooks + contexto | Zero — aditivo |
+| 1 | Criar pacote `@hashcodeti/core-sdk` com interfaces + hooks + contexto | Zero — aditivo |
 | 2 | Implementar `CoreServiceProvider` no Core | Zero — aditivo |
-| 3 | Adicionar `@teraprox/core-sdk` ao shared do webpack (Core + remotes) | Zero — aditivo |
+| 3 | Adicionar `@hashcodeti/core-sdk` ao shared do webpack (Core + remotes) | Zero — aditivo |
 | 4 | Publicar v0.1.0 do SDK | Zero |
 
 ### Fase 2 — Migração gradual (um remote por vez)
@@ -493,8 +493,8 @@ O SS já é o mais limpo — axios é standalone-only, sem imports estáticos do
 | `src/providers/CoreServiceProvider.js` | **CRIAR** |
 | `src/bootstrap.js` | Adicionar `<CoreServiceProvider>` |
 | `src/factories/FederatedComponentHOC.js` | Remover prop `webProvider` |
-| `webpack.config.js` | Adicionar `@teraprox/core-sdk` ao shared |
-| `package.json` | Adicionar `@teraprox/core-sdk` como dependência |
+| `webpack.config.js` | Adicionar `@hashcodeti/core-sdk` ao shared |
+| `package.json` | Adicionar `@hashcodeti/core-sdk` como dependência |
 
 ### SGP (70+ arquivos modificados)
 | Categoria | Qtd | Ação principal |
@@ -567,7 +567,7 @@ remote-app/
 - ❌ Lógica de socket.io
 
 ### O que o remote usa:
-- ✅ `import { useHttpController, useToast, useMatchingObject, useCoreService } from '@teraprox/core-sdk'`
+- ✅ `import { useHttpController, useToast, useMatchingObject, useCoreService } from '@hashcodeti/core-sdk'`
 - ✅ Redux reducers próprios (exportados via `ReducersBundle`)
 - ✅ Componentes de UI puros
 - ✅ Hooks de UI locais

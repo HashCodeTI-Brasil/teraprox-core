@@ -1,6 +1,6 @@
 // A partir de v0.2.0, teraprox-ui-kit é um meta-package em transição.
-// Os componentes abaixo migrarão gradualmente para @teraprox/ui-kit-core,
-// @teraprox/ui-kit-sgm e @teraprox/ui-kit-sgp nas Waves 1-3 — preservados aqui para retrocompat.
+// Os componentes abaixo migrarão gradualmente para @hashcodeti/ui-kit-core,
+// @hashcodeti/ui-kit-sgm e @hashcodeti/ui-kit-sgp nas Waves 1-3 — preservados aqui para retrocompat.
 
 // ─── Buttons ─────────────────────────────────────────────────────────────────
 export { default as AddButton } from './buttons/AddButton'
@@ -53,7 +53,7 @@ export * from './forms/ClickToWriteField'
 export * from './forms/ColorPicker'
 export * from './forms/Switch'
 export * from './forms/UploadArea'
-// AnexoManager migrado para @teraprox/ui-kit-core em Track C.3 da sprint
+// AnexoManager migrado para @hashcodeti/ui-kit-core em Track C.3 da sprint
 // 2026-04-20-code-split-fix-e-ports-faltantes. Re-export preservado para
 // retrocompat dos callers existentes (SGM-OS etc.).
 export {
@@ -61,7 +61,7 @@ export {
   type AnexoManagerProps,
   type AnexoPersistedItem,
   type AnexoLocalItem,
-} from '@teraprox/ui-kit-core'
+} from '@hashcodeti/ui-kit-core'
 export * from './forms/FindRecursoByTagField'
 export * from './forms/SectorSelector'
 export * from './forms/UnidadeMaterialForm'
@@ -91,7 +91,7 @@ export * from './tables/ReusableTableWithModal'
 // ─── Text ────────────────────────────────────────────────────────────────────
 export * from './text/TextWithMore'
 
-// ─── Re-exports from @teraprox/ui-kit-sgp (Wave 3 retrocompat) ─────────────
+// ─── Re-exports from @hashcodeti/ui-kit-sgp (Wave 3 retrocompat) ─────────────
 export {
   CalculoCorrecao,
   CalculadoraCorrecaoModal,
@@ -99,4 +99,4 @@ export {
   TarefaUnidadeForm,
   FrequenciaFormV2,
   CampoDeVerificacaoV2,
-} from '@teraprox/ui-kit-sgp'
+} from '@hashcodeti/ui-kit-sgp'

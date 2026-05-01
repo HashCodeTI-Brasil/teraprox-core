@@ -55,7 +55,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/unidade-material/UnidadeMaterialModal.tsx
-var import_ui_kit_core = require("@teraprox/ui-kit-core");
+var import_ui_kit_core = require("@hashcodeti/ui-kit-core");
 var import_teraprox_ui_kit = require("teraprox-ui-kit");
 var import_jsx_runtime = require("react/jsx-runtime");
 var UnidadeMaterialModal = ({
@@ -106,7 +106,7 @@ var UnidadeMaterialModal = ({
 };
 
 // src/inspecao/InspecaoModal.tsx
-var import_ui_kit_core2 = require("@teraprox/ui-kit-core");
+var import_ui_kit_core2 = require("@hashcodeti/ui-kit-core");
 var import_teraprox_ui_kit2 = require("teraprox-ui-kit");
 var import_jsx_runtime2 = require("react/jsx-runtime");
 var InspecaoModal = ({
@@ -1455,7 +1455,7 @@ var import_react_bootstrap10 = require("react-bootstrap");
 var import_fa4 = require("react-icons/fa");
 var import_md3 = require("react-icons/md");
 var import_teraprox_ui_kit7 = require("teraprox-ui-kit");
-var import_ui_kit_core3 = require("@teraprox/ui-kit-core");
+var import_ui_kit_core3 = require("@hashcodeti/ui-kit-core");
 
 // src/tarefa/ObservacaoModal.tsx
 var import_react5 = require("react");

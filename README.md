@@ -114,14 +114,14 @@ Ferramentas para desenvolvimento local dos remotes:
 
 ---
 
-### `@teraprox/ui-kit` (v0.1.0)
+### `@hashcodeti/ui-kit` (v0.1.0)
 
 Componentes visuais compartilhados entre módulos.
 
 ```js
-import { AddButton } from '@teraprox/ui-kit';
-import { UuidPill } from '@teraprox/ui-kit';
-import '@teraprox/ui-kit/styles'; // CSS
+import { AddButton } from '@hashcodeti/ui-kit';
+import { UuidPill } from '@hashcodeti/ui-kit';
+import '@hashcodeti/ui-kit/styles'; // CSS
 ```
 
 ---

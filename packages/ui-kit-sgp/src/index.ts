@@ -1,4 +1,4 @@
-// @teraprox/ui-kit-sgp — Wave 3B.
+// @hashcodeti/ui-kit-sgp — Wave 3B.
 // Widgets do dominio Processo (SGP). Props-driven: sem Redux,
 // sem useCoreService, sem useHttpController. Callers resolvem IO.
 

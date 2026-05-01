@@ -244,7 +244,7 @@ interface ColorPickerProps {
 declare function ColorPicker({ defaultColor, setCor, disabled, label }: ColorPickerProps): react_jsx_runtime.JSX.Element;
 
 /**
- * FormActionButtons — @teraprox/ui-kit-core
+ * FormActionButtons — @hashcodeti/ui-kit-core
  *
  * Agrupamento padrão de botões de ação para formulários (Cancelar, Excluir, Salvar
  * + opcionais Voltar e Copiar). Props-driven (zero Redux, zero useCoreService).
@@ -304,7 +304,7 @@ interface FormActionButtonsProps {
 declare const FormActionButtons: React.FC<FormActionButtonsProps>;
 
 /**
- * DeleteConfirm — @teraprox/ui-kit-core
+ * DeleteConfirm — @hashcodeti/ui-kit-core
  *
  * Modal de confirmação de exclusão padronizado, props-driven (zero Redux).
  * Promovido de teraprox-ui-kit/forms/DeleteConfirm para ui-kit-core em 2026-04-30
@@ -327,7 +327,7 @@ declare const DeleteConfirm: React.FC<DeleteConfirmProps>;
  * IconWithBadge — ícone com badge numérico opcional (ex.: contagem de itens).
  *
  * Promovido de `teraprox-SGM-OS/Components/default-components/icons/IconWithBadge.tsx`
- * para `@teraprox/ui-kit-core` na sprint 2026-04-29 (tarefa-item-unified, Phase 2).
+ * para `@hashcodeti/ui-kit-core` na sprint 2026-04-29 (tarefa-item-unified, Phase 2).
  * Cross-domain (SGM/SGP) e apresentacional puro — zero Redux, zero IO.
  *
  * Modos:

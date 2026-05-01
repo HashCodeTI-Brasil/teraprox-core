@@ -1,4 +1,4 @@
-# @teraprox/ui-kit-sgp
+# @hashcodeti/ui-kit-sgp
 
 Widgets visuais do domínio SGP (Processo) — formulários, modais e displays específicos consumidos por `SGP-caderno`, `SGP-ordemDeCorrecao` e `SGP-planoDeControle`.
 

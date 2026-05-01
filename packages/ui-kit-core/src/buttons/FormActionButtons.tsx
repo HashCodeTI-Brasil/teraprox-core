@@ -1,5 +1,5 @@
 /**
- * FormActionButtons — @teraprox/ui-kit-core
+ * FormActionButtons — @hashcodeti/ui-kit-core
  *
  * Agrupamento padrão de botões de ação para formulários (Cancelar, Excluir, Salvar
  * + opcionais Voltar e Copiar). Props-driven (zero Redux, zero useCoreService).

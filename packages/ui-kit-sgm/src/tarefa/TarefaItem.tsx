@@ -15,7 +15,7 @@ import {
   StatusBadge,
   SwitchOnClick,
 } from 'teraprox-ui-kit'
-import { AnexoManager, IconWithBadge } from '@teraprox/ui-kit-core'
+import { AnexoManager, IconWithBadge } from '@hashcodeti/ui-kit-core'
 import type {
   ITarefaItemViewModel,
   TarefaItemMode,
@@ -40,7 +40,7 @@ import './TarefaItem.css'
  *  - Zero `useDispatch`, `useSelector`, `useCoreService`, `useHttpController`,
  *    `endPointManutencao`. Toda IO via Port `vm`.
  *  - Zero imports de `teraprox-SGM-OS/...` (componente nao conhece o caller).
- *  - Imports permitidos: `teraprox-ui-kit`, `@teraprox/ui-kit-core`,
+ *  - Imports permitidos: `teraprox-ui-kit`, `@hashcodeti/ui-kit-core`,
  *    `teraprox-core-sdk` (apenas tipos), Bootstrap.
  *
  * Diferenciacao por modo:

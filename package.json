@@ -22,9 +22,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
     "@stomp/stompjs": "^7.3.0",
-    "@teraprox/ui-kit-core": "file:packages/ui-kit-core",
-    "@teraprox/ui-kit-sgm": "file:packages/ui-kit-sgm",
-    "@teraprox/ui-kit-sgp": "file:packages/ui-kit-sgp",
+    "@hashcodeti/ui-kit-core": "file:packages/ui-kit-core",
+    "@hashcodeti/ui-kit-sgm": "file:packages/ui-kit-sgm",
+    "@hashcodeti/ui-kit-sgp": "file:packages/ui-kit-sgp",
     "axios": "^1.13.6",
     "bootstrap": "^5.3.2",
     "dayjs": "^1.11.19",

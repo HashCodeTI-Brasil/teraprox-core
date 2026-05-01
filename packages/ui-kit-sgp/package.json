@@ -1,5 +1,5 @@
 {
-  "name": "@teraprox/ui-kit-sgp",
+  "name": "@hashcodeti/ui-kit-sgp",
   "version": "0.1.0",
   "description": "Widgets visuais do domínio SGP (Processo) — formulários, modais e displays específicos — skeleton Wave 0",
   "main": "dist/index.js",
@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "teraprox-ui-kit": "file:../ui-kit",
-    "@teraprox/ui-kit-core": "file:../ui-kit-core"
+    "@hashcodeti/ui-kit-core": "file:../ui-kit-core"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

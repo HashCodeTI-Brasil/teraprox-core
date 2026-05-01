@@ -1,4 +1,4 @@
-# @teraprox/ui-kit-core
+# @hashcodeti/ui-kit-core
 
 Primitivos visuais cross-cutting (buttons, forms, displays, containers) compartilhados entre os micro-frontends dos domínios SGM (Manutenção) e SGP (Processo).
 

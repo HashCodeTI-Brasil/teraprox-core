@@ -1,6 +1,6 @@
 // @ts-nocheck — DTS pré-existente (incompat React types ui-kit-core/ui-kit-sgm).
 import React from 'react'
-import { FormModal } from '@teraprox/ui-kit-core'
+import { FormModal } from '@hashcodeti/ui-kit-core'
 import { AutoComplete } from 'teraprox-ui-kit'
 import type {
   IInspecaoModalViewModel,

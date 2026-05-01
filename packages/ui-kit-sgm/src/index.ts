@@ -1,4 +1,4 @@
-// @teraprox/ui-kit-sgm — Wave 1 fase 2 + Wave 2C.
+// @hashcodeti/ui-kit-sgm — Wave 1 fase 2 + Wave 2C.
 // Modais compostos e widgets do domínio SGM (Manutenção). Consomem
 // ViewModels (Ports) do teraprox-core-sdk ou recebem IO via props —
 // sem Redux/useCoreService/useHttpController na UI.
