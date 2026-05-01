@@ -192,6 +192,17 @@ export function useScreenCachedState<T>(
         ? (next as (prev: T) => T)(valueRef.current)
         : next
       valueRef.current = resolved
+      // Diagnostic log (TEMP) — investigar relato de allOrdens vazio em cache.
+      // Remover após validar que writes estão de fato ocorrendo.
+      try {
+        const sample = Array.isArray(resolved)
+          ? `Array(${(resolved as unknown[]).length})`
+          : typeof resolved
+        // eslint-disable-next-line no-console
+        console.debug('[useScreenCachedState] write', storageKey, sample)
+      } catch {
+        // ignore
+      }
       writeEntry<T>(storageKey, { v: resolved, t: Date.now() }, scope)
       setValue(resolved)
     },
