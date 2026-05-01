@@ -12,6 +12,7 @@ import { useToasts } from "react-toast-notifications"
 import {
     logOut,
     setNeedUserLogin,
+    setSocketConnectionStatus,
     setToken,
 } from "../Reducers/default-reducers/globalConfigReducer"
 import { routesConfig } from "../models/routesConfig"
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom"
 import { setGlobalError } from "../Reducers/default-reducers/globalErrorReducer"
 import { createNotificationFirebaseClient } from "./notificationFirebaseClient"
 import { createAsyncResponseClient } from "./asyncResponseFirebaseClient"
+import { watchRtdbConnection } from "./connectionStatusClient"
 import { createMoFirebaseClient } from "./moFirebaseClient"
 import { registerPresence } from "./presenceClient"
 import { createRateLimitFirebaseClient } from "./rateLimitFirebaseClient"
@@ -79,6 +81,21 @@ export default function WebProviderComponent({ children }) {
             }
         }
     }, [])
+
+    // Status real da conexão RTDB → Redux global.socketConnection
+    // Lê o path especial `.info/connected` que o Firebase SDK mantém:
+    // true ao subir conexão, false em queda. A MenuBar (Connected/Offline)
+    // observa esse mesmo state.
+    useEffect(() => {
+        const unwatch = watchRtdbConnection((connected) => {
+            dispatch(setSocketConnectionStatus(connected))
+        })
+        return () => {
+            unwatch()
+            // Ao desmontar o provider (logout/unload), garante false
+            dispatch(setSocketConnectionStatus(false))
+        }
+    }, [dispatch])
 
     useEffect(() => {
         if (token && userId && company) {
