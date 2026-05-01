@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useCoreService } from '../hooks/useCoreService'
 import { useToast } from '../hooks/useToast'
 import type {
@@ -30,6 +31,10 @@ export function useObservacoesTarefaViewModel(
   const { tarefaId } = opts
   const { createController } = useCoreService()
   const toast = useToast()
+  // Identidade do usuário para o payload — JWT pode não carregar userId
+  // (ex: tokens antigos ou role-only) então enviamos explicitamente do estado
+  // global. Sem isso, INSERT em justificativa viola NOT NULL em userId.
+  const currentUser = useSelector((state: any) => state?.global ?? {})
 
   const [list, setList] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -64,9 +69,22 @@ export function useObservacoesTarefaViewModel(
     async (obs: ObservacaoTarefaPayload): Promise<void> => {
       setLoading(true)
       try {
+        const fullName = [currentUser.firstName, currentUser.lastName]
+          .filter(Boolean)
+          .join(' ')
+          .trim()
+        const payload: Record<string, unknown> = {
+          ...obs,
+          // Backend tem coluna `descricao`; UI envia `texto` por convenção
+          // do ObservacaoModal — manda ambos para garantir mapeamento.
+          descricao: obs.descricao ?? obs.texto,
+          userId: obs.userId ?? currentUser.userId,
+          nomeUsuario:
+            obs.nomeUsuario ?? currentUser.nomeUsuario ?? fullName ?? currentUser.userName,
+        }
         await tarefaCtrl.post(
           `addObservacaoTarefa/${tarefaId}`,
-          obs
+          payload
         )
         await load()
       } catch (err: any) {
@@ -81,7 +99,7 @@ export function useObservacoesTarefaViewModel(
         setLoading(false)
       }
     },
-    [tarefaCtrl, tarefaId, load, toast]
+    [tarefaCtrl, tarefaId, load, toast, currentUser]
   )
 
   return useMemo<IObservacoesTarefaViewModel>(
