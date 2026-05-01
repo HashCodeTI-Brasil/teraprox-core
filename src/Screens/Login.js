@@ -4,12 +4,12 @@ import { useSelector } from "react-redux"
 import { Navigate } from "react-router-dom"
 import ToogablePasswordField from "../Components/User/ToogablePasswordField"
 import useLogin from "../hooks/useLogin"
-import { isLocalDev, getDevTenant, setDevTenant } from "../utils/tenantResolver.js"
+import { shouldPromptTenant, getDevTenant, setDevTenant } from "../utils/tenantResolver.js"
 
 const Login = () => {
     const global = useSelector((state) => state.global)
     const { setUsuario, setSenha, authPlataform } = useLogin()
-    const showTenantField = isLocalDev()
+    const showTenantField = shouldPromptTenant()
     const [devTenant, setDevTenantState] = useState(getDevTenant())
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const Login = () => {
                                 {showTenantField && (
                                     <Form.Group className="mb-3" controlId="formTenant">
                                         <Form.Label className="text-muted small">
-                                            Tenant (dev local)
+                                            Empresa / Tenant
                                         </Form.Label>
                                         <Form.Control
                                             type="text"
@@ -44,7 +44,13 @@ const Login = () => {
                                             onChange={(e) => setDevTenantState(e.target.value)}
                                             className="py-2"
                                             style={{ borderColor: '#ffc107', backgroundColor: '#fffdf0' }}
+                                            autoCapitalize="none"
+                                            autoCorrect="off"
                                         />
+                                        <Form.Text className="text-muted small">
+                                            Em produção com domínio próprio (ex: cationbrasil.teraprox.com.br)
+                                            esse campo é detectado automaticamente.
+                                        </Form.Text>
                                     </Form.Group>
                                 )}
 
