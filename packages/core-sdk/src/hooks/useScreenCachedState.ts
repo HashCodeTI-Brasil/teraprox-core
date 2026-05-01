@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
 /**
@@ -59,7 +59,6 @@ interface CachedEntry<T> {
 }
 
 const STORAGE_PREFIX = 'teraprox.screen.'
-const WRITE_DEBOUNCE_MS = 100
 
 /** Cache em memória (fallback quando scope='memory' ou sessionStorage indisponível). */
 const memoryStore = new Map<string, string>()
@@ -172,53 +171,42 @@ export function useScreenCachedState<T>(
     return entry.v
   })
 
-  // Debounce de writes para evitar serialização excessiva quando há
-  // múltiplos `setValue` síncronos (ex: smart-refresh em loop).
-  const writeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pendingValueRef = useRef<T>(value)
+  // Setter wrapper: escreve em sessionStorage SINCRONAMENTE no momento da
+  // chamada (não em useEffect debounced). Evita races em navegação cross-MF
+  // (componente desmonta antes do effect rodar) e garante que o cache
+  // sempre reflete a última chamada de setValue, sem depender de cleanup.
+  //
+  // Custo: serialização JSON acontece a cada setValue. Para os volumes
+  // típicos (50-200KB) é ~5-10ms — aceitável; smart-refresh dispara no
+  // máximo poucas vezes por segundo.
+  //
+  // valueRef rastreia o último value escrito para que updater functions
+  // (setValue(prev => next)) calculem a partir do estado real, não do
+  // closure de uma render anterior.
+  const valueRef = useRef<T>(value)
+  valueRef.current = value
 
-  const flushWrite = useCallback(() => {
-    if (writeTimerRef.current != null) {
-      clearTimeout(writeTimerRef.current)
-      writeTimerRef.current = null
-    }
-    writeEntry<T>(storageKey, { v: pendingValueRef.current, t: Date.now() }, scope)
-  }, [storageKey, scope])
-
-  // Persiste sempre que `value` muda. Debounce evita escritas em cascata.
-  useEffect(() => {
-    pendingValueRef.current = value
-    if (writeTimerRef.current != null) clearTimeout(writeTimerRef.current)
-    writeTimerRef.current = setTimeout(() => {
-      writeEntry<T>(storageKey, { v: value, t: Date.now() }, scope)
-      writeTimerRef.current = null
-    }, WRITE_DEBOUNCE_MS)
-    return () => {
-      // Sem flush no cleanup do effect normal — só no unmount/pagehide.
-    }
-  }, [value, storageKey, scope])
-
-  // Flush no unload e no unmount: garante que dados em flight sejam persistidos.
-  useEffect(() => {
-    if (!isWindowAvailable()) return
-    const handlePageHide = () => flushWrite()
-    window.addEventListener('pagehide', handlePageHide)
-    window.addEventListener('beforeunload', handlePageHide)
-    return () => {
-      window.removeEventListener('pagehide', handlePageHide)
-      window.removeEventListener('beforeunload', handlePageHide)
-      // Flush também no unmount do componente — cobre cross-MF nav.
-      flushWrite()
-    }
-  }, [flushWrite])
+  const wrappedSetValue = useCallback<Dispatch<SetStateAction<T>>>(
+    (next) => {
+      const resolved = typeof next === 'function'
+        ? (next as (prev: T) => T)(valueRef.current)
+        : next
+      valueRef.current = resolved
+      writeEntry<T>(storageKey, { v: resolved, t: Date.now() }, scope)
+      setValue(resolved)
+    },
+    [storageKey, scope],
+  )
 
   const clear = useCallback(() => {
     removeEntry(storageKey, scope)
-    setValue(resolveInitialValue(initialValue))
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialValue é
-    // intencionalmente fora das deps; clear sempre restaura para o valor da
-    // chamada original do hook (consistente com useState).
+    const initial = resolveInitialValue(initialValue)
+    valueRef.current = initial
+    setValue(initial)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialValue
+    // intencionalmente fora das deps: clear sempre restaura ao valor da
+    // chamada original do hook (consistente com semântica de useState).
   }, [storageKey, scope])
 
-  return [value, setValue, clear]
+  return [value, wrappedSetValue, clear]
 }
