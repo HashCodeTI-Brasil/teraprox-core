@@ -638,6 +638,9 @@ interface OsCardOrdem {
     modelId?: number | string | null;
     recorrenciaId?: number | string | null;
     agregadorId?: number | string | null;
+    /** Id da solicitação de serviço que originou esta OS, quando aplicável.
+     *  Quando ausente, considera-se que a OS foi criada manualmente. */
+    solicitacaoOrigemId?: number | string | null;
     recurso?: {
         nome?: string;
     } | null;
@@ -673,6 +676,8 @@ interface OsCardProps {
     onCardAction?: (ordem: OsCardOrdem) => void;
     onViewAgregador?: (agregadorId: number | string) => void;
     onViewRecorrencia?: (recorrenciaId: number | string) => void;
+    /** Navega para a SS de origem (chip "Origem: SS #X"). Se omitido, o chip vira label não-clicável. */
+    onViewSolicitacao?: (solicitacaoId: number | string) => void;
     onIniciar?: (ordem: OsCardOrdem) => void | Promise<void>;
     onContinuar?: (ordem: OsCardOrdem) => void;
     isSelectable?: boolean;

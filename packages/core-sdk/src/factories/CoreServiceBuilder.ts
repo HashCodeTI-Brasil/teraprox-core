@@ -23,9 +23,16 @@ export class FetchHttpAdapter implements HttpController {
     }
   }
 
-  /** Join non-empty path segments, avoiding double slashes. */
+  /** Join non-empty path segments, stripping leading/trailing slashes per part
+   * so callers can pass `'foo/bar'` or `'/foo/bar'` interchangeably without
+   * producing `gateway/ctx//foo/bar` (double-slash → upstream 404). */
   private joinPath(...parts: (string | number | null | undefined)[]): string {
-    return parts.filter(p => p != null && p !== '').map(String).join('/')
+    return parts
+      .filter(p => p != null && p !== '')
+      .map(String)
+      .map(p => p.replace(/^\/+|\/+$/g, ''))
+      .filter(p => p !== '')
+      .join('/')
   }
 
   private async request(method: string, extraPath: string, data?: any, extraHeaders?: Record<string, string>) {
