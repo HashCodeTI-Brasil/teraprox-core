@@ -435,6 +435,13 @@ export default function WebProviderComponent({ children }) {
         unsubscribe,
         subscribeEvent,
         unsubscribeEvent,
+        // Exposed so non-axios HTTP layers (FetchHttpAdapter via core-sdk's
+        // CoreServiceBuilder) can fan matching objects through the same
+        // subscriber path (refresher callbacks) as the RTDB delivery.
+        // Without this, useMatchingObject subscribers waited on RTDB
+        // round-trip — observed 15-20s lag on confirmAnexo before the
+        // registro card refreshed.
+        processResponseMatchingObjects,
         sendMessage,
         connectSocket,
         connectNotificationSocket,
@@ -451,6 +458,7 @@ export default function WebProviderComponent({ children }) {
         unsubscribe,
         subscribeEvent,
         unsubscribeEvent,
+        processResponseMatchingObjects,
         sendMessage,
         connectSocket,
         connectNotificationSocket,

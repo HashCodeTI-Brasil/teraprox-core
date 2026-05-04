@@ -65,6 +65,16 @@ export default function CoreServiceProvider({ children }) {
 
     const processResponseMatchingObjects = useCallback((matchingObjects) => {
         if (!matchingObjects) return
+        // Delegate to wsProvider so HTTP-response MOs walk the same path as
+        // RTDB-delivered ones — both invoke useMatchingObject's refresher
+        // callbacks. The local fallback (only wsEvent.dispatchEvent) reaches
+        // subscribeEvent listeners but skips the refresher subscribers used
+        // by core-sdk's useMatchingObject hook, leaving consumers to wait
+        // on the RTDB round-trip (15-20s observed for confirmAnexo).
+        if (wp?.processResponseMatchingObjects) {
+            wp.processResponseMatchingObjects(matchingObjects)
+            return
+        }
         const mos = Array.isArray(matchingObjects) ? matchingObjects : [matchingObjects]
         for (const mo of mos) {
             if (wp?.wsEvent) {
