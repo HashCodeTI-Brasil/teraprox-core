@@ -107,6 +107,14 @@ export const routesConfig = [
             { configuration: { context: "setor", path: paths.setores, endPoint: endPointUser } },
             { configuration: { context: "company", path: paths.empresas, endPoint: endPointUser } },
             { configuration: { context: "permissao", path: paths.permissoes, endPoint: endPointUser } },
+            // SGU contexts (Sprint 3 / refactor 2026-05-04) — Adapters em core-sdk/state/sgu/*
+            { configuration: { context: "colaborators", endPoint: endPointUser } },
+            { configuration: { context: "role", endPoint: endPointUser } },
+            { configuration: { context: "frontEndPerms", endPoint: endPointUser } },
+            { configuration: { context: "registerUser", endPoint: endPointUser } },
+            { configuration: { context: "inviteToCompany", endPoint: endPointUser } },
+            { configuration: { context: "companiesByUser", endPoint: endPointUser } },
+            { configuration: { context: "findSetoresByCompanyId", endPoint: endPointUser } },
         ],
     },
 ]
