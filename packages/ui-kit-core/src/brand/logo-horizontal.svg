@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PLACEHOLDER — substituir pelo logo horizontal oficial Teraprox.
+  TODO(brand-assets): user fornecerá SVG oficial. Manter viewBox/proporção.
+  Documentação: src/brand/README.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 56" role="img" aria-label="Teraprox">
+  <rect width="240" height="56" rx="8" fill="#2563eb"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="22" font-weight="700" fill="#ffffff" letter-spacing="0.5">Teraprox</text>
+</svg>

@@ -14,17 +14,29 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "import": "./dist/tokens/index.mjs",
+      "require": "./dist/tokens/index.js"
+    },
+    "./tailwind-preset": {
+      "types": "./dist/tailwind.preset.d.ts",
+      "import": "./dist/tailwind.preset.mjs",
+      "require": "./dist/tailwind.preset.js"
+    },
+    "./brand/*": "./src/brand/*",
     "./dist/index.css": {
       "style": "./dist/index.css",
       "default": "./dist/index.css"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src/brand"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "publishConfig": {
     "access": "public"

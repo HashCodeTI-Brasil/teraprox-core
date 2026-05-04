@@ -211,3 +211,19 @@ export type {
 } from './ITarefaItemViewModel'
 
 export { useTarefaItemViewModel } from './ReduxTarefaItemAdapter'
+
+// SGU Ports (sprint 2026-05-02 web-client-site-teraprox — Sprint 3 fase A EX3)
+export type { IUserViewModel, UserListFilters } from './IUserViewModel'
+export type { IRoleViewModel } from './IRoleViewModel'
+export type { ISetorViewModel } from './ISetorViewModel'
+export type { IPermissaoViewModel } from './IPermissaoViewModel'
+export type { IEmpresaViewModel } from './IEmpresaViewModel'
+
+export { useUserViewModel } from './ReduxUserAdapter'
+export { useRoleViewModel } from './ReduxRoleAdapter'
+export { useSetorViewModel } from './ReduxSetorAdapter'
+export {
+  usePermissaoViewModel,
+  type UsePermissaoViewModelOptions,
+} from './ReduxPermissaoAdapter'
+export { useEmpresaViewModel } from './ReduxEmpresaAdapter'

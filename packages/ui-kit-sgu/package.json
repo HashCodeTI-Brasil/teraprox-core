@@ -1,0 +1,47 @@
+{
+  "name": "@hashcodeti/ui-kit-sgu",
+  "version": "0.1.0",
+  "description": "Widgets visuais do dominio SGU (gestao de usuarios, roles, setores, permissoes) — props-driven, apresentacional puro. Sprint 3 fase A da web-client-site-teraprox.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-icons": ">=4.0.0",
+    "@hashcodeti/ui-kit-core": ">=0.1.0",
+    "teraprox-core-sdk": ">=0.3.12"
+  },
+  "peerDependenciesMeta": {
+    "react-icons": { "optional": true },
+    "teraprox-core-sdk": { "optional": true },
+    "@hashcodeti/ui-kit-core": { "optional": true }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "license": "MIT"
+}

@@ -217,6 +217,105 @@ export {
 } from './utils/dateUtils'
 export { capitalize, truncate, removeAccents, slugify, isBlank } from './utils/stringUtils'
 
+// SGU domain types (sprint 2026-05-02 web-client-site-teraprox — Sprint 3 EX3)
+export type {
+  User,
+  UserSetorLink,
+  UserRoleLink,
+  CreateUserInput,
+  UpdateUserInput,
+  InvitationToken,
+  Role,
+  CreateRoleInput,
+  UpdateRoleInput,
+  Setor,
+  CreateSetorInput,
+  UpdateSetorInput,
+  Empresa,
+  UpdateEmpresaInput,
+  PermissionComponent,
+  PermissionPath,
+  BlockedPermissionItem,
+  UpdatePermissionInput,
+} from './domain/sgu'
+
+// SGU Ports + Adapters
+export type {
+  IUserViewModel,
+  UserListFilters,
+  IRoleViewModel,
+  ISetorViewModel,
+  IPermissaoViewModel,
+  IEmpresaViewModel,
+} from './viewmodels'
+export {
+  useUserViewModel,
+  useRoleViewModel,
+  useSetorViewModel,
+  usePermissaoViewModel,
+  useEmpresaViewModel,
+} from './viewmodels'
+export type { UsePermissaoViewModelOptions } from './viewmodels'
+
+// SGU state slices
+export {
+  sguUserReducer,
+  SGU_USER_SLICE_KEY,
+  setSguUserList,
+  upsertSguUser,
+  removeSguUser,
+  setSguSelectedUser,
+  patchSguSelectedUser,
+  setSguUserLoading,
+  setSguUserError,
+  clearSguUser,
+  selectSguUser,
+  sguRoleReducer,
+  SGU_ROLE_SLICE_KEY,
+  setSguRoleList,
+  upsertSguRole,
+  removeSguRole,
+  setSguSelectedRole,
+  setSguRoleLoading,
+  setSguRoleError,
+  clearSguRole,
+  selectSguRole,
+  sguSetorReducer,
+  SGU_SETOR_SLICE_KEY,
+  setSguSetorList,
+  upsertSguSetor,
+  removeSguSetor,
+  setSguSelectedSetor,
+  setSguSetorLoading,
+  setSguSetorError,
+  clearSguSetor,
+  selectSguSetor,
+  sguPermissaoReducer,
+  SGU_PERMISSAO_SLICE_KEY,
+  setSguPermissaoCatalog,
+  upsertSguPermissaoPath,
+  setSguPermissaoLoading,
+  setSguPermissaoError,
+  clearSguPermissao,
+  selectSguPermissao,
+  sguEmpresaReducer,
+  SGU_EMPRESA_SLICE_KEY,
+  setSguCurrentEmpresa,
+  setSguEmpresaCompanies,
+  setSguSelectedEmpresa,
+  setSguEmpresaLoading,
+  setSguEmpresaError,
+  clearSguEmpresa,
+  selectSguEmpresa,
+} from './state/sgu'
+export type {
+  SguUserSliceState,
+  SguRoleSliceState,
+  SguSetorSliceState,
+  SguPermissaoSliceState,
+  SguEmpresaSliceState,
+} from './state/sgu'
+
 // Federation Runtime (v0.3.0 + v0.4.0 manifest-driven reducers)
 export { FederatedBridge } from './federation/FederatedBridge'
 export { isHostedByCore } from './federation/isHostedByCore'

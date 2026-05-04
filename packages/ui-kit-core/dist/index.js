@@ -28,8 +28,8 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
-var index_exports = {};
-__export(index_exports, {
+var src_exports = {};
+__export(src_exports, {
   AnexoManager: () => AnexoManager,
   ClickToWriteField: () => ClickToWriteField,
   ColorPicker: () => ColorPicker,
@@ -41,7 +41,7 @@ __export(index_exports, {
   FrequenciaFormV2: () => FrequenciaFormV2,
   IconWithBadge: () => IconWithBadge
 });
-module.exports = __toCommonJS(index_exports);
+module.exports = __toCommonJS(src_exports);
 
 // src/containers/FormModal.tsx
 var import_react_bootstrap = require("react-bootstrap");

@@ -73,6 +73,12 @@ const REMOTE_CONFIGS = [
         importBridge:         () => import('teraprox_app_plano_de_controle/FederatedBridge'),
         importReducersBundle: () => import('teraprox_app_plano_de_controle/ReducersBundle'),
     },
+    {
+        name: 'sgu_useroles',
+        importManifest:       () => import('sgu_useroles/Manifest'),
+        importBridge:         () => import('sgu_useroles/FederatedBridge'),
+        importReducersBundle: () => import('sgu_useroles/ReducersBundle'),
+    },
 ];
 
 // Lookup rápido por nome do remote
