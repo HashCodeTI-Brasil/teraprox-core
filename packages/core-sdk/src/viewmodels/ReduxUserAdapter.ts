@@ -79,7 +79,10 @@ export function useUserViewModel(): IUserViewModel {
       dispatch(setSguUserLoading(true))
       dispatch(setSguUserError(null))
       try {
-        const path = filters?.companyName ? String(filters.companyName) : ''
+        // Default 'me' — alias para tenant atual (JWT). Evita colisão com
+        // auto-CRUD GET /:id de controllers @Controller("/"). Quando caller
+        // passa companyName, vai em /colaborators/<companyName>.
+        const path = filters?.companyName ? String(filters.companyName) : 'me'
         const raw: any = await colaboratorsCtrl.get(path)
         let result = unwrap<User[]>(raw)
         if (!Array.isArray(result)) result = []
