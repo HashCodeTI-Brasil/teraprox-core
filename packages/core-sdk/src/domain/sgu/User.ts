@@ -52,7 +52,7 @@ export interface CreateUserInput {
   lastName: string
   contact?: string | null
   password?: string
-  roleId?: number | string | null
+  role?: string | null
   setorId?: number | string | null
 }
 
@@ -60,7 +60,7 @@ export interface CreateUserInput {
 export type UpdateUserInput = Partial<
   Pick<User, 'firstName' | 'lastName' | 'email' | 'contact' | 'active' | 'admin'>
 > & {
-  roleId?: number | string | null
+  role?: string | null
   setorId?: number | string | null
 }
 
@@ -69,5 +69,5 @@ export interface InvitationToken {
   token: string
   expiresAt?: string
   email: string
-  roleId?: number | string | null
+  role?: string | null
 }

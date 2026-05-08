@@ -19,7 +19,7 @@ interface AvatarProps {
 /** Avatar com iniciais e cor estável derivada do nome. */
 declare const Avatar: React.FC<AvatarProps>;
 
-type RoleValue = 'OWNER' | 'ADMIN' | 'USER' | 'PLANNER' | 'EXECUTIONER';
+type RoleValue = 'OWNER' | 'DEV' | 'ADMIN' | 'USER' | 'PLANNER' | 'EXECUTIONER';
 declare const ROLE_VALUES: ReadonlyArray<RoleValue>;
 interface RolePillProps {
     role: string | null | undefined;
@@ -61,6 +61,10 @@ interface UserTableProps {
     onDeleteUser?: (user: User) => void;
     onCreateUser?: () => void;
     onInviteByEmail?: () => void;
+    /** Habilita edição inline de role (dropdown na pill). */
+    canEditRole?: boolean;
+    /** Callback quando role muda inline. Se rejeitar, lista não muda. */
+    onChangeRole?: (user: User, role: RoleValue) => void | Promise<void>;
     /** Show breadcrumb/subtitle next to title */
     subtitle?: string;
     className?: string;
@@ -86,6 +90,8 @@ interface UserFormProps {
     onDelete?: (user: User) => void;
     errorMessage?: string | null;
     disabled?: boolean;
+    /** Quando false, o select de role fica somente-leitura (default true). */
+    canEditRole?: boolean;
     className?: string;
 }
 /** Form de usuário — role é enum string fixo (5 valores), setor é select. */

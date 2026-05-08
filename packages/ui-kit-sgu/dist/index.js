@@ -124,9 +124,10 @@ var Avatar = ({ name, size = "md" }) => {
 
 // src/shared/RolePill.tsx
 var import_jsx_runtime3 = require("react/jsx-runtime");
-var ROLE_VALUES = ["OWNER", "ADMIN", "USER", "PLANNER", "EXECUTIONER"];
+var ROLE_VALUES = ["OWNER", "DEV", "ADMIN", "PLANNER", "EXECUTIONER", "USER"];
 var STYLE = {
   OWNER: "bg-amber-100 text-amber-900 ring-amber-200",
+  DEV: "bg-rose-100 text-rose-900 ring-rose-200",
   ADMIN: "bg-violet-100 text-violet-900 ring-violet-200",
   USER: "bg-neutral-100 text-neutral-700 ring-neutral-200",
   PLANNER: "bg-sky-100 text-sky-900 ring-sky-200",
@@ -134,6 +135,7 @@ var STYLE = {
 };
 var LABEL = {
   OWNER: "Owner",
+  DEV: "Dev",
   ADMIN: "Admin",
   USER: "User",
   PLANNER: "Planner",
@@ -144,10 +146,14 @@ var SIZE3 = {
   sm: "text-xs px-2 py-0.5"
 };
 var RolePill = ({ role, size = "sm" }) => {
-  const upper = (role != null ? role : "").toUpperCase();
+  const raw = (role != null ? role : "").trim();
+  if (!raw) {
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `inline-flex items-center rounded-md ring-1 ring-inset ring-neutral-200 bg-neutral-50 text-neutral-500 font-medium ${SIZE3[size]}`, children: "\u2014" });
+  }
+  const upper = raw.toUpperCase();
   const isKnown = ROLE_VALUES.includes(upper);
   if (!isKnown) {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `inline-flex items-center rounded-md ring-1 ring-inset ring-neutral-200 bg-neutral-50 text-neutral-500 font-medium ${SIZE3[size]}`, children: "\u2014" });
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `inline-flex items-center rounded-md ring-1 ring-inset ring-neutral-200 bg-neutral-100 text-neutral-700 font-medium ${SIZE3[size]}`, children: raw });
   }
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `inline-flex items-center rounded-md ring-1 ring-inset font-medium ${STYLE[upper]} ${SIZE3[size]}`, children: LABEL[upper] });
 };
@@ -160,16 +166,20 @@ var fullName = (u) => {
   const derived = (_c = u._fullName) != null ? _c : `${(_a = u.firstName) != null ? _a : ""} ${(_b = u.lastName) != null ? _b : ""}`.trim();
   return derived || u.email || "\u2014";
 };
-var userRole = (u) => {
-  var _a, _b, _c;
-  const raw = (_c = (_b = u.role) != null ? _b : (_a = u.userRole) == null ? void 0 : _a.role) != null ? _c : null;
-  if (typeof raw !== "string") return null;
+var userRoleRaw = (u) => {
+  var _a, _b, _c, _d, _e, _f;
+  const raw = (_f = (_e = (_c = u.role) != null ? _c : (_b = (_a = u.userRoles) == null ? void 0 : _a[0]) == null ? void 0 : _b.role) != null ? _e : (_d = u.userRole) == null ? void 0 : _d.role) != null ? _f : null;
+  return typeof raw === "string" && raw.trim() ? raw : null;
+};
+var userRoleFiltro = (u) => {
+  const raw = userRoleRaw(u);
+  if (!raw) return null;
   const upper = raw.toUpperCase();
-  return ROLE_VALUES.includes(upper) ? upper : null;
+  return ROLE_VALUES.includes(upper) ? upper : "OTHER";
 };
 var userSetorName = (u) => {
-  var _a, _b, _c;
-  return (_c = (_b = u.setor) != null ? _b : (_a = u.userSetor) == null ? void 0 : _a.setor) != null ? _c : "\u2014";
+  var _a, _b, _c, _d, _e, _f;
+  return (_f = (_e = (_c = u.setor) != null ? _c : (_b = (_a = u.userSetor) == null ? void 0 : _a.setor) == null ? void 0 : _b.nome) != null ? _e : (_d = u.userSetor) == null ? void 0 : _d.setor) != null ? _f : "\u2014";
 };
 var UserTable = ({
   users,
@@ -178,6 +188,8 @@ var UserTable = ({
   onDeleteUser,
   onCreateUser,
   onInviteByEmail,
+  canEditRole = false,
+  onChangeRole,
   subtitle,
   className = ""
 }) => {
@@ -187,7 +199,7 @@ var UserTable = ({
     const term = search.trim().toLowerCase();
     return users.filter((u) => {
       var _a;
-      if (roleFilter !== "ALL" && userRole(u) !== roleFilter) return false;
+      if (roleFilter !== "ALL" && userRoleFiltro(u) !== roleFilter) return false;
       if (!term) return true;
       const hay = `${fullName(u)} ${(_a = u.email) != null ? _a : ""}`.toLowerCase();
       return hay.includes(term);
@@ -259,7 +271,9 @@ var UserTable = ({
           {
             user,
             onEdit: onEditUser,
-            onDelete: onDeleteUser
+            onDelete: onDeleteUser,
+            canEditRole,
+            onChangeRole
           },
           user.id
         )) }),
@@ -274,45 +288,95 @@ var UserTable = ({
     }
   );
 };
-var UserRow = ({ user, onEdit, onDelete }) => {
+var UserRow = ({ user, onEdit, onDelete, canEditRole, onChangeRole }) => {
   var _a;
   const name = fullName(user);
-  const role = userRole(user);
+  const role = userRoleRaw(user);
   const setor = userSetorName(user);
   const active = (_a = user.active) != null ? _a : true;
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("li", { className: "group px-6 py-3 flex items-center gap-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Avatar, { name }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex-1 min-w-0", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "font-medium text-sm text-neutral-900 dark:text-neutral-50 truncate", children: name }),
-        !active && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500", children: "inativo" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "text-xs text-neutral-500 dark:text-neutral-400 truncate", children: user.email || "\u2014" })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hidden sm:block min-w-[110px]", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(RolePill, { role }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hidden md:block min-w-[120px] text-sm text-neutral-600 dark:text-neutral-400 truncate", children: setor }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity", children: [
-      onEdit && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        "button",
-        {
-          type: "button",
-          onClick: () => onEdit(user),
-          "aria-label": `Editar ${name}`,
-          className: "p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-neutral-200 dark:hover:bg-neutral-700",
-          children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { width: "14", height: "14", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M11 1.5L14.5 5l-9 9H2v-3.5l9-9z", strokeLinejoin: "round" }) })
-        }
-      ),
-      onDelete && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-        "button",
-        {
-          type: "button",
-          onClick: () => onDelete(user),
-          "aria-label": `Desativar ${name}`,
-          className: "p-1.5 rounded-md text-neutral-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40",
-          children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { width: "14", height: "14", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M2.5 4h11M6 4V2.5h4V4M5 4l.5 9.5h5L11 4M6.5 7v4M9.5 7v4", strokeLinecap: "round", strokeLinejoin: "round" }) })
-        }
-      )
-    ] })
+  const [savingRole, setSavingRole] = (0, import_react2.useState)(false);
+  const handleRoleChange = async (e) => {
+    if (!onChangeRole) return;
+    const next = e.target.value;
+    if (!next || next === (role != null ? role : "").toUpperCase()) return;
+    setSavingRole(true);
+    try {
+      await onChangeRole(user, next);
+    } finally {
+      setSavingRole(false);
+    }
+  };
+  const handleRowClick = () => onEdit == null ? void 0 : onEdit(user);
+  const handleRowKey = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onEdit == null ? void 0 : onEdit(user);
+    }
+  };
+  const stop = (e) => e.stopPropagation();
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+    "li",
+    {
+      className: `group px-6 py-3 flex items-center gap-4 transition-colors ${onEdit ? "cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50" : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"}`,
+      onClick: onEdit ? handleRowClick : void 0,
+      onKeyDown: onEdit ? handleRowKey : void 0,
+      role: onEdit ? "button" : void 0,
+      tabIndex: onEdit ? 0 : void 0,
+      "aria-label": onEdit ? `Editar ${name}` : void 0,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Avatar, { name }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "font-medium text-sm text-neutral-900 dark:text-neutral-50 truncate", children: name }),
+            !active && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500", children: "inativo" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "text-xs text-neutral-500 dark:text-neutral-400 truncate", children: user.email || "\u2014" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hidden sm:block min-w-[110px]", onClick: stop, children: canEditRole && onChangeRole ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          RoleEditor,
+          {
+            currentRole: role,
+            disabled: savingRole,
+            onChange: handleRoleChange
+          }
+        ) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(RolePill, { role }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hidden md:block min-w-[120px] text-sm text-neutral-600 dark:text-neutral-400 truncate", children: setor }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity", onClick: stop, children: onDelete && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          "button",
+          {
+            type: "button",
+            onClick: (e) => {
+              e.stopPropagation();
+              onDelete(user);
+            },
+            "aria-label": `Desativar ${name}`,
+            className: "p-1.5 rounded-md text-neutral-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40",
+            children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { width: "14", height: "14", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M2.5 4h11M6 4V2.5h4V4M5 4l.5 9.5h5L11 4M6.5 7v4M9.5 7v4", strokeLinecap: "round", strokeLinejoin: "round" }) })
+          }
+        ) })
+      ]
+    }
+  );
+};
+var RoleEditor = ({ currentRole, disabled, onChange }) => {
+  const upper = (currentRole != null ? currentRole : "").toUpperCase();
+  const valueInEnum = ROLE_VALUES.includes(upper);
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "relative inline-block", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(RolePill, { role: currentRole }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+      "select",
+      {
+        value: valueInEnum ? upper : "",
+        disabled,
+        onChange,
+        "aria-label": "Alterar role do usu\xE1rio",
+        className: "absolute inset-0 opacity-0 cursor-pointer disabled:cursor-wait",
+        children: [
+          !valueInEnum && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "", disabled: true, children: currentRole != null ? currentRole : "\u2014" }),
+          ROLE_VALUES.map((r) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: r, children: r }, r))
+        ]
+      }
+    )
   ] });
 };
 var SkeletonRows = () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("ul", { className: "divide-y divide-neutral-100 dark:divide-neutral-800", children: [1, 2, 3, 4].map((i) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("li", { className: "px-6 py-3 flex items-center gap-4", children: [
@@ -354,14 +418,15 @@ var import_react3 = require("react");
 var import_jsx_runtime5 = require("react/jsx-runtime");
 var ROLE_LABEL = {
   OWNER: "Owner \u2014 propriet\xE1rio da empresa",
+  DEV: "Dev \u2014 superadmin (suporte/billing)",
   ADMIN: "Admin \u2014 administrador",
   USER: "User \u2014 acesso padr\xE3o",
   PLANNER: "Planner \u2014 planejamento",
   EXECUTIONER: "Executioner \u2014 execu\xE7\xE3o em campo"
 };
 var extractRole = (u) => {
-  var _a, _b, _c;
-  const raw = (_c = (_b = u == null ? void 0 : u.role) != null ? _b : (_a = u == null ? void 0 : u.userRole) == null ? void 0 : _a.role) != null ? _c : null;
+  var _a, _b, _c, _d, _e, _f;
+  const raw = (_f = (_e = (_c = u == null ? void 0 : u.role) != null ? _c : (_b = (_a = u == null ? void 0 : u.userRoles) == null ? void 0 : _a[0]) == null ? void 0 : _b.role) != null ? _e : (_d = u == null ? void 0 : u.userRole) == null ? void 0 : _d.role) != null ? _f : null;
   if (typeof raw !== "string") return null;
   const upper = raw.toUpperCase();
   return ROLE_VALUES.includes(upper) ? upper : null;
@@ -387,6 +452,7 @@ var UserForm = ({
   onDelete,
   errorMessage,
   disabled = false,
+  canEditRole = true,
   className = ""
 }) => {
   var _a, _b, _c;
@@ -471,7 +537,8 @@ var UserForm = ({
         "select",
         {
           value: (_b = values.role) != null ? _b : "",
-          disabled,
+          disabled: disabled || !canEditRole,
+          title: !canEditRole ? "Apenas Owner, Dev e Admin podem alterar role." : void 0,
           onChange: (e) => setValues((v) => ({
             ...v,
             role: e.target.value === "" ? null : e.target.value

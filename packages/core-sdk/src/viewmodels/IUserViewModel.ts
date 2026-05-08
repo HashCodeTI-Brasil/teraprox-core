@@ -68,10 +68,10 @@ export interface IUserViewModel {
   delete(id: number | string): Promise<void>
 
   /** Convida usuário (POST /inviteToCompany). */
-  invite(email: string, roleId: number | string): Promise<InvitationToken>
+  invite(email: string, role: string): Promise<InvitationToken>
 
   /** Atribui Role ao usuário (proxy para update). */
-  assignRole(userId: number | string, roleId: number | string): Promise<User>
+  assignRole(userId: number | string, role: string): Promise<User>
 
   /** Atribui Setor ao usuário (proxy para update). */
   assignSetor(userId: number | string, setorId: number | string): Promise<User>

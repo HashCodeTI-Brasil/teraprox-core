@@ -111,7 +111,10 @@ export function useUserViewModel(): IUserViewModel {
 
   const getAll = useCallback(() => list, [list])
   const getById = useCallback(
-    (id: number | string) => list.find((u) => u.id === id),
+    (id: number | string) => {
+      const key = String(id)
+      return list.find((u) => String(u.id) === key)
+    },
     [list]
   )
 
@@ -161,9 +164,9 @@ export function useUserViewModel(): IUserViewModel {
   const invite = useCallback(
     async (
       email: string,
-      roleId: number | string
+      role: string
     ): Promise<InvitationToken> => {
-      const raw: any = await inviteCtrl.post('', { email, roleId } as any)
+      const raw: any = await inviteCtrl.post('', { email, role } as any)
       const data = unwrap<InvitationToken>(raw)
       return data as InvitationToken
     },
@@ -171,8 +174,8 @@ export function useUserViewModel(): IUserViewModel {
   )
 
   const assignRole = useCallback(
-    (userId: number | string, roleId: number | string) =>
-      update(userId, { roleId }),
+    (userId: number | string, role: string) =>
+      update(userId, { role }),
     [update]
   )
 

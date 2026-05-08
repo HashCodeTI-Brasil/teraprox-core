@@ -21,11 +21,14 @@ export interface UserFormProps {
   onDelete?: (user: User) => void
   errorMessage?: string | null
   disabled?: boolean
+  /** Quando false, o select de role fica somente-leitura (default true). */
+  canEditRole?: boolean
   className?: string
 }
 
 const ROLE_LABEL: Record<RoleValue, string> = {
   OWNER: 'Owner — proprietário da empresa',
+  DEV: 'Dev — superadmin (suporte/billing)',
   ADMIN: 'Admin — administrador',
   USER: 'User — acesso padrão',
   PLANNER: 'Planner — planejamento',
@@ -33,7 +36,11 @@ const ROLE_LABEL: Record<RoleValue, string> = {
 }
 
 const extractRole = (u?: User | null): RoleValue | null => {
-  const raw = (u as any)?.role ?? (u as any)?.userRole?.role ?? null
+  const raw =
+    (u as any)?.role ??
+    (u as any)?.userRoles?.[0]?.role ??
+    (u as any)?.userRole?.role ??
+    null
   if (typeof raw !== 'string') return null
   const upper = raw.toUpperCase() as RoleValue
   return (ROLE_VALUES as readonly string[]).includes(upper) ? upper : null
@@ -66,6 +73,7 @@ export const UserForm: React.FC<UserFormProps> = ({
   onDelete,
   errorMessage,
   disabled = false,
+  canEditRole = true,
   className = '',
 }) => {
   const isEdit = mode === 'edit' || (mode === 'auto' && !!initialUser)
@@ -149,7 +157,8 @@ export const UserForm: React.FC<UserFormProps> = ({
         <Field label="Role">
           <select
             value={values.role ?? ''}
-            disabled={disabled}
+            disabled={disabled || !canEditRole}
+            title={!canEditRole ? 'Apenas Owner, Dev e Admin podem alterar role.' : undefined}
             onChange={(e) =>
               setValues((v) => ({
                 ...v,
