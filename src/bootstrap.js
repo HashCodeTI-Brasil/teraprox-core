@@ -1,3 +1,4 @@
+// @agent-touched: 2026-05-18
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -20,10 +21,8 @@ import WebProviderComponent from './websocket/wsProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'teraprox-ui-kit/index.css';
-// ui-kit-core styles (AnexoManager, FrequenciaFormV2, ClickToWriteField, etc.)
-// O host precisa carregar este CSS porque no modo federado os bootstrap.tsx
-// dos remotes não são executados — apenas os módulos expostos são importados.
-import '@hashcodeti/ui-kit-core/dist/index.css';
+// ui-kit-core não exporta CSS — componentes são 100% Tailwind (preset aplicado
+// no tailwind.config do host via @hashcodeti/ui-kit-core/tailwind-preset).
 // ui-kit-sgm styles (TarefaItem.tsx — sprint 2026-04-29-tarefa-item-unified
 // migrou TarefaItem.css de teraprox-SGM-OS pro package). Mesma razão acima:
 // host carrega para que tela de execução / OS form em federation veja o CSS.

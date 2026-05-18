@@ -1,6 +1,6 @@
 {
   "name": "teraprox-core-sdk",
-  "version": "0.3.14",
+  "version": "0.4.0",
   "description": "Contrato tipado Core ↔ Federados — interfaces, context, hooks e componentes compartilhados",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -21,14 +21,20 @@
       "types": "./dist/federation.d.ts",
       "import": "./dist/federation.mjs",
       "require": "./dist/federation.js"
+    },
+    "./periodSpec": {
+      "types": "./dist/periodSpec.d.ts",
+      "import": "./dist/periodSpec.mjs",
+      "require": "./dist/periodSpec.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/dev.ts src/federation.ts --format esm,cjs --dts --clean",
-    "dev": "tsup src/index.ts src/dev.ts src/federation.ts --format esm,cjs --dts --watch"
+    "build": "tsup src/index.ts src/dev.ts src/federation.ts src/periodSpec.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts src/dev.ts src/federation.ts src/periodSpec.ts --format esm,cjs --dts --watch",
+    "test:periodSpec": "node scripts/run-periodSpec-smoke.mjs"
   },
   "publishConfig": {
     "access": "public"
