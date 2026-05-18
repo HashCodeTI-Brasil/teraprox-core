@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react'
-import { ListGroup } from 'react-bootstrap'
+import { List, ListItem } from '@hashcodeti/ui-kit-core'
 import { GrCheckmark } from 'react-icons/gr'
 import { ApproveAndReproveButtons, FormField } from 'teraprox-ui-kit'
 import type {
@@ -9,7 +9,7 @@ import type {
 } from 'teraprox-core-sdk'
 
 /**
- * MantenedorPicker (Wave 5B — hexagonal).
+ * MantenedorPicker (Wave 5B — hexagonal; Wave F.1.C — Tailwind/Radix migration).
  *
  * Widget props-driven: consome IMantenedorPickerViewModel (Port do
  * core-sdk). Zero Redux/useDispatch/useSelector/useCoreService direto.
@@ -17,6 +17,12 @@ import type {
  * Substitui MantenedoresDisplay.js local do SGM-OS. CSS continua em
  * teraprox-SGM-OS/src/styles/mantenedoresDisplay.css (débito residual —
  * ui-kit-sgm ainda não importa CSS via tsup).
+ *
+ * Wave F.1.C (2026-05-13): removido `react-bootstrap` (ListGroup/ListGroup.Item)
+ * em favor de `List`/`ListItem` de `@hashcodeti/ui-kit-core@0.7.0`. API
+ * pública preservada (zero breaking change). FormField e
+ * ApproveAndReproveButtons (teraprox-ui-kit) permanecem — não são bootstrap
+ * e estão fora do escopo desta wave.
  */
 
 export interface MantenedorPickerProps {
@@ -81,23 +87,22 @@ export const MantenedorPicker: React.FC<MantenedorPickerProps> = ({
       />
 
       {!hideOps && viewModel.pendingConfirm === null && (
-        <ListGroup className="list-mantenedor-container">
+        <List className="list-mantenedor-container">
           {viewModel.filteredOptions.length === 0 ? (
-            <ListGroup.Item>Nenhum manutentor encontrado.</ListGroup.Item>
+            <ListItem>Nenhum manutentor encontrado.</ListItem>
           ) : (
             viewModel.filteredOptions.map((m) => {
               const isBusyOther = m._busy && m.osId !== currentOsId
               const isBusyHere = m._busy && m.osId === currentOsId
               return (
-                <ListGroup.Item
-                  action
+                <ListItem
                   key={m.id}
                   onClick={() => handleClick(m)}
                   className={`mantenedor-option ${
                     isBusyOther ? 'busy' : ''
                   } ${isBusyHere ? 'current-os' : ''}`}
                 >
-                  <li className="d-flex align-items-center">
+                  <span className="flex items-center w-full">
                     <span>{m.nomeUsuario}</span>
                     {isBusyHere && (
                       <span className="current-os-indicator">
@@ -109,12 +114,12 @@ export const MantenedorPicker: React.FC<MantenedorPickerProps> = ({
                         {`Alocado OS-${m.osId}`}
                       </span>
                     )}
-                  </li>
-                </ListGroup.Item>
+                  </span>
+                </ListItem>
               )
             })
           )}
-        </ListGroup>
+        </List>
       )}
 
       {viewModel.pendingConfirm && (

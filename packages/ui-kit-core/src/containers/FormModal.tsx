@@ -1,5 +1,13 @@
 import React from 'react'
-import { Modal, Button, Spinner } from 'react-bootstrap'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  type ModalSize,
+} from '../primitives/Modal'
+import { Button, type ButtonVariant } from '../primitives/Button'
+import { Spinner } from '../primitives/Spinner'
 
 /**
  * FormModal — base reutilizável para modais de formulário com ação primária.
@@ -9,18 +17,25 @@ import { Modal, Button, Spinner } from 'react-bootstrap'
  * SwitchOnClick + GenericContextForm vazio + ResponsiveContainer sem footer.
  *
  * Wave 1 da sprint 2026-04-21-ui-kit-domain-split-wave0.
+ *
+ * Refatorado em 2026-05-13 para Tailwind+Radix (ui-kit-core primitives).
+ * API pública (FormModalProps) preservada — adapter interno mapeia
+ * `show`→`open`, `closeOnBackdrop=false`→bloqueio de overlay/esc, e variantes
+ * legadas de bootstrap (`outline-secondary`) para o novo Button.
  */
 
 export interface FormModalPrimaryAction {
   label: string
   onClick: () => void | Promise<void>
   icon?: React.ReactNode
+  /** Aceita variantes do Button novo (primary, danger, outline-*, etc.) */
   variant?: string
 }
 
 export interface FormModalSecondaryAction {
   label: string
   onClick: () => void
+  /** Aceita variantes do Button novo (primary, danger, outline-*, etc.) */
   variant?: string
 }
 
@@ -36,6 +51,10 @@ export interface FormModalProps {
   isValid?: boolean
   isLoading?: boolean
   closeOnBackdrop?: boolean
+  /**
+   * @deprecated O Modal novo (Radix) gerencia scroll do body via overflow no
+   * próprio ModalBody. Prop mantido para parity de assinatura — sem efeito.
+   */
   scrollable?: boolean
   footerExtra?: React.ReactNode
 }
@@ -52,34 +71,43 @@ export const FormModal: React.FC<FormModalProps> = ({
   isValid = true,
   isLoading = false,
   closeOnBackdrop = true,
-  scrollable = true,
+  // scrollable é tratado nativamente pelo ModalBody (overflow-y-auto)
+  scrollable: _scrollable = true,
   footerExtra,
 }) => {
-  const modalSize = size === 'md' ? undefined : size
-  const primaryVariant = primaryAction.variant ?? 'primary'
-  const secondaryVariant = secondaryAction?.variant ?? 'outline-secondary'
+  const modalSize: ModalSize = size
+  const primaryVariant = (primaryAction.variant ?? 'primary') as ButtonVariant
+  const secondaryVariant = (secondaryAction?.variant ??
+    'outline-secondary') as ButtonVariant
   const primaryDisabled = !isValid || isLoading
+
+  // Adapter show→open: só dispara onClose quando passa de open=true → false.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) onClose()
+  }
 
   return (
     <Modal
-      show={show}
-      onHide={onClose}
+      open={show}
+      onOpenChange={
+        closeOnBackdrop
+          ? handleOpenChange
+          : (next) => {
+              // Bloqueia fechamento por overlay/ESC quando backdrop="static"
+              if (next) handleOpenChange(next)
+            }
+      }
       size={modalSize}
-      backdrop={closeOnBackdrop ? true : 'static'}
-      scrollable={scrollable}
-      centered
     >
-      <Modal.Header closeButton>
-        <Modal.Title>
-          {icon ? <span style={{ marginRight: '0.5rem' }}>{icon}</span> : null}
-          {title}
-        </Modal.Title>
-      </Modal.Header>
+      <ModalHeader>
+        {icon ? <span className="mr-2 inline-flex">{icon}</span> : null}
+        {title}
+      </ModalHeader>
 
-      <Modal.Body>{children}</Modal.Body>
+      <ModalBody>{children}</ModalBody>
 
-      <Modal.Footer>
-        {footerExtra ? <div className="me-auto">{footerExtra}</div> : null}
+      <ModalFooter>
+        {footerExtra ? <div className="mr-auto">{footerExtra}</div> : null}
 
         {secondaryAction ? (
           <Button
@@ -95,15 +123,13 @@ export const FormModal: React.FC<FormModalProps> = ({
           variant={primaryVariant}
           onClick={primaryAction.onClick}
           disabled={primaryDisabled}
+          leftIcon={
+            isLoading ? <Spinner size="sm" variant="border" /> : primaryAction.icon
+          }
         >
-          {isLoading ? (
-            <Spinner size="sm" animation="border" className="me-2" />
-          ) : (
-            primaryAction.icon
-          )}
           {primaryAction.label}
         </Button>
-      </Modal.Footer>
+      </ModalFooter>
     </Modal>
   )
 }

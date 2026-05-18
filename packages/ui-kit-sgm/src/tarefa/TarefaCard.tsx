@@ -1,10 +1,6 @@
 // @ts-nocheck
 import React from 'react'
-import {
-  Button,
-  Card,
-  ListGroup,
-} from 'react-bootstrap'
+import { Button, Card, List, ListItem } from '@hashcodeti/ui-kit-core'
 import { FaRegCommentDots } from 'react-icons/fa6'
 import { UnidadeMaterialPicker } from './UnidadeMaterialPicker'
 
@@ -82,23 +78,23 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({
   return (
     <Card style={{ margin: 12 }} key={`${posindex}${tarefa.sequencia}`}>
       <Card.Header>
-        <div className="d-flex justify-content-between align-items-center gap-2">
+        <div className="flex justify-between items-center gap-2 w-full">
           <strong>{`Ordem: ${ordem}`}</strong>
           {!onlyView && conditionalActionButton()}
         </div>
       </Card.Header>
       <Card.Body>
-        <ListGroup>
-          <ListGroup.Item>
+        <List>
+          <ListItem>
             <strong>A realizar:</strong>{' '}
             {`${
               tarefa?.modelIdentifier
                 ? tarefa?.modelIdentifier
                 : tarefa?.acao?.nome
             } - ${tarefa?.acao?.descricao}`}
-          </ListGroup.Item>
+          </ListItem>
           {tarefa.unidadesMateriais && (
-            <ListGroup.Item>
+            <ListItem>
               <strong>Material Nescessario:</strong>
 
               {tarefa.unidadesMateriais && tarefa.status !== 'ENCERRADO' ? (
@@ -135,40 +131,40 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({
                   />
                 )
               ) : (
-                <ListGroup as="ol" numbered>
+                <ol className="list-decimal pl-5 mt-2 space-y-1">
                   {tarefa.unidadesMateriais &&
                     tarefa.unidadesMateriais.map((uM: any, idx: number) => (
-                      <ListGroup.Item key={idx}>
+                      <li key={idx}>
                         {materialDisplay(uM.nomeMaterial)}
                         {uM.quantidade}
                         {unidadeDisplay(uM.labelUnidade)}
-                      </ListGroup.Item>
+                      </li>
                     ))}
-                </ListGroup>
+                </ol>
               )}
-            </ListGroup.Item>
+            </ListItem>
           )}
           {tarefa.inspecoes && (
-            <ListGroup.Item>
+            <ListItem>
               <strong>Inspeções:</strong>
-              <ListGroup as="ol" numbered>
+              <ol className="list-decimal pl-5 mt-2 space-y-1">
                 {tarefa.inspecoes && renderInspecoes
                   ? renderInspecoes(tarefa.inspecoes)
                   : null}
-              </ListGroup>
-            </ListGroup.Item>
+              </ol>
+            </ListItem>
           )}
           {tarefa?.tarefaJustificativas?.length > 0 && (
-            <ListGroup.Item>
+            <ListItem>
               <FaRegCommentDots size={20} />{' '}
               {
                 tarefa.tarefaJustificativas[
                   tarefa.tarefaJustificativas.length - 1
                 ].descricao
               }
-            </ListGroup.Item>
+            </ListItem>
           )}
-        </ListGroup>
+        </List>
       </Card.Body>
     </Card>
   )

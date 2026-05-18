@@ -4,9 +4,20 @@
  * Modal de confirmação de exclusão padronizado, props-driven (zero Redux).
  * Promovido de teraprox-ui-kit/forms/DeleteConfirm para ui-kit-core em 2026-04-30
  * como dependência interna do FormActionButtons.
+ *
+ * Refatorado em 2026-05-13 para Tailwind+Radix (ui-kit-core primitives).
+ * API pública (DeleteConfirmProps) preservada — adapter interno mapeia
+ * `show`→`open` do Modal novo. Usa TextField (multiline) em vez de Form.Control.
  */
 import React, { useState } from 'react'
-import { Button, Form, Modal } from 'react-bootstrap'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from '../primitives/Modal'
+import { Button } from '../primitives/Button'
+import { TextField } from '../primitives/TextField'
 
 export interface DeleteConfirmProps {
   show: boolean
@@ -49,37 +60,38 @@ export const DeleteConfirm: React.FC<DeleteConfirmProps> = ({
     onHide(false)
   }
 
+  // Adapter show→open: só dispara onHide quando passa de open=true → false.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) handleHide()
+  }
+
   return (
-    <Modal show={show} onHide={handleHide} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="d-flex flex-column gap-3">
+    <Modal open={show} onOpenChange={handleOpenChange} size="md">
+      <ModalHeader>{title}</ModalHeader>
+      <ModalBody>
+        <div className="flex flex-col gap-3">
           <strong>{resolveDialog()}</strong>
           {needExclusionDetails && (
-            <Form.Group>
-              <Form.Label>Motivo da Exclusão (mín. {minDetailsLength} caracteres)</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                placeholder="Descreva o motivo..."
-                autoFocus
-              />
-            </Form.Group>
+            <TextField
+              label={`Motivo da Exclusão (mín. ${minDetailsLength} caracteres)`}
+              multiline
+              rows={3}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Descreva o motivo..."
+              autoFocus
+            />
           )}
         </div>
-      </Modal.Body>
-      <Modal.Footer>
+      </ModalBody>
+      <ModalFooter>
         <Button variant="secondary" onClick={handleHide}>
           Cancelar
         </Button>
         <Button variant="danger" disabled={!canConfirm} onClick={handleConfirm}>
           Confirmar Exclusão
         </Button>
-      </Modal.Footer>
+      </ModalFooter>
     </Modal>
   )
 }

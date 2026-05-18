@@ -1,12 +1,14 @@
 // @ts-nocheck
 import React from 'react'
-import { Card } from 'react-bootstrap'
+import { Card, CardBody } from '@hashcodeti/ui-kit-core'
 
 /**
- * ManutentorCardCompact (ui-kit-sgm)
- * 
- * Versão simplificada e moderna do card de mantenedor, focada em 
+ * ManutentorCardCompact (ui-kit-sgm) — Wave F.1.A migration.
+ *
+ * Versão simplificada e moderna do card de mantenedor, focada em
  * nome e disponibilidade para uso em modais de seleção rápida.
+ *
+ * Wave F.1.A: react-bootstrap Card -> ui-kit-core Card/CardBody.
  */
 
 export interface ManutentorCardCompactProps {
@@ -22,14 +24,14 @@ export const ManutentorCardCompact: React.FC<ManutentorCardCompactProps> = ({
   const statusColor = isBusy ? '#ef4444' : '#10b981'
 
   return (
-    <Card 
-      className="border rounded-3 h-100 transition-all shadow-sm-hover" 
+    <Card
+      variant={onClick ? 'interactive' : 'outlined'}
+      className="rounded-lg h-full"
       onClick={onClick}
-      style={{ 
+      style={{
         cursor: onClick ? 'pointer' : 'default',
-        borderColor: '#e2e8f0',
         backgroundColor: '#ffffff',
-        transition: 'transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out'
+        transition: 'transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out',
       }}
       onMouseEnter={(e) => {
         if (onClick) {
@@ -44,37 +46,51 @@ export const ManutentorCardCompact: React.FC<ManutentorCardCompactProps> = ({
         }
       }}
     >
-      <Card.Body className="p-3">
-        <div className="d-flex justify-content-between align-items-start mb-2">
-           <h6 className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: '0.9rem' }}>
-              {mantenedor?.nomeUsuario}
-           </h6>
-           <span className="text-muted" style={{ fontSize: '0.7rem' }}>
-              ID: {mantenedor.id}
-           </span>
+      <CardBody className="p-3">
+        <div className="flex justify-between items-start mb-2">
+          <h6
+            className="mb-0 font-bold text-neutral-900 truncate"
+            style={{ fontSize: '0.9rem' }}
+          >
+            {mantenedor?.nomeUsuario}
+          </h6>
+          <span className="text-neutral-500" style={{ fontSize: '0.7rem' }}>
+            ID: {mantenedor.id}
+          </span>
         </div>
-        
-        <div className="d-flex align-items-center gap-2">
-          <div 
-            style={{ 
-              width: 8, 
-              height: 8, 
-              borderRadius: '50%', 
+
+        <div className="flex items-center gap-2">
+          <div
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
               background: statusColor,
-              boxShadow: isBusy ? `0 0 4px ${statusColor}` : 'none'
-            }} 
+              boxShadow: isBusy ? `0 0 4px ${statusColor}` : 'none',
+            }}
           />
-          <span className="fw-medium" style={{ fontSize: '0.75rem', color: isBusy ? '#ef4444' : '#10b981' }}>
-            {isBusy ? `Ocupado (OS-${mantenedor.osId || '?'})` : 'Disponível'}
+          <span
+            className="font-medium"
+            style={{
+              fontSize: '0.75rem',
+              color: isBusy ? '#ef4444' : '#10b981',
+            }}
+          >
+            {isBusy
+              ? `Ocupado (OS-${mantenedor.osId || '?'})`
+              : 'Disponível'}
           </span>
         </div>
 
         {mantenedor.setor && (
-          <div className="mt-2 pt-2 border-top text-muted" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+          <div
+            className="mt-2 pt-2 border-t border-surface-border text-neutral-500"
+            style={{ fontSize: '0.7rem', opacity: 0.8 }}
+          >
             {mantenedor.setor}
           </div>
         )}
-      </Card.Body>
+      </CardBody>
     </Card>
   )
 }

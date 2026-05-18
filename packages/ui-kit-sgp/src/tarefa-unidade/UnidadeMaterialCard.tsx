@@ -1,8 +1,9 @@
 // @ts-nocheck
 // Migrado de teraprox-SGP-ordemDeCorrecao/src/Components/processo/UnidadeMaterialCard.tsx
 // Wave 3B — puramente apresentacional (sem Redux / sem IO).
+// Wave F.2.A — react-bootstrap removido. Migrado para ui-kit-core (Card/Button) + Tailwind.
 import { ReactNode } from 'react'
-import { Button, Card, Col } from 'react-bootstrap'
+import { Button, Card, CardBody } from '@hashcodeti/ui-kit-core'
 
 export interface UnidadeMaterialVM {
   nomeMaterial?: string
@@ -48,84 +49,84 @@ export const UnidadeMaterialCard = ({
   const quantidadeLabel = tarefaUnidadeMaterial?.unidadeMaterial?.quantidade ?? '-'
 
   return (
-    <Col xs={12}>
+    <div className="w-full">
       <Card
-        className="border-0 shadow-sm"
-        style={{
-          background: '#fff',
-          borderRadius: '14px',
-          overflow: 'hidden'
-        }}
+        className="border-0 shadow-sm bg-white overflow-hidden"
+        style={{ borderRadius: '14px' }}
       >
-        <Card.Body style={{ padding: '14px 16px' }}>
-          <div className="d-flex justify-content-between align-items-start gap-3">
-            <div className="flex-grow-1">
+        <CardBody style={{ padding: '14px 16px' }}>
+          <div className="flex justify-between items-start gap-3">
+            <div className="flex-grow">
               {header ? <div className="mb-2">{header}</div> : null}
-              <div className="text-muted text-uppercase small mb-1">{indexLabel ?? 'Unidade material'}</div>
-              <div className="fw-semibold" style={{ fontSize: '1rem', lineHeight: 1.2 }}>
+              <div className="text-neutral-500 uppercase text-xs mb-1">
+                {indexLabel ?? 'Unidade material'}
+              </div>
+              <div className="font-semibold leading-tight text-base">
                 {materialContent ?? materialLabel}
               </div>
             </div>
             <div
+              className="flex items-center justify-center font-bold text-sm"
               style={{
                 minWidth: 38,
                 height: 38,
                 borderRadius: 10,
                 background: '#0d6efd14',
                 color: '#0d6efd',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.9rem'
               }}
             >
               UM
             </div>
           </div>
 
-          <div className="d-flex flex-wrap gap-2 mt-3">
-            <div className="px-3 py-2 rounded-3 flex-fill" style={{ background: '#f6f8fb', minWidth: 150 }}>
-              <div className="text-muted text-uppercase small">Unidade</div>
-              <div className="fw-semibold mt-1">
+          <div className="flex flex-wrap gap-2 mt-3">
+            <div
+              className="px-3 py-2 rounded flex-1"
+              style={{ background: '#f6f8fb', minWidth: 150 }}
+            >
+              <div className="text-neutral-500 uppercase text-xs">Unidade</div>
+              <div className="font-semibold mt-1">
                 {unidadeContent ?? unidadeLabel}
               </div>
             </div>
-            <div className="px-3 py-2 rounded-3 flex-fill" style={{ background: '#f6f8fb', minWidth: 150 }}>
-              <div className="text-muted text-uppercase small">Planejado</div>
-              <div className="fw-semibold mt-1">
+            <div
+              className="px-3 py-2 rounded flex-1"
+              style={{ background: '#f6f8fb', minWidth: 150 }}
+            >
+              <div className="text-neutral-500 uppercase text-xs">Planejado</div>
+              <div className="font-semibold mt-1">
                 {quantidadeContent ?? quantidadeLabel}
               </div>
             </div>
           </div>
 
-          <div className="d-flex gap-2 justify-content-end flex-wrap mt-3">
+          <div className="flex gap-2 justify-end flex-wrap mt-3">
             {actions ?? (
               <>
                 {onEditClick && (
-              <Button
-                size="sm"
-                variant="outline-primary"
-                onClick={() => onEditClick(tarefaUnidadeMaterial)}
-              >
-                Editar
-              </Button>
+                  <Button
+                    size="sm"
+                    variant="outline-primary"
+                    onClick={() => onEditClick(tarefaUnidadeMaterial)}
+                  >
+                    Editar
+                  </Button>
                 )}
                 {onRemoveClick && (
-              <Button
-                size="sm"
-                variant="outline-danger"
-                onClick={() => onRemoveClick(tarefaUnidadeMaterial)}
-              >
-                Remover
-              </Button>
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    onClick={() => onRemoveClick(tarefaUnidadeMaterial)}
+                  >
+                    Remover
+                  </Button>
                 )}
               </>
             )}
           </div>
-        </Card.Body>
+        </CardBody>
       </Card>
-    </Col>
+    </div>
   )
 }
 

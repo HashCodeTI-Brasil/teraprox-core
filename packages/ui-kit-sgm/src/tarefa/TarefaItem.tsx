@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Card, Spinner } from 'react-bootstrap'
+import { Card, Spinner } from '@hashcodeti/ui-kit-core'
 import {
   FaClipboardList,
   FaComments,
@@ -609,12 +609,12 @@ export const TarefaItem: React.FC<TarefaItemProps> = ({
                 <Card.Body style={{ padding: '1rem' }}>
                   <div className="d-flex align-items-center gap-2 mb-3">
                     <FaCubes style={{ color: '#17a2b8', fontSize: '1rem' }} />
-                    <Card.Title
+                    <div
                       className="mb-0"
-                      style={{ fontSize: '1rem', color: '#2c3e50' }}
+                      style={{ fontSize: '1rem', color: '#2c3e50', fontWeight: 500 }}
                     >
                       {nomeMaterial}
-                    </Card.Title>
+                    </div>
                   </div>
 
                   <div

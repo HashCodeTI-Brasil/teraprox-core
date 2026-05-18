@@ -15,11 +15,16 @@
  *
  * Promovido de teraprox-ui-kit/buttons/ActionButtons para ui-kit-core em 2026-04-30
  * para virar padrão de todo formulário do ecossistema.
+ *
+ * Refatorado 2026-05-13: migrado de react-bootstrap para primitivos
+ * Tailwind+Radix (Button, Progress) do próprio ui-kit-core. API pública intacta.
  */
 import React, { useRef, useState } from 'react'
-import { Button, Form, ProgressBar } from 'react-bootstrap'
 import { FiChevronLeft, FiCopy, FiRotateCcw, FiSave, FiTrash2 } from 'react-icons/fi'
 
+import { Button, type ButtonVariant } from '../primitives/Button'
+import { Progress } from '../primitives/Progress'
+import { cn } from '../lib/cn'
 import { DeleteConfirm } from './DeleteConfirm'
 
 export interface FormActionButtonsProps {
@@ -64,7 +69,7 @@ export interface FormActionButtonsProps {
   /** Wrapper opcional de permissão envolvendo o botão Excluir. */
   PermissionWrapper?: React.ComponentType<{ children: React.ReactNode; id?: string }>
 
-  /** Classe adicional no Form.Group container. */
+  /** Classe adicional no container. */
   className?: string
 }
 
@@ -137,7 +142,7 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
 
     if (useDelayedDelete) {
       return (
-        <div style={{ position: 'relative', display: 'inline-block', margin: 2 }}>
+        <div className="relative inline-block m-0.5">
           <Button
             variant="outline-danger"
             onMouseDown={startHold}
@@ -146,23 +151,17 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
             onTouchStart={startHold}
             onTouchEnd={stopHold}
             disabled={disabled}
-            style={{ minWidth: '120px' }}
+            leftIcon={<FiTrash2 />}
+            className="min-w-[120px]"
           >
-            <FiTrash2 className="me-2" />
             {holding ? 'Segure...' : deleteLabel}
           </Button>
           {holding && (
-            <ProgressBar
-              now={progress}
-              variant="danger"
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                borderRadius: '0 0 4px 4px',
-              }}
+            <Progress
+              value={progress}
+              tone="error"
+              size="sm"
+              className="absolute bottom-0 left-0 right-0 rounded-none rounded-b-md"
             />
           )}
         </div>
@@ -174,9 +173,9 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
         variant="danger"
         onClick={() => setShowConfirm(true)}
         disabled={disabled}
-        style={{ margin: 2 }}
+        leftIcon={<FiTrash2 />}
+        className="m-0.5"
       >
-        <FiTrash2 className="me-2" />
         {deleteLabel}
       </Button>
     )
@@ -196,17 +195,27 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
         needExclusionDetails={needExclusionDetails}
       />
 
-      <Form.Group className={`d-flex flex-wrap align-items-center mt-3 gap-1 ${className ?? ''}`.trim()}>
+      <div className={cn('flex flex-wrap items-center mt-3 gap-1', className)}>
         {visible(onBack, showBack) && (
-          <Button variant="outline-secondary" onClick={onBack} disabled={disabled} style={{ margin: 2 }}>
-            <FiChevronLeft className="me-2" />
+          <Button
+            variant="outline-secondary"
+            onClick={onBack}
+            disabled={disabled}
+            leftIcon={<FiChevronLeft />}
+            className="m-0.5"
+          >
             {backLabel}
           </Button>
         )}
 
         {isEditing && visible(onCancelEdit, showCancelEdit) && (
-          <Button variant="warning" onClick={onCancelEdit} disabled={disabled} style={{ margin: 2 }}>
-            <FiRotateCcw className="me-2" />
+          <Button
+            variant="warning"
+            onClick={onCancelEdit}
+            disabled={disabled}
+            leftIcon={<FiRotateCcw />}
+            className="m-0.5"
+          >
             {cancelEditLabel}
           </Button>
         )}
@@ -214,19 +223,29 @@ export const FormActionButtons: React.FC<FormActionButtonsProps> = ({
         {wrappedDelete}
 
         {visible(onSave, showSave) && (
-          <Button variant={saveVariant} onClick={onSave} disabled={disabled} style={{ margin: 2 }}>
-            <FiSave className="me-2" />
+          <Button
+            variant={saveVariant as ButtonVariant}
+            onClick={onSave}
+            disabled={disabled}
+            leftIcon={<FiSave />}
+            className="m-0.5"
+          >
             {saveLabel}
           </Button>
         )}
 
         {isEditing && visible(onCopy, showCopy) && (
-          <Button variant="outline-primary" onClick={onCopy} disabled={disabled} style={{ margin: 2 }}>
-            <FiCopy className="me-2" />
+          <Button
+            variant="outline-primary"
+            onClick={onCopy}
+            disabled={disabled}
+            leftIcon={<FiCopy />}
+            className="m-0.5"
+          >
             {copyLabel}
           </Button>
         )}
-      </Form.Group>
+      </div>
     </>
   )
 }

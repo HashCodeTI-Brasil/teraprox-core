@@ -1,6 +1,10 @@
 // @ts-nocheck
 // Migrado de teraprox-SGP-ordemDeCorrecao/src/Components/processo/CalculadoraCorrecaoModal.tsx
 // Wave 3B — props-driven.
+// Wave F.2.C (2026-05-13): refatorado para ui-kit-core@0.7.0 (Tailwind+Radix).
+// Zero react-bootstrap. API EXTERNA preservada (show/onClose). Adapter interno para
+// Modal Radix (open/onOpenChange). Lógica de cálculo (eval/regex/aplicarModuloNaFormula)
+// INTOCADA — apenas componentes UI substituídos.
 //
 // Diferencas em relacao ao original:
 //  - `useCoreService` removido. Caller injeta `fetchDimensao(idDimensao) => Promise<{ valor: number }>`.
@@ -8,7 +12,18 @@
 //    para evitar dependencia cruzada entre ui-kits domain-split.
 //  - Zero Redux. Zero spread `{...props}` em DOM.
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Card, ListGroup } from 'react-bootstrap'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  TextField,
+  Card,
+  CardBody,
+  List,
+  ListItem,
+} from '@hashcodeti/ui-kit-core'
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa'
 import { CalculoCorrecao } from './CalculoCorrecao'
 
@@ -46,11 +61,11 @@ export interface CalculadoraCorrecaoModalProps {
 // Botao com estado async interno — evita dependencia em teraprox-ui-kit.
 const AsyncConfirmButton = ({
   onClick,
-  variant = 'success',
+  variant = 'primary',
   children,
 }: {
   onClick: () => Promise<void> | void
-  variant?: string
+  variant?: any
   children: React.ReactNode
 }) => {
   const [loading, setLoading] = useState(false)
@@ -249,44 +264,54 @@ export const CalculadoraCorrecaoModal = ({
     }
   }
 
+  // Adapter Bootstrap show/onClose -> Radix open/onOpenChange.
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose(false)
+  }
+
+  const valorDesejadoNum = parseFloat(valorDesejado.replace(',', '.'))
+
   return (
-    <Modal show={show} onHide={() => onClose(false)}>
-      <Modal.Header closeButton>
-        <Modal.Title>Calculadora de Correção</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <Modal open={show} onOpenChange={handleOpenChange} size="md">
+      <ModalHeader>Calculadora de Correção</ModalHeader>
+      <ModalBody>
         <div className="mb-3">
           <strong>Valor Atual:</strong> {parseFloat(String(valorAtual)).toFixed(2)}
         </div>
-        <Form>
-          <Form.Group controlId="valorDesejado">
-            <Form.Label>Valor Desejado</Form.Label>
-            <div className="d-flex align-items-center">
-              {parseFloat(valorDesejado.replace(',', '.')) > Number(valorAtual) ? (
+        <div>
+          <div className="mb-3">
+            <div className="flex items-end gap-2">
+              {valorDesejadoNum > Number(valorAtual) ? (
                 <FaArrowUp
-                  style={{ color: 'green', fontSize: '16px', marginRight: '8px' }}
+                  style={{ color: 'green', fontSize: '16px' }}
+                  className="mb-2"
                 />
-              ) : parseFloat(valorDesejado.replace(',', '.')) < Number(valorAtual) ? (
+              ) : valorDesejadoNum < Number(valorAtual) ? (
                 <FaArrowDown
-                  style={{ color: 'red', fontSize: '16px', marginRight: '8px' }}
+                  style={{ color: 'red', fontSize: '16px' }}
+                  className="mb-2"
                 />
               ) : null}
-              <Form.Control
-                type="text"
-                placeholder="Insira o valor desejado"
-                value={valorDesejado}
-                onChange={(e) => setValorDesejado(e.target.value)}
-              />
+              <div className="flex-1">
+                <TextField
+                  label="Valor Desejado"
+                  type="text"
+                  placeholder="Insira o valor desejado"
+                  value={valorDesejado}
+                  onChange={(e) => setValorDesejado(e.target.value)}
+                />
+              </div>
             </div>
-          </Form.Group>
+          </div>
 
           {regraSelecionada && (
             <div className="mt-3">
               <strong>Regra Selecionada:</strong>
               <Button
-                variant="link"
+                variant="ghost"
+                size="sm"
                 onClick={() => setMostrarDetalhes(!mostrarDetalhes)}
-                style={{ padding: 0, marginLeft: '8px' }}
+                className="ml-2 p-0 h-auto underline"
               >
                 {mostrarDetalhes ? 'Ocultar' : 'Mostrar'}
               </Button>
@@ -297,7 +322,7 @@ export const CalculadoraCorrecaoModal = ({
                     <br />
                     <strong>Descrição:</strong> {regraSelecionada.acao?.descricao}
                   </div>
-                  <h3>Cálculos</h3>
+                  <h3 className="text-base font-semibold mb-2">Cálculos</h3>
                   {regraSelecionada.calculosDeCorrecao?.map((calculo: any) => (
                     <CalculoCorrecao
                       key={calculo._id}
@@ -318,22 +343,22 @@ export const CalculadoraCorrecaoModal = ({
               )}
             </div>
           )}
-        </Form>
+        </div>
 
         {resultadosCalculado && (
-          <Card className="mb-3">
-            <Card.Body className="resultados mt-4">
-              <h5 className="mb-3">Descrição da Ação</h5>
-              <p className="text-muted">{regraSelecionada?.acao?.descricao}</p>
-              <h6 className="mt-4">Valores Calculados:</h6>
-              <ListGroup>
+          <Card className="mb-3 mt-4">
+            <CardBody>
+              <h5 className="text-base font-semibold mb-3">Descrição da Ação</h5>
+              <p className="text-neutral-600">{regraSelecionada?.acao?.descricao}</p>
+              <h6 className="text-sm font-semibold mt-4 mb-2">Valores Calculados:</h6>
+              <List>
                 {resultadosCalculado.map((rC: any, index: number) => (
-                  <ListGroup.Item
+                  <ListItem
                     key={index}
                     onClick={() => handleEditStart(index)}
                   >
                     {editingIndex === index ? (
-                      <Form.Control
+                      <TextField
                         type="text"
                         value={editValues[index]}
                         onChange={(e) => handleEditChange(index, e.target.value)}
@@ -346,24 +371,24 @@ export const CalculadoraCorrecaoModal = ({
                     ) : (
                       `${rC.quantidade} ${rC.unidade || rC.unidadeLabel} ${rC.nomeMaterial}`
                     )}
-                  </ListGroup.Item>
+                  </ListItem>
                 ))}
-              </ListGroup>
-            </Card.Body>
+              </List>
+            </CardBody>
           </Card>
         )}
-      </Modal.Body>
-      <Modal.Footer>
+      </ModalBody>
+      <ModalFooter>
         <Button variant="secondary" onClick={() => onClose(false)}>
           Fechar
         </Button>
-        <Button variant="info" onClick={calcularResultado} disabled={!regraSelecionada}>
+        <Button variant="primary" onClick={calcularResultado} disabled={!regraSelecionada}>
           Calcular
         </Button>
         {calculado && (
           <AsyncConfirmButton onClick={handleConfirm}>Confirmar</AsyncConfirmButton>
         )}
-      </Modal.Footer>
+      </ModalFooter>
     </Modal>
   )
 }

@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Form, Modal, ModalBody, ModalHeader } from 'react-bootstrap'
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from '@hashcodeti/ui-kit-core'
 import { FaRegComments } from 'react-icons/fa'
 import { GrSend } from 'react-icons/gr'
 
@@ -105,10 +110,14 @@ export const ObservacaoModal: React.FC<ObservacaoModalProps> = ({
   }
 
   return (
-    <Modal show={show} size="lg" onHide={onClose}>
-      <ModalHeader closeButton>
-        <h5>{title ?? 'Chat de Observações'}</h5>
-      </ModalHeader>
+    <Modal
+      open={show}
+      size="lg"
+      onOpenChange={(next) => {
+        if (!next) onClose()
+      }}
+    >
+      <ModalHeader>{title ?? 'Chat de Observações'}</ModalHeader>
       <ModalBody>
         <div className="chat-container">
           <div className="chat-messages">
@@ -167,7 +176,7 @@ export const ObservacaoModal: React.FC<ObservacaoModalProps> = ({
                         <Button
                           variant="link"
                           size="sm"
-                          className="ms-2 p-0"
+                          className="ml-2 p-0"
                           onClick={() => onRemove(msg)}
                           aria-label="Remover observação"
                         >
@@ -185,8 +194,7 @@ export const ObservacaoModal: React.FC<ObservacaoModalProps> = ({
           <div className={`send-field ${readOnly ? 'locked-chat' : ''}`}>
             {!readOnly ? (
               <>
-                <Form.Control
-                  as="textarea"
+                <textarea
                   rows={1}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -196,7 +204,7 @@ export const ObservacaoModal: React.FC<ObservacaoModalProps> = ({
                       ? `Digite uma mensagem como ${currentUserName}...`
                       : 'Digite uma mensagem...'
                   }
-                  className="send-input"
+                  className="send-input w-full rounded-md border border-surface-border bg-surface-background px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent disabled:opacity-50"
                   disabled={sending}
                 />
                 <Button
@@ -209,10 +217,13 @@ export const ObservacaoModal: React.FC<ObservacaoModalProps> = ({
                 </Button>
               </>
             ) : (
-              <Form.Control
+              <input
+                type="text"
                 style={{ cursor: 'not-allowed' }}
                 disabled
                 value={'Indisponível'}
+                readOnly
+                className="w-full rounded-md border border-surface-border bg-neutral-50 px-3 py-2 text-sm text-neutral-400"
               />
             )}
           </div>

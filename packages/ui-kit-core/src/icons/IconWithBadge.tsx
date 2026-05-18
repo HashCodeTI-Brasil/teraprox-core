@@ -1,5 +1,6 @@
 import React from 'react'
-import { Badge } from 'react-bootstrap'
+
+import { Badge, type BadgeTone } from '../primitives/Badge'
 
 /**
  * IconWithBadge — ícone com badge numérico opcional (ex.: contagem de itens).
@@ -11,6 +12,10 @@ import { Badge } from 'react-bootstrap'
  * Modos:
  *  - `overlay` (default): badge sobreposto no canto superior direito do ícone
  *  - `inline`: ícone + badge lado-a-lado, com gap
+ *
+ * Refatorado 2026-05-13: migrado de react-bootstrap `<Badge>` para o primitivo
+ * `Badge` Tailwind+cva do próprio ui-kit-core. API pública intacta — `bg`
+ * mantido (mapeia 1:1 para `tone` do Badge novo, com shim deprecation interno).
  */
 export type IconWithBadgeMode = 'overlay' | 'inline'
 export type IconWithBadgeBg =
@@ -30,7 +35,7 @@ export interface IconWithBadgeProps {
   content?: React.ReactNode
   /** `overlay` (default) ou `inline` */
   mode?: IconWithBadgeMode
-  /** Variant Bootstrap (default `danger`) */
+  /** Tom do badge (compat react-bootstrap, default `danger`) */
   bg?: IconWithBadgeBg
 }
 
@@ -41,29 +46,18 @@ export const IconWithBadge: React.FC<IconWithBadgeProps> = ({
   bg = 'danger',
 }) => {
   const showBadge = content !== null && content !== undefined && content !== 0 && content !== ''
+  const tone = bg as BadgeTone
 
   if (mode === 'inline') {
     return (
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}
-      >
+      <div className="inline-flex items-center gap-1.5">
         {icon}
         {showBadge ? (
           <Badge
-            bg={bg}
+            tone={tone}
             pill
-            style={{
-              fontSize: '10px',
-              fontWeight: 600,
-              padding: '2px 6px',
-              minWidth: '18px',
-              lineHeight: 1.2,
-              opacity: 0.9,
-            }}
+            size="sm"
+            className="opacity-90 font-semibold"
           >
             {content}
           </Badge>
@@ -73,23 +67,14 @@ export const IconWithBadge: React.FC<IconWithBadgeProps> = ({
   }
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div className="relative inline-block">
       {icon}
       <Badge
-        bg={bg}
-        style={{
-          position: 'absolute',
-          top: '-5px',
-          right: '-10px',
-          padding: '5px',
-          borderRadius: '50%',
-          minWidth: '20px',
-          minHeight: '20px',
-          fontSize: '12px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          display: showBadge ? 'flex' : 'none',
-        }}
+        tone={tone}
+        pill
+        size="sm"
+        className="absolute -top-1.5 -right-2.5 min-w-[20px] min-h-[20px] px-1"
+        style={{ display: showBadge ? 'inline-flex' : 'none' }}
       >
         {content}
       </Badge>

@@ -70,6 +70,21 @@ export {
   type FindRecursoByTagFieldProps,
 } from './recurso/FindRecursoByTagField'
 
+// Wave G.1 (2026-05-15) — promovidos de teraprox-app-SGM-UTILS.
+// View-puros props-driven; toda lógica Redux/hooks fica no caller.
+export {
+  BranchNodeDisplayV2,
+  type BranchNodeDisplayV2Props,
+  type BranchNodeData,
+  type BranchData,
+  type BranchNodeRecurso,
+} from './recurso/BranchNodeDisplayV2'
+
+export {
+  BranchContainerV2,
+  type BranchContainerV2Props,
+} from './recurso/BranchContainerV2'
+
 // Wave 2B — widgets do dominio Tarefa migrados de SGM-OS.
 // Apresentacionais puros: IO/Redux fica no caller (SGM-OS).
 export {
@@ -116,4 +131,68 @@ export {
   OS_STATUS_PALETTE,
   getOsStatusMeta,
   type OsStatusMeta,
+  // Wave H.3 (2026-05-15) — OrdemDeServicoDisplayCard promovido de SGM-OS.
+  // Apresentacional puro com slots para inline-edit; caller injeta dispatch/navigate.
+  OrdemDeServicoDisplayCard,
+  getOrdemDeServicoDisplayColor,
+  type OrdemDeServicoDisplayCardProps,
+  type OrdemDeServicoDisplayCardItem,
+  type OsDisplayStatus,
 } from './os'
+
+// Wave G.1 (2026-05-15) — promoções DOMAIN_PURO de teraprox-SGM-OM/Components.
+// Apresentacionais puros (zero Redux/router/useCoreService); 100% Tailwind+Radix
+// via @hashcodeti/ui-kit-core. Markers nos arquivos originais do MF documentam
+// o import canônico e o TODO de refactor dos callers.
+export {
+  OrdemStatusIndicator,
+  type OrdemStatusIndicatorProps,
+  type OrdemStatus,
+  OrdemStatusActions,
+  type OrdemStatusActionsProps,
+  type OrdemStatusActionsOrdem,
+  OrdemInfoCard,
+  type OrdemInfoCardProps,
+  type OrdemInfoCardOrdem,
+  OSQuickEndModal,
+  type OSQuickEndModalProps,
+  type OSQuickEndModalOS,
+  OSQuickActionsMenu,
+  type OSQuickActionsMenuProps,
+  type OSQuickActionsMenuOS,
+  // Wave H.2 (2026-05-15) — par DEDICADO promovido com Port/slots.
+  OSCheckoutModalV2,
+  type OSCheckoutModalV2Props,
+  type OSCheckoutForm,
+  type OSCheckoutOMContext,
+  type OSCheckoutMode,
+  OSQuickStartModal,
+  type OSQuickStartModalProps,
+  type OSQuickStartModalOS,
+  type OSQuickStartToastType,
+} from './om'
+
+// ─── Wave G.1 (2026-05-15) — promoções SGM-OS execução ───
+// Componentes domain SGM promovidos de teraprox-SGM-OS/Components.
+// Refs: wiki/arquitetura/wave-g-sgm-os-inventory.md.
+
+// OsSkeleton — placeholder card OS planejada (loading state).
+// OsEmpty — estado vazio canônico da tela de planejamento.
+export { OsSkeleton, OsEmpty, type OsSkeletonProps, type OsEmptyProps } from './states/OsSkeleton'
+
+// ─── Wave H.1 (2026-05-13) — promoção dedicada SGM-OS ───
+// TarefasTab — tab de edição de tarefas em /os/form. Componente complexo que
+// vivia em teraprox-SGM-OS com Redux + useCoreService + useTarefaItemViewModel
+// + hooks customizados inline; agora 100% props-driven (caller injeta hook do
+// VM, dispatchers, IO services e render-props para componentes que ainda
+// vivem no MF — InspecoesList, LimiteDeControlePicker).
+// Refs: wiki/arquitetura/wave-g-sgm-os-inventory.md (DEDICADO).
+export {
+  TarefasTab,
+  type TarefasTabProps,
+  type TarefasTabForm,
+  type TarefasTabTarefa,
+  type UseTarefaItemVmHook,
+  type RenderInspecoesListArgs,
+  type RenderLimitePickerArgs,
+} from './os/tabs/TarefasTab'

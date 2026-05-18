@@ -2,10 +2,13 @@
 import React, { useEffect, useState } from 'react'
 import {
   Button,
-  ListGroup,
-  OverlayTrigger,
-  Tooltip,
-} from 'react-bootstrap'
+  List,
+  ListItem,
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from '@hashcodeti/ui-kit-core'
 import { MdClose } from 'react-icons/md'
 import { RiDeleteBin5Line } from 'react-icons/ri'
 import { TiDeleteOutline } from 'react-icons/ti'
@@ -172,12 +175,6 @@ export const UnidadeMaterialPicker: React.FC<UnidadeMaterialPickerProps> = ({
     return `${(optionDisplayKey && pi[optionDisplayKey]) || pi.id || index}`
   }
 
-  const renderTooltip = (props: any) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Remover todas as opcoes
-    </Tooltip>
-  )
-
   const onDeleteConfirmHandler = () => {
     const { pi, index } = optionIndexToDelete
     const removedOptions = removeAt(optionsPicked, index)
@@ -213,18 +210,19 @@ export const UnidadeMaterialPicker: React.FC<UnidadeMaterialPickerProps> = ({
       <h4>
         {optionDisplayName}
         {clearPickerOptions && (
-          <OverlayTrigger
-            placement="right"
-            delay={{ show: 250, hide: 250 }}
-            overlay={renderTooltip}
-          >
-            <Button variant="warning">
-              <RiDeleteBin5Line onClick={() => clearPickerOptions()} />
-            </Button>
-          </OverlayTrigger>
+          <TooltipProvider delayDuration={250}>
+            <TooltipRoot>
+              <TooltipTrigger asChild>
+                <Button variant="warning">
+                  <RiDeleteBin5Line onClick={() => clearPickerOptions()} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Remover todas as opcoes</TooltipContent>
+            </TooltipRoot>
+          </TooltipProvider>
         )}
       </h4>
-      <ListGroup numbered id="pickerOps">
+      <List id="pickerOps">
         {optionsPicked.map((pi: any, index: number) => {
           if (optionComponent) {
             return (
@@ -253,7 +251,7 @@ export const UnidadeMaterialPicker: React.FC<UnidadeMaterialPickerProps> = ({
             )
           }
           return (
-            <ListGroup.Item
+            <ListItem
               disabled={pi?.removed}
               style={{
                 opacity: pi?.removed ? 0.5 : 1,
@@ -261,7 +259,6 @@ export const UnidadeMaterialPicker: React.FC<UnidadeMaterialPickerProps> = ({
                 alignContent: 'center',
                 textDecoration: pi?.removed ? 'line-through' : 'none',
               }}
-              action
               key={index}
             >
               <div onClick={() => onOptionEditClickHandler(pi, index)}>
@@ -276,10 +273,10 @@ export const UnidadeMaterialPicker: React.FC<UnidadeMaterialPickerProps> = ({
                   onClick={() => onDeleteHandler(pi, index)}
                 />
               )}
-            </ListGroup.Item>
+            </ListItem>
           )
         })}
-      </ListGroup>
+      </List>
       {!singlePick && !readOnlyMode && (
         <div style={{ textAlign: 'center', padding: 8 }}>
           <Button

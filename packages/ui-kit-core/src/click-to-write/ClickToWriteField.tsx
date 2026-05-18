@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form } from 'react-bootstrap'
+import { TextField } from '../primitives/TextField'
 
 /**
  * ClickToWriteField — campo de texto props-driven para edicao inline.
@@ -17,6 +17,11 @@ import { Form } from 'react-bootstrap'
  *
  * Props `isActive`, `initialValue`, `fallBack` sao absorvidas (compat com
  * callers legados) mas nao vazam para o DOM — evitam React warnings.
+ *
+ * Refator Tailwind (sprint 2026-05-08 ui-kit Tailwind migration, D3):
+ *  - Substitui `Form.Group` + `Form.Label` + `Form.Control` (react-bootstrap)
+ *    pelo composite `TextField` (ui-kit-core L1, Tailwind+Radix).
+ *  - API externa preservada 100%.
  */
 export interface ClickToWriteFieldProps {
   value?: string | number | null
@@ -30,7 +35,9 @@ export interface ClickToWriteFieldProps {
   isActive?: boolean
   initialValue?: string
   fallBack?: unknown
-  // Qualquer prop extra de Form.Control (size, type, autoFocus, ...)
+  // Qualquer prop extra (size, type, autoFocus, ...). `size` aqui eh o size
+  // do TextField (sm | md | lg). Default 'sm' para preservar densidade do
+  // bootstrap `size="sm"` original.
   [key: string]: unknown
 }
 
@@ -47,28 +54,30 @@ export const ClickToWriteField: React.FC<ClickToWriteFieldProps> = ({
   onEnterPress,
   ...props
 }) => {
+  // Defaults — mantem densidade compacta do legado (Form.Control size="sm").
+  const { size = 'sm', ...rest } = props as Record<string, unknown>
+
   return (
-    <Form.Group className="mb-2">
-      {label && <Form.Label className="small text-muted">{label}</Form.Label>}
-      <Form.Control
-        size="sm"
-        value={(value as string) ?? ''}
-        onChange={e => onChange?.(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' && typeof onEnterPress === 'function') {
-            onEnterPress((e.target as HTMLInputElement).value)
-          }
-        }}
-        onBlur={e => {
-          if (typeof onHide === 'function') {
-            onHide(e.target.value)
-          }
-        }}
-        placeholder={placeholder}
-        disabled={disabled}
-        {...(props as Record<string, unknown>)}
-      />
-    </Form.Group>
+    <TextField
+      wrapperClassName="mb-2"
+      label={label}
+      size={size as 'sm' | 'md' | 'lg'}
+      value={(value as string) ?? ''}
+      onChange={(e) => onChange?.(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && typeof onEnterPress === 'function') {
+          onEnterPress((e.target as HTMLInputElement).value)
+        }
+      }}
+      onBlur={(e) => {
+        if (typeof onHide === 'function') {
+          onHide(e.target.value)
+        }
+      }}
+      placeholder={placeholder}
+      disabled={disabled}
+      {...(rest as Record<string, unknown>)}
+    />
   )
 }
 

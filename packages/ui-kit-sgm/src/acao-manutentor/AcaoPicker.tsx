@@ -1,10 +1,10 @@
 // @ts-nocheck
 import React from 'react'
-import { Button } from 'react-bootstrap'
+import { Button } from '@hashcodeti/ui-kit-core'
 import { AutoComplete } from 'teraprox-ui-kit'
 
 /**
- * AcaoPicker (ui-kit-sgm) — Wave 2C migration.
+ * AcaoPicker (ui-kit-sgm) — Wave F.1.A migration.
  *
  * Widget puramente visual: lista de ações carregada via prop `loadAcoes`,
  * seleção comunicada via `onSelect` e callback `onNovaAcao` para o botão
@@ -14,6 +14,9 @@ import { AutoComplete } from 'teraprox-ui-kit'
  * ação — apenas embrulha este componente passando `acao`, `onSelect`
  * (dispatch de setAcaoPicked), `loadAcoes` (controller('acao').readAll)
  * e `onNovaAcao` (navigate(paths.acaoForm)).
+ *
+ * Wave F.1.A: react-bootstrap Button -> ui-kit-core Button.
+ * AutoComplete (teraprox-ui-kit legacy) preservado — não é react-bootstrap.
  */
 
 export interface AcaoRef {
@@ -53,7 +56,11 @@ export const AcaoPicker: React.FC<AcaoPickerProps> = ({
       onSelectedClick={(selected: AcaoRef) => onSelect(selected)}
       actionButton={
         onNovaAcao
-          ? () => <Button onClick={onNovaAcao}>Nova Ação</Button>
+          ? () => (
+              <Button variant="primary" size="sm" onClick={onNovaAcao}>
+                Nova Ação
+              </Button>
+            )
           : undefined
       }
       loadCondition={loadCondition}

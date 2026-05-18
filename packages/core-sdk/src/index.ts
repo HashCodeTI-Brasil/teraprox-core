@@ -109,6 +109,9 @@ export type {
   ITarefaItemViewModel,
   TarefaItemMode,
   UseTarefaItemViewModelOptions,
+  IGenericPickerViewModel,
+  GenericPickerItem,
+  UseGenericPickerOptions,
 } from './viewmodels'
 export {
   useUnidadeMaterialViewModel,

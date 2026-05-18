@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { memo, useState } from 'react'
-import { Button, Card, Spinner } from 'react-bootstrap'
+import { Button, Card, Spinner } from '@hashcodeti/ui-kit-core'
 import { FaExclamationTriangle, FaUser, FaClock, FaPlay } from 'react-icons/fa'
 import { FaArrowRight, FaArrowsRotate, FaClipboardList, FaPlus, FaPaperPlane } from 'react-icons/fa6'
 import dayjs from 'dayjs'

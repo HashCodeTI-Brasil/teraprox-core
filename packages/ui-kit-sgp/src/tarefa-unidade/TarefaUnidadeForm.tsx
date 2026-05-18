@@ -1,22 +1,18 @@
 // @ts-nocheck
 // Migrado de teraprox-SGP-ordemDeCorrecao/src/Components/processo/TarefaUnidadeForm.tsx
 // Wave 3B — props-driven.
-//
-// Mudancas em relacao ao original:
-//  - Redux removido. O caller (SGP-*) continua dono do estado do sub-form
-//    de UnidadeMaterial e injeta:
-//      - `unidadeMaterial` (valor atual),
-//      - `onClearUnidadeMaterial()`,
-//      - `onLoadTumForEdit(tum)`   -> pre-popula o sub-form,
-//      - `renderUnidadeMaterialForm()` -> slot para o `<UnidadeMaterialForm />`
-//        real (seja do teraprox-ui-kit legado ou um proprio).
-//  - `useCoreService` removido. O caller injeta `loadAcoes()` — uma funcao
-//    assincrona que retorna a lista de acoes disponiveis para o AutoComplete.
-//  - `UnidadeMaterialCard` segue vindo do proprio ui-kit-sgp.
-//  - Zero spread `{...props}` em DOM.
+// Wave F.2.A — react-bootstrap removido. Migrado para ui-kit-core (Card/Button) + Tailwind.
+//   AutoComplete continua via teraprox-ui-kit (componente nao primitivo de bootstrap;
+//   sera tratado em wave especifica do ui-kit legacy).
 
 import { ReactNode, useEffect, useState } from 'react'
-import { Button, Card, Col, Row } from 'react-bootstrap'
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+} from '@hashcodeti/ui-kit-core'
 import { AutoComplete } from 'teraprox-ui-kit'
 import { UnidadeMaterialCard, TarefaUnidadeMaterialVM } from './UnidadeMaterialCard'
 
@@ -200,14 +196,14 @@ export const TarefaUnidadeForm = ({
 
   return (
     <Card className="mb-3 border-0 shadow-sm">
-      <Card.Header>
+      <CardHeader>
         <h5 className="mb-0">
           {editIndex !== null ? 'Editar Tarefa' : 'Nova Tarefa'}
         </h5>
-      </Card.Header>
-      <Card.Body>
-        <Row className="g-3">
-          <Col xs={12}>
+      </CardHeader>
+      <CardBody>
+        <div className="grid grid-cols-12 gap-3">
+          <div className="col-span-12">
             <AutoComplete
               title="Ação"
               displayKey="descricao"
@@ -224,9 +220,9 @@ export const TarefaUnidadeForm = ({
               loadFunc={loadAcoes}
               placeholder="Selecione uma ação"
             />
-          </Col>
-        </Row>
-        <hr />
+          </div>
+        </div>
+        <hr className="my-3 border-neutral-200" />
         <div className="mt-3">
           {!showTumForm ? (
             <Button
@@ -236,15 +232,18 @@ export const TarefaUnidadeForm = ({
               {editIndex !== null ? 'Editar Material' : 'Adicionar Material'}
             </Button>
           ) : (
-            <div className="p-3 border rounded bg-light">
+            <div
+              className="p-3 rounded"
+              style={{ border: '1px solid #dee2e6', background: '#f8f9fa' }}
+            >
               {renderUnidadeMaterialForm?.()}
-              <div className="mt-3 d-flex justify-content-end">
+              <div className="mt-3 flex justify-end">
                 <Button variant="success" onClick={handleAddUnidade}>
                   {editIndex !== null ? 'Atualizar' : 'Confirmar'}
                 </Button>
                 <Button
                   variant="outline-secondary"
-                  className="ms-2"
+                  className="ml-2"
                   onClick={() => {
                     onClearUnidadeMaterial?.()
                     setShowTumForm(false)
@@ -257,7 +256,7 @@ export const TarefaUnidadeForm = ({
             </div>
           )}
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col gap-3">
           {tarefaForm.tarefasUnidadeMaterial
             ?.filter((tum) => !tum.removed)
             .map((tum, index) => (
@@ -268,7 +267,7 @@ export const TarefaUnidadeForm = ({
                 onEditClick={() => handleTumEdit(tum, index)}
                 header={
                   <div
-                    className="me-3 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
+                    className="mr-3 flex items-center justify-center rounded-full bg-brand-primary text-brand-primary-foreground"
                     style={{ width: 32, height: 32, fontWeight: 600 }}
                   >
                     {index + 1}
@@ -277,15 +276,15 @@ export const TarefaUnidadeForm = ({
               />
             ))}
         </div>
-      </Card.Body>
-      <Card.Footer className="d-flex justify-content-between">
+      </CardBody>
+      <CardFooter className="flex justify-between">
         <Button variant="outline-danger" onClick={handleCancelEdit}>
           Cancelar
         </Button>
         <Button variant="primary" onClick={handleSave}>
           Salvar
         </Button>
-      </Card.Footer>
+      </CardFooter>
     </Card>
   )
 }

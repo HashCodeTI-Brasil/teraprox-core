@@ -17,14 +17,24 @@
 //
 // Migrado de `teraprox-ui-kit/src/forms/AnexoManager.tsx` em Track C.3 da sprint
 // 2026-04-20-code-split-fix-e-ports-faltantes (decisao: cross-domain -> ui-kit-core).
+//
+// Refatoração 2026-05-13 (sprint ui-kit Tailwind migration):
+//   - Removido CSS scoped (anexo-*) → Tailwind tokens
+//   - Lightbox → primitivo `Modal` (Radix Dialog: focus trap, ESC, overlay)
+//   - Barras de progresso → primitivo `Progress` (Radix)
+//   - Spinner de loading → primitivo `Spinner`
+//   - API externa preservada 1:1 (AnexoManagerProps inalterado)
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
-  FiUploadCloud, FiTrash2, FiDownload, FiRefreshCw, FiX,
+  FiUploadCloud, FiTrash2, FiDownload, FiRefreshCw,
   FiFile, FiImage, FiFilm, FiMusic,
 } from 'react-icons/fi'
 import { FaFilePdf, FaFileWord, FaFileExcel, FaFileCsv, FaFileArchive } from 'react-icons/fa'
-import './AnexoManager.css'
+import { cn } from '../lib/cn'
+import { Modal, ModalBody } from '../primitives/Modal'
+import { Progress, type ProgressTone } from '../primitives/Progress'
+import { Spinner } from '../primitives/Spinner'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -145,6 +155,19 @@ function FileIcon({ category }: { category: string }) {
     case 'zip': return <FaFileArchive />
     default:   return <FiFile />
   }
+}
+
+// Cores de fundo (chip do ícone) por categoria — substituem .anexo-icon-*
+const ICON_BG_BY_CAT: Record<string, string> = {
+  pdf: 'bg-red-500',
+  doc: 'bg-blue-500',
+  xls: 'bg-green-500',
+  img: 'bg-violet-500',
+  vid: 'bg-orange-500',
+  aud: 'bg-pink-500',
+  csv: 'bg-teal-500',
+  zip: 'bg-indigo-500',
+  generic: 'bg-slate-400',
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -269,15 +292,6 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
     }
   }, [persistidosSig])
 
-  useEffect(() => {
-    if (!lightbox) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightbox(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [lightbox])
-
   const openImagePreview = useCallback(
     (anexo: AnexoPersistedItem) => {
       if (!isImageAnexo(anexo)) return
@@ -326,25 +340,88 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
 
   const totalCount = persistidos.length + locais.length
 
+  // ─── Tailwind class atoms (extraídos para reuso) ────────────────────────
+  const fileItemCls = cn(
+    'flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white',
+    'px-3 py-2.5 transition-shadow duration-150 hover:shadow-sm',
+  )
+  const fileNameCls =
+    'text-[0.85rem] font-medium text-slate-800 truncate'
+  const fileNameLinkCls = cn(
+    'block w-full text-left bg-transparent border-0 p-0 cursor-pointer',
+    'text-[0.85rem] font-medium text-blue-600 truncate rounded',
+    'hover:underline focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2',
+  )
+  const fileMetaCls =
+    'mt-px flex items-center gap-1.5 text-[0.72rem] text-slate-400'
+  const iconChipCls = (cat: string) =>
+    cn(
+      'flex shrink-0 items-center justify-center w-9 h-9 rounded-lg text-white text-[1.1rem]',
+      ICON_BG_BY_CAT[cat] ?? ICON_BG_BY_CAT.generic,
+    )
+  const thumbBtnCls = cn(
+    'shrink-0 p-0 border-0 bg-transparent cursor-pointer rounded-[10px] leading-none',
+    'transition-[box-shadow,transform] duration-150',
+    'hover:shadow-md hover:scale-[1.02]',
+    'focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2',
+  )
+  const thumbImgCls = 'shrink-0 w-12 h-12 rounded-[10px] object-cover border border-slate-200'
+  const thumbSkelCls = cn(
+    'shrink-0 w-12 h-12 rounded-[10px]',
+    'bg-[linear-gradient(90deg,#e2e8f0_0%,#f1f5f9_50%,#e2e8f0_100%)] bg-[length:200%_100%]',
+    'animate-[anexo-shimmer_1.2s_ease-in-out_infinite]',
+  )
+  const actionBtnBaseCls = cn(
+    'inline-flex items-center justify-center w-7 h-7 rounded-md border-0 cursor-pointer',
+    'text-[0.85rem] bg-slate-100 text-slate-500',
+    'transition-colors duration-150 hover:bg-slate-200 hover:text-slate-800',
+    'focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-1',
+  )
+  const dangerBtnCls = 'hover:!bg-red-100 hover:!text-red-600'
+  const downloadBtnCls = 'hover:!bg-blue-100 hover:!text-blue-600'
+
+  // Tom da Progress por status
+  const progressToneByStatus = (status: AnexoLocalItem['status']): ProgressTone => {
+    if (status === 'done') return 'success'
+    if (status === 'error') return 'error'
+    return 'brand'
+  }
+
   return (
-    <div className="anexo-manager">
+    <div className="flex w-full flex-col gap-3">
+      {/* Keyframes inline p/ shimmer skeleton — autossuficiente */}
+      <style>{`@keyframes anexo-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+
       {/* Drop Zone */}
       {!readonly && (
         <div
           {...getRootProps()}
-          className={`anexo-dropzone ${isDragActive ? 'anexo-drag-active' : ''}`}
+          className={cn(
+            'select-none cursor-pointer rounded-[10px] border-2 border-dashed text-center',
+            'transition-[border-color,background-color] duration-200',
+            'px-4 py-6 sm:px-4 sm:py-6',
+            'border-slate-300 bg-slate-50',
+            'hover:border-blue-500 hover:bg-blue-50',
+            isDragActive && '!border-blue-500 !bg-blue-100',
+            'max-sm:px-3 max-sm:py-4',
+          )}
         >
           <input {...getInputProps()} />
-          <div className="anexo-dropzone-inner">
-            <FiUploadCloud className="anexo-dropzone-icon" />
-            <p className="anexo-dropzone-text">
+          <div className="flex flex-col items-center gap-1.5">
+            <FiUploadCloud
+              className={cn(
+                'text-[2rem]',
+                isDragActive ? 'text-blue-500' : 'text-slate-400',
+              )}
+            />
+            <p className="text-sm text-slate-500">
               {dropzoneLabel || (
                 <>
-                  <strong>Clique para selecionar</strong> ou arraste arquivos aqui
+                  <strong className="text-blue-500 cursor-pointer">Clique para selecionar</strong> ou arraste arquivos aqui
                 </>
               )}
             </p>
-            <p className="anexo-dropzone-hint">
+            <p className="mt-0.5 text-xs text-slate-400">
               Max. {formatFileSize(maxFileSize)} por arquivo - Ate {maxFiles} arquivos
             </p>
           </div>
@@ -353,9 +430,12 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
 
       {/* File List */}
       {(totalCount > 0 || loading) && (
-        <div className="anexo-file-list">
+        <div className="flex flex-col gap-2">
           {loading && (
-            <div className="anexo-empty">Carregando anexos...</div>
+            <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-slate-200 p-4 text-[0.85rem] text-slate-400">
+              <Spinner size="sm" tone="brand" srLabel="Carregando anexos" />
+              <span>Carregando anexos...</span>
+            </div>
           )}
 
           {/* Persistidos */}
@@ -371,47 +451,52 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
               isImg && !isUnavailable && (Boolean(pImg) || Boolean(getImageReadUrl))
 
             return (
-              <div key={`p-${anexo.id}`} className={`anexo-file-item ${isUnavailable ? 'anexo-file-unavailable' : ''}`}>
+              <div
+                key={`p-${anexo.id}`}
+                className={cn(fileItemCls, isUnavailable && 'opacity-50')}
+              >
                 {isImg && pImg && !isUnavailable ? (
                   <button
                     type="button"
-                    className="anexo-persist-thumb-wrap"
+                    className={thumbBtnCls}
                     title="Ver imagem"
                     onClick={() => openImagePreview(anexo)}
                   >
-                    <img src={pImg} alt="" className="anexo-file-thumb anexo-file-thumb--lg" />
+                    <img src={pImg} alt="" className={thumbImgCls} />
                   </button>
                 ) : isImg && pLoading ? (
-                  <div className="anexo-persist-thumb-skel" aria-hidden />
+                  <div className={thumbSkelCls} aria-hidden />
                 ) : (
-                  <div className={`anexo-file-icon anexo-icon-${cat}`}>
+                  <div className={cn(iconChipCls(cat), isUnavailable && '!bg-slate-400')}>
                     <FileIcon category={cat} />
                   </div>
                 )}
-                <div className="anexo-file-info">
+                <div className="flex-1 min-w-0">
                   {canPreviewImage ? (
                     <button
                       type="button"
-                      className="anexo-file-name anexo-file-name--link"
+                      className={fileNameLinkCls}
                       title={displayName}
                       onClick={() => openImagePreview(anexo)}
                     >
                       {displayName}
                     </button>
                   ) : (
-                    <div className="anexo-file-name" title={displayName}>{displayName}</div>
+                    <div className={fileNameCls} title={displayName}>{displayName}</div>
                   )}
-                  <div className="anexo-file-meta">
-                    {isUnavailable && <span className="anexo-status-error">Anexo indisponivel</span>}
+                  <div className={fileMetaCls}>
+                    {isUnavailable && (
+                      <span className="text-[0.72rem] font-medium text-red-500">Anexo indisponivel</span>
+                    )}
                     {!isUnavailable && anexo.tamanho ? <span>{formatFileSize(anexo.tamanho)}</span> : null}
                     {anexo.createdAt && <span>{new Date(anexo.createdAt).toLocaleDateString('pt-BR')}</span>}
                   </div>
                 </div>
-                <div className="anexo-file-actions">
+                <div className="flex shrink-0 gap-1">
                   {onDownload && !isUnavailable && (
                     <button
                       type="button"
-                      className="anexo-btn-action anexo-btn-download"
+                      className={cn(actionBtnBaseCls, downloadBtnCls)}
                       title={isImg ? 'Abrir em nova aba' : 'Download'}
                       onClick={() => handleDownload(anexo)}
                     >
@@ -421,7 +506,7 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
                   {!readonly && onRemovePersistido && (
                     <button
                       type="button"
-                      className="anexo-btn-action anexo-btn-danger"
+                      className={cn(actionBtnBaseCls, dangerBtnCls)}
                       title="Remover"
                       onClick={() => onRemovePersistido(anexo.id)}
                     >
@@ -440,63 +525,68 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
             const cat = getFileCategory(localTipo, localNome)
             const isImg = localTipo.startsWith('image/')
             const localPreviewUrl = isImg ? thumbUrls[anexo.localId] : undefined
+            const showProgress =
+              anexo.status === 'uploading' || anexo.status === 'done' || anexo.status === 'error'
             return (
-              <div key={`l-${anexo.localId}`} className="anexo-file-item">
+              <div key={`l-${anexo.localId}`} className={fileItemCls}>
                 {isImg && localPreviewUrl ? (
                   <button
                     type="button"
-                    className="anexo-persist-thumb-wrap"
+                    className={thumbBtnCls}
                     title="Pré-visualizar"
                     onClick={() => openLocalImagePreview(localPreviewUrl, localNome)}
                   >
-                    <img src={localPreviewUrl} alt="" className="anexo-file-thumb anexo-file-thumb--lg" />
+                    <img src={localPreviewUrl} alt="" className={thumbImgCls} />
                   </button>
                 ) : (
-                  <div className={`anexo-file-icon anexo-icon-${cat}`}>
+                  <div className={iconChipCls(cat)}>
                     <FileIcon category={cat} />
                   </div>
                 )}
-                <div className="anexo-file-info">
+                <div className="flex-1 min-w-0">
                   {isImg && localPreviewUrl ? (
                     <button
                       type="button"
-                      className="anexo-file-name anexo-file-name--link"
+                      className={fileNameLinkCls}
                       title={localNome}
                       onClick={() => openLocalImagePreview(localPreviewUrl, localNome)}
                     >
                       {localNome}
                     </button>
                   ) : (
-                    <div className="anexo-file-name" title={localNome}>{localNome}</div>
+                    <div className={fileNameCls} title={localNome}>{localNome}</div>
                   )}
-                  <div className="anexo-file-meta">
+                  <div className={fileMetaCls}>
                     <span>{formatFileSize(anexo.tamanho)}</span>
-                    {anexo.status === 'uploading' && <span className="anexo-status-uploading">Enviando...</span>}
+                    {anexo.status === 'uploading' && (
+                      <span className="text-[0.72rem] font-medium text-blue-500">Enviando...</span>
+                    )}
                     {anexo.status === 'error' && (
-                      <span className="anexo-status-error">{anexo.errorMessage || 'Erro'}</span>
+                      <span className="text-[0.72rem] font-medium text-red-500">
+                        {anexo.errorMessage || 'Erro'}
+                      </span>
                     )}
                   </div>
-                  {(anexo.status === 'uploading' || anexo.status === 'done') && (
-                    <div className="anexo-progress-bar">
-                      <div
-                        className={`anexo-progress-fill ${
-                          anexo.status === 'done' ? 'anexo-progress-done' : ''
-                        }`}
-                        style={{ width: `${anexo.progress}%` }}
+                  {showProgress && (
+                    <div className="mt-1.5">
+                      <Progress
+                        value={anexo.status === 'error' ? 100 : anexo.progress}
+                        tone={progressToneByStatus(anexo.status)}
+                        size="sm"
+                        aria-label={
+                          anexo.status === 'error'
+                            ? `Erro no upload de ${localNome}`
+                            : `Upload de ${localNome}`
+                        }
                       />
                     </div>
                   )}
-                  {anexo.status === 'error' && (
-                    <div className="anexo-progress-bar">
-                      <div className="anexo-progress-fill anexo-progress-error" style={{ width: '100%' }} />
-                    </div>
-                  )}
                 </div>
-                <div className="anexo-file-actions">
+                <div className="flex shrink-0 gap-1">
                   {anexo.status === 'error' && onRetry && (
                     <button
                       type="button"
-                      className="anexo-btn-action"
+                      className={actionBtnBaseCls}
                       title="Tentar novamente"
                       onClick={() => onRetry(anexo.localId)}
                     >
@@ -506,7 +596,7 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
                   {(anexo.status === 'pending' || anexo.status === 'error') && onRemoveLocal && (
                     <button
                       type="button"
-                      className="anexo-btn-action anexo-btn-danger"
+                      className={cn(actionBtnBaseCls, dangerBtnCls)}
                       title="Remover"
                       onClick={() => onRemoveLocal(anexo.localId)}
                     >
@@ -522,35 +612,36 @@ export const AnexoManager: React.FC<AnexoManagerProps> = ({
 
       {/* Empty state */}
       {!loading && totalCount === 0 && readonly && (
-        <div className="anexo-empty">Nenhum anexo encontrado.</div>
-      )}
-
-      {lightbox && (
-        <div
-          className="anexo-lightbox-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-label={lightbox.title}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setLightbox(null)
-          }}
-        >
-          <div className="anexo-lightbox-panel" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="anexo-lightbox-close"
-              onClick={() => setLightbox(null)}
-              aria-label="Fechar"
-            >
-              <FiX />
-            </button>
-            <div className="anexo-lightbox-title">{lightbox.title}</div>
-            <div className="anexo-lightbox-img-wrap">
-              <img src={lightbox.url} alt={lightbox.title} className="anexo-lightbox-img" />
-            </div>
-          </div>
+        <div className="rounded-lg border border-dashed border-slate-200 p-4 text-center text-[0.85rem] text-slate-400">
+          Nenhum anexo encontrado.
         </div>
       )}
+
+      {/* Lightbox (preview de imagem) — primitivo Modal (Radix) */}
+      <Modal
+        open={!!lightbox}
+        onOpenChange={(open) => { if (!open) setLightbox(null) }}
+        size="xl"
+        className="!bg-transparent !shadow-none"
+      >
+        {lightbox && (
+          <ModalBody className="!p-0 flex flex-col items-stretch gap-2.5">
+            <div
+              className="text-xs font-medium text-slate-50 truncate pr-11 max-w-[min(90vw,1000px)]"
+              title={lightbox.title}
+            >
+              {lightbox.title}
+            </div>
+            <div className="flex max-h-[calc(92vh-48px)] items-center justify-center overflow-auto rounded-xl bg-slate-900 shadow-2xl">
+              <img
+                src={lightbox.url}
+                alt={lightbox.title}
+                className="block w-auto h-auto max-w-full max-h-[min(80vh,900px)] object-contain"
+              />
+            </div>
+          </ModalBody>
+        )}
+      </Modal>
     </div>
   )
 }

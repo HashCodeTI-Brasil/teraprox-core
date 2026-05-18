@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react'
-import { Button } from 'react-bootstrap'
+import { Button } from '@hashcodeti/ui-kit-core'
 import {
   useRecursoDisplayerViewModel,
   useFindRecursoByTagViewModel,
@@ -21,6 +21,8 @@ import { FindRecursoByTagField } from './FindRecursoByTagField'
  *
  * Se `vm` nao for fornecido, o componente resolve via
  * `useRecursoDisplayerViewModel()` default (DI via CoreService).
+ *
+ * Wave F.1.A: react-bootstrap Button -> ui-kit-core Button.
  */
 
 export interface RecursoDisplayerProps {
@@ -63,14 +65,14 @@ export const RecursoDisplayer = ({
 
   return (
     <div style={{ width: '100%', padding: 0 }} className="recurso-displayer-generic">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="flex justify-between items-center mb-3">
         <div>
-          <label className="me-2">Selecionar Recurso Por:</label>
+          <label className="mr-2">Selecionar Recurso Por:</label>
           <Button
             size="sm"
             onClick={() => setSelectorDisplay('branch')}
             variant={selectorDisplay === 'branch' ? 'primary' : 'outline-primary'}
-            className="me-1"
+            className="mr-1"
           >
             Arvore
           </Button>

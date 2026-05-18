@@ -1,6 +1,25 @@
 // @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react'
-import { Modal, Button, Spinner, Row, Col, Accordion, Form } from 'react-bootstrap'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Spinner,
+  Badge,
+  Checkbox,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  FieldLabel,
+} from '@hashcodeti/ui-kit-core'
 import { ManutentorCardCompact } from '../acao-manutentor/ManutentorCardCompact'
 import type {
   IPickMantenedorTipoViewModel,
@@ -167,31 +186,40 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
     : `Preencha os requisitos pendentes para iniciar a OS #${os?.id}`
 
   return (
-    <Modal show={show} onHide={onHide} size="lg" centered scrollable className="pick-mantenedor-tipo-modal">
-      <Modal.Header closeButton className="border-0 pb-0">
-        <Modal.Title>
-          <div className="fw-bold">Configuração da Ordem de Serviço</div>
-          <div className="text-muted small">{headerSubtitle}</div>
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="pt-3">
+    <Modal
+      open={show}
+      onOpenChange={(next) => {
+        if (!next) onHide()
+      }}
+      size="lg"
+      className="pick-mantenedor-tipo-modal"
+    >
+      <ModalHeader className="border-0 pb-0">
+        <div>
+          <div className="font-bold">Configuração da Ordem de Serviço</div>
+          <div className="text-neutral-500 text-sm font-normal">{headerSubtitle}</div>
+        </div>
+      </ModalHeader>
+      <ModalBody className="pt-3">
         {loading ? (
           <div className="text-center p-5">
-            <Spinner animation="border" variant="primary" />
-            <div className="mt-2 text-muted">Carregando opções...</div>
+            <Spinner variant="border" tone="brand" />
+            <div className="mt-2 text-neutral-500">Carregando opções...</div>
           </div>
         ) : (
-          <Accordion alwaysOpen defaultActiveKey={defaultActiveKeys}>
+          <Accordion type="multiple" defaultValue={defaultActiveKeys} variant="bordered">
             {isMulti && (
-              <Accordion.Item eventKey="os" className="mb-3 border-0 shadow-sm rounded">
-                <Accordion.Header>
-                  <div className="d-flex align-items-center">
-                    <span className="fw-bold">Aplicar a quais OS?</span>
-                    <span className="badge bg-info ms-2">{selectedOsIds.length} de {targetList.length}</span>
+              <AccordionItem value="os" className="mb-3 shadow-sm">
+                <AccordionTrigger>
+                  <div className="flex items-center">
+                    <span className="font-bold">Aplicar a quais OS?</span>
+                    <Badge tone="info" className="ml-2">
+                      {selectedOsIds.length} de {targetList.length}
+                    </Badge>
                   </div>
-                </Accordion.Header>
-                <Accordion.Body>
-                  <div className="d-flex justify-content-end mb-2 gap-2">
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex justify-end mb-2 gap-2">
                     <Button
                       size="sm"
                       variant="outline-secondary"
@@ -209,7 +237,7 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
                       Desmarcar todas
                     </Button>
                   </div>
-                  <div className="d-flex flex-column gap-2">
+                  <div className="flex flex-col gap-2">
                     {targetList.map((o: any) => {
                       const checked = selectedOsIds.includes(o.id)
                       const recursoNome = o.recurso?.nome ?? ''
@@ -218,20 +246,19 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
                       if (isMissingMaintainers(o)) tagMissing.push('Sem executor')
                       if (isMissingType(o)) tagMissing.push('Sem tipo')
                       return (
-                        <Form.Check
+                        <Checkbox
                           key={o.id}
-                          type="checkbox"
                           id={`pmt-os-${o.id}`}
                           checked={checked}
                           disabled={assigning}
-                          onChange={() => toggleOs(o.id)}
+                          onCheckedChange={() => toggleOs(o.id)}
                           label={
                             <span>
                               <strong>OS #{o.id}</strong>
-                              {recursoNome && <span className="text-muted ms-2">{recursoNome}</span>}
-                              {desc && <span className="text-muted ms-2">— {desc}</span>}
+                              {recursoNome && <span className="text-neutral-500 ml-2">{recursoNome}</span>}
+                              {desc && <span className="text-neutral-500 ml-2">— {desc}</span>}
                               {tagMissing.length > 0 && (
-                                <span className="badge bg-warning text-dark ms-2">{tagMissing.join(' · ')}</span>
+                                <Badge tone="warning" className="ml-2">{tagMissing.join(' · ')}</Badge>
                               )}
                             </span>
                           }
@@ -239,82 +266,87 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
                       )
                     })}
                   </div>
-                </Accordion.Body>
-              </Accordion.Item>
+                </AccordionContent>
+              </AccordionItem>
             )}
 
             {missingType && (
-              <Accordion.Item eventKey="tipo" className="mb-3 border-0 shadow-sm rounded">
-                <Accordion.Header>
-                  <div className="d-flex align-items-center">
-                    <span className="fw-bold">{isMulti ? '2.' : '1.'} Selecionar Tipo de Ordem</span>
-                    {!selectedTipoId && <span className="badge bg-warning text-dark ms-2">Obrigatório</span>}
-                    {selectedTipoId && <span className="badge bg-success ms-2">Selecionado</span>}
+              <AccordionItem value="tipo" className="mb-3 shadow-sm">
+                <AccordionTrigger>
+                  <div className="flex items-center">
+                    <span className="font-bold">{isMulti ? '2.' : '1.'} Selecionar Tipo de Ordem</span>
+                    {!selectedTipoId && <Badge tone="warning" className="ml-2">Obrigatório</Badge>}
+                    {selectedTipoId && <Badge tone="success" className="ml-2">Selecionado</Badge>}
                   </div>
-                </Accordion.Header>
-                <Accordion.Body>
-                  <Form.Group>
-                    <Form.Label className="text-muted small">Tipo aplicado a {isMulti ? 'todas as OS marcadas' : 'esta OS'}</Form.Label>
-                    <Form.Select
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div>
+                    <FieldLabel className="text-neutral-500 text-xs">
+                      Tipo aplicado a {isMulti ? 'todas as OS marcadas' : 'esta OS'}
+                    </FieldLabel>
+                    <Select
                       value={selectedTipoId}
-                      onChange={(e) => setSelectedTipoId(e.target.value)}
+                      onValueChange={(v) => setSelectedTipoId(v)}
                       disabled={assigning}
                     >
-                      <option value="">-- Selecione um tipo --</option>
-                      {tiposDeOrdem.map((t) => (
-                        <option key={t.id} value={t.id as string}>{t.tipo}</option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Accordion.Body>
-              </Accordion.Item>
+                      <SelectTrigger>
+                        <SelectValue placeholder="-- Selecione um tipo --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tiposDeOrdem.map((t) => (
+                          <SelectItem key={t.id} value={String(t.id)}>{t.tipo}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             )}
 
             {missingMaintainers && (
-              <Accordion.Item eventKey="mantenedores" className="border-0 shadow-sm rounded">
-                <Accordion.Header>
-                  <div className="d-flex align-items-center">
-                    <span className="fw-bold">{isMulti ? '3.' : missingType ? '2.' : '1.'} Selecionar Executores</span>
-                    {selectedIds.length === 0 && <span className="badge bg-warning text-dark ms-2">Obrigatório</span>}
-                    {selectedIds.length > 0 && <span className="badge bg-success ms-2">{selectedIds.length} Selecionado(s)</span>}
+              <AccordionItem value="mantenedores" className="shadow-sm">
+                <AccordionTrigger>
+                  <div className="flex items-center">
+                    <span className="font-bold">{isMulti ? '3.' : missingType ? '2.' : '1.'} Selecionar Executores</span>
+                    {selectedIds.length === 0 && <Badge tone="warning" className="ml-2">Obrigatório</Badge>}
+                    {selectedIds.length > 0 && <Badge tone="success" className="ml-2">{selectedIds.length} Selecionado(s)</Badge>}
                   </div>
-                </Accordion.Header>
-                <Accordion.Body>
-                  <Row className="g-3">
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {!Array.isArray(mantenedores) || mantenedores.length === 0 ? (
-                      <Col xs={12} className="text-center py-5 text-muted">
+                      <div className="col-span-full text-center py-5 text-neutral-500">
                         Nenhum mantenedor encontrado.
-                      </Col>
+                      </div>
                     ) : (
                       mantenedores.map((m) => {
                         const isSelected = selectedIds.includes(m.id)
                         return (
-                          <Col md={6} lg={4} key={m.id as React.Key}>
-                            <div
-                              onClick={() => toggleMantenedor(m.id)}
-                              style={{
-                                cursor: assigning ? 'not-allowed' : 'pointer',
-                                opacity: assigning ? 0.7 : 1,
-                                transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-                                transition: 'transform 0.2s',
-                              }}
-                            >
-                              <div className={isSelected ? 'rounded-3 p-1 bg-primary bg-opacity-10 border border-primary' : ''}>
-                                <ManutentorCardCompact mantenedor={m} />
-                              </div>
+                          <div
+                            key={m.id as React.Key}
+                            onClick={() => toggleMantenedor(m.id)}
+                            style={{
+                              cursor: assigning ? 'not-allowed' : 'pointer',
+                              opacity: assigning ? 0.7 : 1,
+                              transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                              transition: 'transform 0.2s',
+                            }}
+                          >
+                            <div className={isSelected ? 'rounded-md p-1 bg-brand-primary-muted border border-brand-primary' : ''}>
+                              <ManutentorCardCompact mantenedor={m} />
                             </div>
-                          </Col>
+                          </div>
                         )
                       })
                     )}
-                  </Row>
-                </Accordion.Body>
-              </Accordion.Item>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             )}
           </Accordion>
         )}
-      </Modal.Body>
-      <Modal.Footer className="border-0">
+      </ModalBody>
+      <ModalFooter className="border-0">
         <Button variant="outline-secondary" onClick={onHide} disabled={assigning}>
           Cancelar
         </Button>
@@ -323,17 +355,11 @@ export const PickMantenedorTipoModal: React.FC<PickMantenedorTipoModalProps> = (
           onClick={handleConfirm}
           disabled={assigning || !isFormValid()}
           className="px-4"
+          loading={assigning}
         >
-          {assigning ? (
-            <>
-              <Spinner size="sm" animation="border" className="me-2" />
-              Salvando...
-            </>
-          ) : (
-            'Confirmar'
-          )}
+          {assigning ? 'Salvando...' : 'Confirmar'}
         </Button>
-      </Modal.Footer>
+      </ModalFooter>
     </Modal>
   )
 }

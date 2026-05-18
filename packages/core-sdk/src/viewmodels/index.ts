@@ -212,6 +212,16 @@ export type {
 
 export { useTarefaItemViewModel } from './ReduxTarefaItemAdapter'
 
+// GenericPicker (Wave H.5 — Port + Host de withGenericPicker HOC, 2026-05-13)
+// Substitui HOC factory de 522 LOC duplicado em SGM-OS + SGM-UTILS.
+// Adapter Redux fica nos MFs (encapsulando genericPickerReducer existente)
+// ate Wave I refatorar os 12 callers cross-MF.
+export type {
+  IGenericPickerViewModel,
+  GenericPickerItem,
+  UseGenericPickerOptions,
+} from './IGenericPickerViewModel'
+
 // SGU Ports (sprint 2026-05-02 web-client-site-teraprox — Sprint 3 fase A EX3)
 export type { IUserViewModel, UserListFilters } from './IUserViewModel'
 export type { IRoleViewModel } from './IRoleViewModel'

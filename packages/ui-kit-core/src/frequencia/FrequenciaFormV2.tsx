@@ -23,7 +23,20 @@
 // Reescrito em Track C.1 UI da sprint 2026-04-20-code-split-fix-e-ports-faltantes.
 // Relaxado em Fase D2 (extensao) da mesma sprint para suportar callers
 // sem dataInicio + escalas customizaveis.
-import { Button, Form } from 'react-bootstrap'
+//
+// Refator Tailwind (sprint 2026-05-08 ui-kit Tailwind migration, D3):
+//  - Substitui `Form.Control`/`Form.Label`/`Form.Select`/`Button` (react-bootstrap)
+//    por `TextField` + `Select*` (Radix) + `Button` (ui-kit-core L1 Tailwind+Radix).
+//  - API externa preservada 100% (props, RecorrenciaValue, RecorrenciaEscala).
+import { Button } from '../primitives/Button'
+import { TextField } from '../primitives/TextField'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../primitives/Select'
 
 /**
  * Enum completo do backend (`api-manutencao/recorrencia`). Por default o UI
@@ -125,7 +138,7 @@ export const FrequenciaFormV2 = ({
   if (value === null) {
     return (
       <div className={className}>
-        <div className="text-muted mb-2">Sem recorrencia definida.</div>
+        <div className="text-neutral-500 mb-2">Sem recorrencia definida.</div>
         <Button
           size="sm"
           variant="outline-primary"
@@ -172,10 +185,10 @@ export const FrequenciaFormV2 = ({
 
   return (
     <div className={className}>
-      <div className="d-flex flex-wrap gap-2 align-items-end">
-        <div style={{ flex: '0 0 8rem' }}>
-          <Form.Label>A cada</Form.Label>
-          <Form.Control
+      <div className="flex flex-wrap gap-2 items-end">
+        <div className="basis-32 grow-0 shrink-0">
+          <TextField
+            label="A cada"
             type="number"
             min={1}
             disabled={disabled}
@@ -187,27 +200,38 @@ export const FrequenciaFormV2 = ({
           />
         </div>
 
-        <div style={{ flex: '1 1 10rem' }}>
-          <Form.Label>Escala</Form.Label>
-          <Form.Select
-            disabled={disabled}
+        <div className="basis-40 grow shrink">
+          {/*
+            Adapter Radix Select: API externa do componente (`onEscalaChange`)
+            preservada — internamente Radix usa `value`/`onValueChange`
+            (string) ao inves de evento DOM. Cast para RecorrenciaEscala
+            mantido (mesmo enum do contrato).
+          */}
+          <label className="block text-sm font-medium text-neutral-700 mb-1">
+            Escala
+          </label>
+          <Select
             value={value.escala}
-            onChange={(e) =>
-              onEscalaChange(e.target.value as RecorrenciaEscala)
-            }
+            onValueChange={(v) => onEscalaChange(v as RecorrenciaEscala)}
+            disabled={disabled}
           >
-            {visibleEscalas.map((key) => (
-              <option key={key} value={key}>
-                {ESCALA_LABELS[key] ?? key}
-              </option>
-            ))}
-          </Form.Select>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {visibleEscalas.map((key) => (
+                <SelectItem key={key} value={key}>
+                  {ESCALA_LABELS[key] ?? key}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {showDataInicio && (
-          <div style={{ flex: '1 1 14rem' }}>
-            <Form.Label>Data de inicio</Form.Label>
-            <Form.Control
+          <div className="basis-56 grow shrink">
+            <TextField
+              label="Data de inicio"
               type="datetime-local"
               disabled={disabled}
               value={toDatetimeLocal(value.dataInicio)}

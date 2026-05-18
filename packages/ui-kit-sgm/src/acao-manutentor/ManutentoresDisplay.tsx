@@ -1,14 +1,17 @@
 // @ts-nocheck
 import React from 'react'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Tooltip } from '@hashcodeti/ui-kit-core'
 import { GrUserWorker } from 'react-icons/gr'
 
 /**
- * ManutentoresDisplay (ui-kit-sgm) — Wave 2C migration.
+ * ManutentoresDisplay (ui-kit-sgm) — Wave F.1.A migration.
  *
  * Componente 100% presentacional. Lista executores ativos (mantenedores
  * atribuídos a uma OS) com tooltip para os adicionais. Migrado 1:1 do
  * SGM-OS. Sem dependências de Redux/CoreService.
+ *
+ * Wave F.1.A: react-bootstrap (OverlayTrigger+Tooltip) -> ui-kit-core
+ * Tooltip wrapper Radix.
  */
 
 export interface ManutentorEntry {
@@ -33,41 +36,24 @@ export const ManutentoresDisplay: React.FC<ManutentoresDisplayProps> = ({
   const primeiro = executoresAtivos[0]?.nomeUsuario
   const restantes = executoresAtivos.slice(1)
 
-  const renderTooltip = (props: any) => (
-    <Tooltip {...props}>
+  const tooltipContent = (
+    <div className="flex flex-col gap-0.5">
       {restantes.map((m) => (
         <div key={m.mantenedorId}>{m.nomeUsuario}</div>
       ))}
-    </Tooltip>
+    </div>
   )
 
   return (
-    <span
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-      }}
-    >
+    <span className="inline-flex items-center gap-2">
       <strong>{label}</strong> {primeiro ?? '-'}{' '}
       <GrUserWorker onClick={onIconClick} />
       {restantes.length > 0 && (
-        <OverlayTrigger
-          placement="top"
-          overlay={renderTooltip}
-          delay={{ show: 150, hide: 200 }}
-        >
-          <span
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-            }}
-          >
+        <Tooltip content={tooltipContent} side="top" delayDuration={150}>
+          <span className="inline-flex items-center gap-1 cursor-pointer">
             <small>+{restantes.length}</small>
           </span>
-        </OverlayTrigger>
+        </Tooltip>
       )}
     </span>
   )

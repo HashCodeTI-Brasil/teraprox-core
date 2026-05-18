@@ -1,23 +1,15 @@
 // @ts-nocheck
 // Migrado de teraprox-SGP-caderno/src/Components/processo/CampoDeVerificacaoV2.tsx
-// Wave 3B — props-driven.
-//
-// Mudancas:
-//  - `useDispatch` removido. Os dispatches originais
-//    (`setMarkCampo` / `setPosicao`) foram convertidos em callbacks
-//    `onMarkCampo(campo, checked)` / `onChangePosicao(campo, valor)`
-//    — caller (SGP-caderno) mantem Redux; ui-kit fica puro.
-//  - `react-dnd` permanece (dependencia de runtime opcional — caller
-//    precisa prover DndProvider).
-//  - CSS foi removido do import; caller e responsavel por importar
-//    `cadernoDeVerificacaoForm.css` na sua raiz (estilos globais).
+// Wave 3B — props-driven (callbacks no lugar de useDispatch).
+// Wave F.2.B (2026-05-13) — react-bootstrap removido; migrado para
+// @hashcodeti/ui-kit-core (Button, Tooltip, Checkbox). FormField legacy
+// preservado (vem de teraprox-ui-kit, fora do escopo desta wave).
 import { useRef } from 'react'
 import {
   Button,
-  Form,
-  OverlayTrigger,
   Tooltip,
-} from 'react-bootstrap'
+  Checkbox,
+} from '@hashcodeti/ui-kit-core'
 import { useDrag, useDrop } from 'react-dnd'
 import {
   FiAlignLeft,
@@ -191,10 +183,7 @@ export const CampoDeVerificacaoV2 = ({
         >
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {campo.tipoDeCampo && (
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip>Filtrar por: {getTipoNome(campo.tipoDeCampo)}</Tooltip>}
-              >
+              <Tooltip content={`Filtrar por: ${getTipoNome(campo.tipoDeCampo)}`}>
                 <div
                   style={{
                     display: 'inline-flex',
@@ -210,15 +199,10 @@ export const CampoDeVerificacaoV2 = ({
                 >
                   <TipoIcon type={campo.tipoDeCampo} />
                 </div>
-              </OverlayTrigger>
+              </Tooltip>
             )}
 
-            <OverlayTrigger
-              placement="top"
-              overlay={
-                <Tooltip>{`Regras de correção: ${campo.regrasDeCorrecao?.length || 0}`}</Tooltip>
-              }
-            >
+            <Tooltip content={`Regras de correção: ${campo.regrasDeCorrecao?.length || 0}`}>
               <div
                 style={{
                   display: 'inline-flex',
@@ -258,16 +242,13 @@ export const CampoDeVerificacaoV2 = ({
                   {campo.regrasDeCorrecao?.length || 0}
                 </span>
               </div>
-            </OverlayTrigger>
+            </Tooltip>
 
-            <OverlayTrigger
-              placement="top"
-              overlay={
-                <Tooltip>
-                  {campo.reporter
-                    ? 'Campo reportado (clique para remover)'
-                    : 'Campo não reportado (clique para reportar)'}
-                </Tooltip>
+            <Tooltip
+              content={
+                campo.reporter
+                  ? 'Campo reportado (clique para remover)'
+                  : 'Campo não reportado (clique para reportar)'
               }
             >
               <div
@@ -288,7 +269,7 @@ export const CampoDeVerificacaoV2 = ({
                   <LuMegaphoneOff size={16} color="#6c757d" />
                 )}
               </div>
-            </OverlayTrigger>
+            </Tooltip>
           </div>
 
           <div
@@ -318,9 +299,9 @@ export const CampoDeVerificacaoV2 = ({
           >
             {isMarking && (
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Form.Check
+                <Checkbox
                   checked={!!campo.checked}
-                  onChange={(e) => onMarkCampo(campo, e.target.checked)}
+                  onCheckedChange={(checked) => onMarkCampo(campo, Boolean(checked))}
                   style={{ transform: 'scale(1.25)', transformOrigin: 'center' }}
                 />
               </div>
