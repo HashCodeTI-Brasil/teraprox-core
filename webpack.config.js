@@ -105,8 +105,11 @@ module.exports = {
                 },
             },
             {
+                // postcss-loader executa Tailwind + autoprefixer ANTES do css-loader
+                // (postcss processa tailwind.css em utilities; css-loader injeta no JS;
+                // style-loader monta a <style> em runtime). Mesma cadeia do SGP-caderno.
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,

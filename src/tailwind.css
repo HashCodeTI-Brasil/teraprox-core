@@ -1,0 +1,11 @@
+/* @agent-touched: 2026-05-20 */
+/**
+ * Tailwind entry — teraprox-core (host).
+ *
+ * Carregado APÓS bootstrap.min.css em src/bootstrap.js. Preflight desabilitado
+ * em tailwind.config.js (Bootstrap continua baseline visual). Quando todo
+ * react-bootstrap sair do host, reativar preflight e remover bootstrap.css.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

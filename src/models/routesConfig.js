@@ -1,3 +1,4 @@
+// @agent-touched: 2026-05-20
 import { endPointCaderno, endPointManutencao, endPointNotification, endPointUser, paths } from "./constantes";
 
 export const routesConfig = [
@@ -42,6 +43,12 @@ export const routesConfig = [
             { configuration: { context: "frequencia", path: paths.cadernoDeVerificacaoForm, endPoint: endPointCaderno } },
             { configuration: { context: "cadernoDinamico", path: paths.cadernos, endPoint: endPointCaderno } },
             { configuration: { context: "cadernoDinamico", path: paths.cadernoDeVerificacao, endPoint: endPointCaderno } },
+            // cadernoPreset — backend api-processo (CadernoPresetController). Mesmo
+            // endPoint do cadernoDinamico/cadernoDeVerificacao. Múltiplas entradas
+            // para cobrir as rotas de origem: /cadernos (lista presets) e abrir
+            // preset (rota dinâmica usa cadernoDeVerificacao path).
+            { configuration: { context: "cadernoPreset", path: paths.cadernos, endPoint: endPointCaderno } },
+            { configuration: { context: "cadernoPreset", path: paths.cadernoDeVerificacao, endPoint: endPointCaderno } },
             { configuration: { context: "reporte", path: paths.reporte, endPoint: endPointCaderno } },
             { configuration: { context: "formulario", path: paths.formularios, endPoint: endPointCaderno } },
             { configuration: { context: "regraDeValidacao", path: paths.formularios, endPoint: endPointCaderno } },

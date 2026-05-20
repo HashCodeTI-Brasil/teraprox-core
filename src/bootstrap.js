@@ -23,6 +23,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'teraprox-ui-kit/index.css';
 // ui-kit-core não exporta CSS — componentes são 100% Tailwind (preset aplicado
 // no tailwind.config do host via @hashcodeti/ui-kit-core/tailwind-preset).
+// Tailwind entry — gera utilities a partir do scan em src/ + node_modules/@hashcodeti/*
+// (ver tailwind.config.js + postcss.config.js no root). Carregado APÓS bootstrap.css
+// para que utilities possam sobrescrever onde necessário. Adicionado 2026-05-20
+// para corrigir primitivos ui-kit-core/sgp renderizando sem estilo no host.
+import './tailwind.css';
 // ui-kit-sgm styles (TarefaItem.tsx — sprint 2026-04-29-tarefa-item-unified
 // migrou TarefaItem.css de teraprox-SGM-OS pro package). Mesma razão acima:
 // host carrega para que tela de execução / OS form em federation veja o CSS.
