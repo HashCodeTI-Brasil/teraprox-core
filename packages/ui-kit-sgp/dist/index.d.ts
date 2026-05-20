@@ -949,11 +949,22 @@ interface JustificativaModalProps {
  */
 declare const JustificativaModal: React$1.FC<JustificativaModalProps>;
 
-type PresetAccessMode = 'private' | 'all';
+/**
+ * Mantido por compat — UI agora é um toggle binário (`privateMode: boolean`).
+ * O payload `access` final é resolvido em 3 formas:
+ *   - 'all'                          → privateMode=false (aberto p/ empresa)
+ *   - string[] vazio                 → privateMode=true, ninguém marcado
+ *   - string[] com items             → privateMode=true, subset marcado
+ */
+type PresetAccessMode = 'private' | 'all' | 'users';
 interface PresetSavePayload {
     nome: string;
     descricao: string | null;
-    /** `'all'` = todos da empresa; `string[]` = lista de userIds (P2 — UI atual apenas private/all). */
+    /**
+     * `'all'` = todos da empresa.
+     * `string[]` vazio = privado (só owner).
+     * `string[]` com items = lista explícita de userIds com leitura.
+     */
     access: 'all' | string[];
     /**
      * Lista explícita de `controleRefId` que o preset deve carregar.
@@ -985,6 +996,15 @@ interface PresetControleOption {
     label: string;
     /** Nome do recurso (para sub-linha contextual). */
     recursoNome?: string | null;
+}
+/** Opção mostrada no picker de usuários do modal de save (modo "users"). */
+interface PresetUsuarioOption {
+    /** Identificador estável usado em `access[]` no payload. */
+    id: string;
+    /** Nome exibido (geralmente firstName + lastName). */
+    nome: string;
+    /** Email para sub-linha contextual / desambiguação. */
+    email?: string | null;
 }
 interface PresetSaveModalProps {
     open: boolean;
@@ -1023,6 +1043,20 @@ interface PresetSaveModalProps {
      * sempre como `[]` no payload (back-compat com callers antigos).
      */
     controles?: PresetControleOption[];
+    /**
+     * Universo de usuários disponíveis para compartilhar (modo `'users'`).
+     * - `undefined` → aba "Usuários" some (back-compat com callers antigos).
+     * - `[]`        → aba aparece mas mostra empty/loading state (caller ainda
+     *                 está carregando ou tenant sem colaboradores).
+     * - `[...]`     → picker funcional.
+     * O caller deve **excluir o owner** desta lista — owner tem read implícito.
+     */
+    usuarios?: PresetUsuarioOption[];
+    /**
+     * Sinaliza ao picker que a lista de usuários ainda está sendo carregada.
+     * Quando `true`, mostra "Carregando…" no lugar do empty state.
+     */
+    usuariosLoading?: boolean;
 }
 /**
  * PresetSaveModal — modal para nomear e salvar a visualização atual do

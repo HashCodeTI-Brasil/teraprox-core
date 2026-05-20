@@ -1,4 +1,5 @@
 // @hashcodeti/ui-kit-core/primitives/Tabs
+// @agent-touched: 2026-05-19
 //
 // Wrapper sobre @radix-ui/react-tabs. Substitui usos de `Tabs` (react-bootstrap)
 // e estruturas ad-hoc com botões + estado controlado para troca de painéis.
@@ -69,6 +70,9 @@ export const tabsTriggerVariants = cva(
     'inline-flex items-center justify-center whitespace-nowrap',
     'font-medium leading-none select-none',
     'transition-all duration-150',
+    // border base transparente — neutraliza border UA-default do <button> em
+    // consumidores com preflight: false (vide nota no Button).
+    'border border-transparent appearance-none',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1',
     'data-[disabled]:opacity-50 data-[disabled]:pointer-events-none',
     'text-neutral-600 hover:text-surface-foreground',
@@ -87,7 +91,9 @@ export const tabsTriggerVariants = cva(
         pills: [
           'rounded-md bg-transparent',
           'hover:bg-surface-muted',
-          'data-[state=active]:bg-surface-muted data-[state=active]:text-surface-foreground',
+          // Active: fundo brand-muted + texto brand-primary + bold — destaque
+          // inequívoco em fundo branco (surface-muted sozinho era invisível).
+          'data-[state=active]:bg-brand-primary-muted data-[state=active]:text-brand-primary data-[state=active]:font-semibold',
         ],
         solid: [
           'rounded-[5px] bg-transparent',

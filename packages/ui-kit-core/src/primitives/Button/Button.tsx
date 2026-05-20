@@ -1,4 +1,5 @@
 // @hashcodeti/ui-kit-core/primitives/Button
+// @agent-touched: 2026-05-19
 //
 // Botão primitivo Tailwind+cva. API parity com react-bootstrap `<Button>` para
 // que a migração futura dos MFs seja codemod (s/react-bootstrap/@hashcodeti\/ui-kit-core/),
@@ -21,6 +22,10 @@ const buttonVariants = cva(
     'inline-flex items-center justify-center gap-2',
     'font-medium leading-none',
     'rounded-md',
+    // border base transparente — neutraliza border UA-default do <button> em
+    // consumidores com preflight: false (Bootstrap baseline). Os variants
+    // outline-* sobrescrevem a cor; os solid mantêm border invisível.
+    'border border-transparent appearance-none',
     'transition-colors duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-brand-accent',
     'disabled:opacity-50 disabled:pointer-events-none',

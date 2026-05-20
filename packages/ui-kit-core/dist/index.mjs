@@ -18,6 +18,10 @@ var buttonVariants = cva(
     "inline-flex items-center justify-center gap-2",
     "font-medium leading-none",
     "rounded-md",
+    // border base transparente — neutraliza border UA-default do <button> em
+    // consumidores com preflight: false (Bootstrap baseline). Os variants
+    // outline-* sobrescrevem a cor; os solid mantêm border invisível.
+    "border border-transparent appearance-none",
     "transition-colors duration-150",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-brand-accent",
     "disabled:opacity-50 disabled:pointer-events-none"
@@ -394,6 +398,9 @@ var Modal = ({
       {
         className: cn(
           "absolute right-4 top-4 rounded-md p-1",
+          // border-0 / appearance-none neutralizam UA-default em consumidores
+          // com preflight: false. Mantém aspecto ghost (sem border visível).
+          "border-0 appearance-none bg-transparent",
           "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
         ),
@@ -2680,6 +2687,9 @@ var tabsTriggerVariants = cva20(
     "inline-flex items-center justify-center whitespace-nowrap",
     "font-medium leading-none select-none",
     "transition-all duration-150",
+    // border base transparente — neutraliza border UA-default do <button> em
+    // consumidores com preflight: false (vide nota no Button).
+    "border border-transparent appearance-none",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1",
     "data-[disabled]:opacity-50 data-[disabled]:pointer-events-none",
     "text-neutral-600 hover:text-surface-foreground"
@@ -2698,7 +2708,9 @@ var tabsTriggerVariants = cva20(
         pills: [
           "rounded-md bg-transparent",
           "hover:bg-surface-muted",
-          "data-[state=active]:bg-surface-muted data-[state=active]:text-surface-foreground"
+          // Active: fundo brand-muted + texto brand-primary + bold — destaque
+          // inequívoco em fundo branco (surface-muted sozinho era invisível).
+          "data-[state=active]:bg-brand-primary-muted data-[state=active]:text-brand-primary data-[state=active]:font-semibold"
         ],
         solid: [
           "rounded-[5px] bg-transparent",

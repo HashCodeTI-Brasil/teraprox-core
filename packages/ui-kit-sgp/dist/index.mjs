@@ -6637,7 +6637,7 @@ var JustificativaModal = ({
 
 // src/preset/PresetSaveModal.tsx
 import * as React10 from "react";
-import { FiSave as FiSave2, FiSearch as FiSearch3, FiX as FiX2 } from "react-icons/fi";
+import { FiSave as FiSave2, FiSearch as FiSearch3, FiX as FiX2, FiLock, FiGlobe } from "react-icons/fi";
 import {
   Modal as Modal7,
   ModalHeader as ModalHeader7,
@@ -6645,9 +6645,6 @@ import {
   ModalFooter as ModalFooter6,
   Button as Button21,
   TextField as TextField8,
-  Tabs,
-  TabsList,
-  TabsTrigger,
   Badge as Badge10
 } from "@hashcodeti/ui-kit-core";
 import { Fragment as Fragment13, jsx as jsx38, jsxs as jsxs37 } from "react/jsx-runtime";
@@ -6678,14 +6675,20 @@ var PresetSaveModal = ({
   onSave,
   summary,
   initial,
-  controles
+  controles,
+  usuarios,
+  usuariosLoading
 }) => {
   var _a, _b, _c;
   const [nome, setNome] = React10.useState("");
   const [descricao, setDescricao] = React10.useState("");
-  const [accessMode, setAccessMode] = React10.useState("private");
+  const [privateMode, setPrivateMode] = React10.useState(true);
   const [saving, setSaving] = React10.useState(false);
   const [error, setError] = React10.useState(null);
+  const usuariosUniverse = usuarios != null ? usuarios : [];
+  const hasUserPicker = usuarios !== void 0;
+  const [selectedUserIds, setSelectedUserIds] = React10.useState(/* @__PURE__ */ new Set());
+  const [userSearchQuery, setUserSearchQuery] = React10.useState("");
   const controlesUniverse = controles != null ? controles : [];
   const hasPicker = controlesUniverse.length > 0;
   const [selectedRefIds, setSelectedRefIds] = React10.useState(/* @__PURE__ */ new Set());
@@ -6695,7 +6698,15 @@ var PresetSaveModal = ({
     if (!open) return;
     setNome((_a2 = initial == null ? void 0 : initial.nome) != null ? _a2 : "");
     setDescricao((_b2 = initial == null ? void 0 : initial.descricao) != null ? _b2 : "");
-    setAccessMode((initial == null ? void 0 : initial.access) === "all" ? "all" : "private");
+    const initAccess = initial == null ? void 0 : initial.access;
+    setPrivateMode(initAccess !== "all");
+    if (hasUserPicker && Array.isArray(initAccess) && initAccess.length > 0) {
+      const universe = new Set(usuariosUniverse.map((u) => u.id));
+      setSelectedUserIds(new Set(initAccess.filter((id) => universe.has(id))));
+    } else {
+      setSelectedUserIds(/* @__PURE__ */ new Set());
+    }
+    setUserSearchQuery("");
     setError(null);
     setSearchQuery((_c2 = initial == null ? void 0 : initial.searchQuery) != null ? _c2 : "");
     if (hasPicker) {
@@ -6754,10 +6765,11 @@ var PresetSaveModal = ({
     setSaving(true);
     try {
       const controleRefIds = !hasPicker || allSelected ? [] : Array.from(selectedRefIds);
+      const access = privateMode ? Array.from(selectedUserIds) : "all";
       await onSave({
         nome: trimmed,
         descricao: descricao.trim() ? descricao.trim() : null,
-        access: accessMode === "all" ? "all" : [],
+        access,
         controleRefIds,
         ...saveAsNew ? { saveAsNew: true } : null
       });
@@ -6803,17 +6815,173 @@ var PresetSaveModal = ({
       ),
       /* @__PURE__ */ jsxs37("div", { children: [
         /* @__PURE__ */ jsx38("label", { className: "text-xs font-semibold text-neutral-600 mb-1.5 block", children: "Acesso" }),
-        /* @__PURE__ */ jsx38(
-          Tabs,
+        /* @__PURE__ */ jsxs37(
+          "button",
           {
-            value: accessMode,
-            onValueChange: (v) => setAccessMode(v),
-            children: /* @__PURE__ */ jsxs37(TabsList, { variant: "pills", size: "sm", className: "grid grid-cols-2 gap-2", children: [
-              /* @__PURE__ */ jsx38(TabsTrigger, { value: "private", title: "Apenas voc\xEA v\xEA e edita", children: "S\xF3 eu" }),
-              /* @__PURE__ */ jsx38(TabsTrigger, { value: "all", title: "Qualquer usu\xE1rio v\xEA (s\xF3 voc\xEA edita)", children: "Todos da empresa" })
-            ] })
+            type: "button",
+            onClick: () => setPrivateMode((v) => !v),
+            className: [
+              "w-full flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
+              privateMode ? "border-brand-primary bg-brand-primary-muted" : "border-neutral-300 bg-white hover:bg-neutral-50"
+            ].join(" "),
+            "aria-pressed": privateMode,
+            children: [
+              /* @__PURE__ */ jsx38(
+                "span",
+                {
+                  className: [
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+                    privateMode ? "bg-brand-primary text-white" : "bg-neutral-100 text-neutral-500"
+                  ].join(" "),
+                  children: privateMode ? /* @__PURE__ */ jsx38(FiLock, { size: 16 }) : /* @__PURE__ */ jsx38(FiGlobe, { size: 16 })
+                }
+              ),
+              /* @__PURE__ */ jsxs37("span", { className: "min-w-0 flex-1", children: [
+                /* @__PURE__ */ jsx38("span", { className: "block text-sm font-semibold text-neutral-800", children: privateMode ? "Privado" : "Aberto para todos da empresa" }),
+                /* @__PURE__ */ jsx38("span", { className: "block text-xs text-neutral-500", children: privateMode ? "S\xF3 voc\xEA v\xEA \u2014 opcionalmente compartilhe com usu\xE1rios escolhidos abaixo." : "Qualquer pessoa da empresa pode abrir esta visualiza\xE7\xE3o (s\xF3 voc\xEA edita)." })
+              ] }),
+              /* @__PURE__ */ jsx38(
+                "span",
+                {
+                  className: [
+                    "shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                    privateMode ? "bg-brand-primary" : "bg-neutral-300"
+                  ].join(" "),
+                  "aria-hidden": true,
+                  children: /* @__PURE__ */ jsx38(
+                    "span",
+                    {
+                      className: [
+                        "inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform",
+                        privateMode ? "translate-x-5" : "translate-x-1"
+                      ].join(" ")
+                    }
+                  )
+                }
+              )
+            ]
           }
-        )
+        ),
+        privateMode && hasUserPicker && /* @__PURE__ */ jsxs37("div", { className: "mt-3", children: [
+          /* @__PURE__ */ jsxs37("div", { className: "flex items-baseline justify-between mb-1.5", children: [
+            /* @__PURE__ */ jsx38("span", { className: "text-xs font-semibold text-neutral-600", children: "Compartilhar leitura com" }),
+            /* @__PURE__ */ jsx38(
+              Badge10,
+              {
+                tone: selectedUserIds.size > 0 ? "info" : "neutral",
+                size: "sm",
+                variant: "subtle",
+                children: selectedUserIds.size === 0 ? "S\xF3 voc\xEA" : `${selectedUserIds.size} de ${usuariosUniverse.length}`
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs37("div", { className: "relative mb-2", children: [
+            /* @__PURE__ */ jsx38(
+              FiSearch3,
+              {
+                size: 14,
+                className: "absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+              }
+            ),
+            /* @__PURE__ */ jsx38(
+              "input",
+              {
+                type: "text",
+                value: userSearchQuery,
+                onChange: (e) => setUserSearchQuery(e.target.value),
+                placeholder: "Filtrar por nome ou email\u2026",
+                className: "w-full text-sm pl-8 pr-8 py-1.5 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent"
+              }
+            ),
+            userSearchQuery && /* @__PURE__ */ jsx38(
+              "button",
+              {
+                type: "button",
+                onClick: () => setUserSearchQuery(""),
+                className: "absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600",
+                "aria-label": "Limpar busca",
+                children: /* @__PURE__ */ jsx38(FiX2, { size: 14 })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs37("div", { className: "flex flex-wrap gap-1.5 mb-2", children: [
+            /* @__PURE__ */ jsx38(
+              Button21,
+              {
+                variant: "secondary",
+                size: "sm",
+                type: "button",
+                onClick: () => setSelectedUserIds(
+                  new Set(usuariosUniverse.map((u) => u.id))
+                ),
+                disabled: selectedUserIds.size === usuariosUniverse.length,
+                children: "Marcar todos"
+              }
+            ),
+            /* @__PURE__ */ jsx38(
+              Button21,
+              {
+                variant: "secondary",
+                size: "sm",
+                type: "button",
+                onClick: () => setSelectedUserIds(/* @__PURE__ */ new Set()),
+                disabled: selectedUserIds.size === 0,
+                children: "Limpar"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsx38("div", { className: "max-h-48 overflow-y-auto border border-neutral-200 rounded-md divide-y divide-neutral-100 bg-white", children: (() => {
+            if (usuariosLoading && usuariosUniverse.length === 0) {
+              return /* @__PURE__ */ jsx38("div", { className: "text-center text-xs text-neutral-400 py-6", children: "Carregando usu\xE1rios\u2026" });
+            }
+            if (usuariosUniverse.length === 0) {
+              return /* @__PURE__ */ jsx38("div", { className: "text-center text-xs text-neutral-400 py-6", children: "Nenhum colaborador dispon\xEDvel neste tenant." });
+            }
+            const q = userSearchQuery.trim().toLowerCase();
+            const filtered = q ? usuariosUniverse.filter(
+              (u) => u.nome.toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q)
+            ) : usuariosUniverse;
+            if (filtered.length === 0) {
+              return /* @__PURE__ */ jsxs37("div", { className: "text-center text-xs text-neutral-400 py-6", children: [
+                'Nenhum usu\xE1rio corresponde a "',
+                userSearchQuery,
+                '"'
+              ] });
+            }
+            return filtered.map((u) => {
+              const checked = selectedUserIds.has(u.id);
+              return /* @__PURE__ */ jsxs37(
+                "label",
+                {
+                  className: "flex items-center gap-2 px-2.5 py-1.5 text-xs hover:bg-neutral-50 cursor-pointer",
+                  children: [
+                    /* @__PURE__ */ jsx38(
+                      "input",
+                      {
+                        type: "checkbox",
+                        checked,
+                        onChange: () => {
+                          setSelectedUserIds((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(u.id)) next.delete(u.id);
+                            else next.add(u.id);
+                            return next;
+                          });
+                        },
+                        className: "accent-brand-primary"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxs37("span", { className: "flex-1 min-w-0", children: [
+                      /* @__PURE__ */ jsx38("span", { className: "text-neutral-700 truncate block", children: u.nome }),
+                      u.email && /* @__PURE__ */ jsx38("span", { className: "text-neutral-400 truncate block", children: u.email })
+                    ] })
+                  ]
+                },
+                u.id
+              );
+            });
+          })() })
+        ] })
       ] }),
       hasPicker && /* @__PURE__ */ jsxs37("div", { children: [
         /* @__PURE__ */ jsxs37("div", { className: "flex items-baseline justify-between mb-1.5", children: [

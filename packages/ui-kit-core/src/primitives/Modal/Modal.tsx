@@ -1,4 +1,5 @@
 // @hashcodeti/ui-kit-core/primitives/Modal
+// @agent-touched: 2026-05-19
 //
 // Wrapper sobre @radix-ui/react-dialog. Substitui o `<Modal>` + `<Modal.Header>` +
 // `<Modal.Body>` + `<Modal.Footer>` do react-bootstrap.
@@ -96,6 +97,9 @@ export const Modal: React.FC<ModalProps> = ({
           <DialogPrimitive.Close
             className={cn(
               'absolute right-4 top-4 rounded-md p-1',
+              // border-0 / appearance-none neutralizam UA-default em consumidores
+              // com preflight: false. Mantém aspecto ghost (sem border visível).
+              'border-0 appearance-none bg-transparent',
               'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent',
             )}

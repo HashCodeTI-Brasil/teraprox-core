@@ -1,4 +1,5 @@
 // @hashcodeti/ui-kit-sgp/preset/PresetSaveModal
+// @agent-touched: 2026-05-19
 //
 // Promoção do SaveViewModal local (`teraprox-SGP-caderno/Components/processo/`)
 // para ui-kit-sgp. Renomeado de `SaveViewModal` → `PresetSaveModal` para
@@ -13,7 +14,7 @@
 // View-pure: sem Redux, sem fetch — caller injeta onSave.
 
 import * as React from 'react'
-import { FiSave, FiSearch, FiX } from 'react-icons/fi'
+import { FiSave, FiSearch, FiX, FiLock, FiGlobe } from 'react-icons/fi'
 import {
   Modal,
   ModalHeader,
@@ -21,18 +22,26 @@ import {
   ModalFooter,
   Button,
   TextField,
-  Tabs,
-  TabsList,
-  TabsTrigger,
   Badge,
 } from '@hashcodeti/ui-kit-core'
 
-export type PresetAccessMode = 'private' | 'all'
+/**
+ * Mantido por compat — UI agora é um toggle binário (`privateMode: boolean`).
+ * O payload `access` final é resolvido em 3 formas:
+ *   - 'all'                          → privateMode=false (aberto p/ empresa)
+ *   - string[] vazio                 → privateMode=true, ninguém marcado
+ *   - string[] com items             → privateMode=true, subset marcado
+ */
+export type PresetAccessMode = 'private' | 'all' | 'users'
 
 export interface PresetSavePayload {
   nome: string
   descricao: string | null
-  /** `'all'` = todos da empresa; `string[]` = lista de userIds (P2 — UI atual apenas private/all). */
+  /**
+   * `'all'` = todos da empresa.
+   * `string[]` vazio = privado (só owner).
+   * `string[]` com items = lista explícita de userIds com leitura.
+   */
   access: 'all' | string[]
   /**
    * Lista explícita de `controleRefId` que o preset deve carregar.
@@ -66,6 +75,16 @@ export interface PresetControleOption {
   label: string
   /** Nome do recurso (para sub-linha contextual). */
   recursoNome?: string | null
+}
+
+/** Opção mostrada no picker de usuários do modal de save (modo "users"). */
+export interface PresetUsuarioOption {
+  /** Identificador estável usado em `access[]` no payload. */
+  id: string
+  /** Nome exibido (geralmente firstName + lastName). */
+  nome: string
+  /** Email para sub-linha contextual / desambiguação. */
+  email?: string | null
 }
 
 export interface PresetSaveModalProps {
@@ -105,6 +124,20 @@ export interface PresetSaveModalProps {
    * sempre como `[]` no payload (back-compat com callers antigos).
    */
   controles?: PresetControleOption[]
+  /**
+   * Universo de usuários disponíveis para compartilhar (modo `'users'`).
+   * - `undefined` → aba "Usuários" some (back-compat com callers antigos).
+   * - `[]`        → aba aparece mas mostra empty/loading state (caller ainda
+   *                 está carregando ou tenant sem colaboradores).
+   * - `[...]`     → picker funcional.
+   * O caller deve **excluir o owner** desta lista — owner tem read implícito.
+   */
+  usuarios?: PresetUsuarioOption[]
+  /**
+   * Sinaliza ao picker que a lista de usuários ainda está sendo carregada.
+   * Quando `true`, mostra "Carregando…" no lugar do empty state.
+   */
+  usuariosLoading?: boolean
 }
 
 const SUMMARY_LABELS: Record<string, Record<string, string>> = {
@@ -161,12 +194,25 @@ export const PresetSaveModal: React.FC<PresetSaveModalProps> = ({
   summary,
   initial,
   controles,
+  usuarios,
+  usuariosLoading,
 }) => {
   const [nome, setNome] = React.useState('')
   const [descricao, setDescricao] = React.useState('')
-  const [accessMode, setAccessMode] = React.useState<PresetAccessMode>('private')
+  // privateMode === true  → only owner + optionally selectedUserIds têm leitura
+  // privateMode === false → 'all' (aberto para todos da empresa)
+  const [privateMode, setPrivateMode] = React.useState(true)
   const [saving, setSaving] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+
+  // Picker de usuários — exibido só quando privateMode=true. Estado interno é
+  // `Set<userId>`. Convenção: nenhum marcado = só você; subset = compartilha
+  // leitura com esses.
+  // hasUserPicker: caller declarou intenção (passou `usuarios`, mesmo que `[]`).
+  const usuariosUniverse = usuarios ?? []
+  const hasUserPicker = usuarios !== undefined
+  const [selectedUserIds, setSelectedUserIds] = React.useState<Set<string>>(new Set())
+  const [userSearchQuery, setUserSearchQuery] = React.useState('')
 
   // Picker de controles (Fase B+B+ do plano "Caderno como preset"):
   //   - estado interno: `Set<refId>` do que está selecionado
@@ -183,7 +229,20 @@ export const PresetSaveModal: React.FC<PresetSaveModalProps> = ({
     if (!open) return
     setNome(initial?.nome ?? '')
     setDescricao(initial?.descricao ?? '')
-    setAccessMode(initial?.access === 'all' ? 'all' : 'private')
+    // initial.access:
+    //   - 'all'          → privateMode=false
+    //   - string[] (qq)  → privateMode=true (e pre-seleciona ids)
+    //   - undef          → privateMode=true (default sensato p/ preset novo)
+    const initAccess = initial?.access
+    setPrivateMode(initAccess !== 'all')
+    // Pre-seleciona userIds. Filtra IDs órfãos (não estão no universe atual).
+    if (hasUserPicker && Array.isArray(initAccess) && initAccess.length > 0) {
+      const universe = new Set(usuariosUniverse.map((u) => u.id))
+      setSelectedUserIds(new Set(initAccess.filter((id) => universe.has(id))))
+    } else {
+      setSelectedUserIds(new Set())
+    }
+    setUserSearchQuery('')
     setError(null)
     setSearchQuery(initial?.searchQuery ?? '')
     // Initial seleção: subset declarado, ou tudo (= sem filtro).
@@ -255,10 +314,15 @@ export const PresetSaveModal: React.FC<PresetSaveModalProps> = ({
       const controleRefIds: string[] = !hasPicker || allSelected
         ? []
         : Array.from(selectedRefIds)
+      // privateMode=false → 'all'; privateMode=true → string[] (vazio = só owner,
+      // com items = compartilhado com esses usuários).
+      const access: 'all' | string[] = privateMode
+        ? Array.from(selectedUserIds)
+        : 'all'
       await onSave({
         nome: trimmed,
         descricao: descricao.trim() ? descricao.trim() : null,
-        access: accessMode === 'all' ? 'all' : [],
+        access,
         controleRefIds,
         ...(saveAsNew ? { saveAsNew: true } : null),
       })
@@ -310,19 +374,189 @@ export const PresetSaveModal: React.FC<PresetSaveModalProps> = ({
             <label className="text-xs font-semibold text-neutral-600 mb-1.5 block">
               Acesso
             </label>
-            <Tabs
-              value={accessMode}
-              onValueChange={(v) => setAccessMode(v as PresetAccessMode)}
+
+            {/* Toggle binário Privado/Aberto: clique no botão alterna. Ícone +
+                texto contextual explicam o estado vigente. Quando privado,
+                o picker abaixo controla compartilhamento granular. */}
+            <button
+              type="button"
+              onClick={() => setPrivateMode((v) => !v)}
+              className={[
+                'w-full flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors',
+                privateMode
+                  ? 'border-brand-primary bg-brand-primary-muted'
+                  : 'border-neutral-300 bg-white hover:bg-neutral-50',
+              ].join(' ')}
+              aria-pressed={privateMode}
             >
-              <TabsList variant="pills" size="sm" className="grid grid-cols-2 gap-2">
-                <TabsTrigger value="private" title="Apenas você vê e edita">
-                  Só eu
-                </TabsTrigger>
-                <TabsTrigger value="all" title="Qualquer usuário vê (só você edita)">
-                  Todos da empresa
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+              <span
+                className={[
+                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                  privateMode ? 'bg-brand-primary text-white' : 'bg-neutral-100 text-neutral-500',
+                ].join(' ')}
+              >
+                {privateMode ? <FiLock size={16} /> : <FiGlobe size={16} />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-neutral-800">
+                  {privateMode ? 'Privado' : 'Aberto para todos da empresa'}
+                </span>
+                <span className="block text-xs text-neutral-500">
+                  {privateMode
+                    ? 'Só você vê — opcionalmente compartilhe com usuários escolhidos abaixo.'
+                    : 'Qualquer pessoa da empresa pode abrir esta visualização (só você edita).'}
+                </span>
+              </span>
+              <span
+                className={[
+                  'shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                  privateMode ? 'bg-brand-primary' : 'bg-neutral-300',
+                ].join(' ')}
+                aria-hidden
+              >
+                <span
+                  className={[
+                    'inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform',
+                    privateMode ? 'translate-x-5' : 'translate-x-1',
+                  ].join(' ')}
+                />
+              </span>
+            </button>
+
+            {privateMode && hasUserPicker && (
+              <div className="mt-3">
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-neutral-600">
+                    Compartilhar leitura com
+                  </span>
+                  <Badge
+                    tone={selectedUserIds.size > 0 ? 'info' : 'neutral'}
+                    size="sm"
+                    variant="subtle"
+                  >
+                    {selectedUserIds.size === 0
+                      ? 'Só você'
+                      : `${selectedUserIds.size} de ${usuariosUniverse.length}`}
+                  </Badge>
+                </div>
+
+                <div className="relative mb-2">
+                  <FiSearch
+                    size={14}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+                  />
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder='Filtrar por nome ou email…'
+                    className="w-full text-sm pl-8 pr-8 py-1.5 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent"
+                  />
+                  {userSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setUserSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      aria-label="Limpar busca"
+                    >
+                      <FiX size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={() =>
+                      setSelectedUserIds(
+                        new Set(usuariosUniverse.map((u) => u.id)),
+                      )
+                    }
+                    disabled={selectedUserIds.size === usuariosUniverse.length}
+                  >
+                    Marcar todos
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={() => setSelectedUserIds(new Set())}
+                    disabled={selectedUserIds.size === 0}
+                  >
+                    Limpar
+                  </Button>
+                </div>
+
+                <div className="max-h-48 overflow-y-auto border border-neutral-200 rounded-md divide-y divide-neutral-100 bg-white">
+                  {(() => {
+                    if (usuariosLoading && usuariosUniverse.length === 0) {
+                      return (
+                        <div className="text-center text-xs text-neutral-400 py-6">
+                          Carregando usuários…
+                        </div>
+                      )
+                    }
+                    if (usuariosUniverse.length === 0) {
+                      return (
+                        <div className="text-center text-xs text-neutral-400 py-6">
+                          Nenhum colaborador disponível neste tenant.
+                        </div>
+                      )
+                    }
+                    const q = userSearchQuery.trim().toLowerCase()
+                    const filtered = q
+                      ? usuariosUniverse.filter(
+                          (u) =>
+                            u.nome.toLowerCase().includes(q) ||
+                            (u.email || '').toLowerCase().includes(q),
+                        )
+                      : usuariosUniverse
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="text-center text-xs text-neutral-400 py-6">
+                          Nenhum usuário corresponde a "{userSearchQuery}"
+                        </div>
+                      )
+                    }
+                    return filtered.map((u) => {
+                      const checked = selectedUserIds.has(u.id)
+                      return (
+                        <label
+                          key={u.id}
+                          className="flex items-center gap-2 px-2.5 py-1.5 text-xs hover:bg-neutral-50 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              setSelectedUserIds((prev) => {
+                                const next = new Set(prev)
+                                if (next.has(u.id)) next.delete(u.id)
+                                else next.add(u.id)
+                                return next
+                              })
+                            }}
+                            className="accent-brand-primary"
+                          />
+                          <span className="flex-1 min-w-0">
+                            <span className="text-neutral-700 truncate block">
+                              {u.nome}
+                            </span>
+                            {u.email && (
+                              <span className="text-neutral-400 truncate block">
+                                {u.email}
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      )
+                    })
+                  })()}
+                </div>
+              </div>
+            )}
           </div>
 
           {hasPicker && (
