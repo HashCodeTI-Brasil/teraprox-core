@@ -77,27 +77,34 @@ export default function CoreServiceProvider({ children }) {
         }, delay)
     }, [])
 
+    // wp também é instável caso o WebProvider re-render por qualquer state.
+    // Ref-stabilization: callbacks dentro do interceptor leem wpRef.current.
+    const wpRef = useRef(wp)
+    wpRef.current = wp
+
     const processResponseMatchingObjects = useCallback((matchingObjects) => {
         if (!matchingObjects) return
-        // Delegate to wsProvider so HTTP-response MOs walk the same path as
-        // RTDB-delivered ones — both invoke useMatchingObject's refresher
-        // callbacks. The local fallback (only wsEvent.dispatchEvent) reaches
-        // subscribeEvent listeners but skips the refresher subscribers used
-        // by core-sdk's useMatchingObject hook, leaving consumers to wait
-        // on the RTDB round-trip (15-20s observed for confirmAnexo).
-        if (wp?.processResponseMatchingObjects) {
-            wp.processResponseMatchingObjects(matchingObjects)
+        const currentWp = wpRef.current
+        if (currentWp?.processResponseMatchingObjects) {
+            currentWp.processResponseMatchingObjects(matchingObjects)
             return
         }
         const mos = Array.isArray(matchingObjects) ? matchingObjects : [matchingObjects]
         for (const mo of mos) {
-            if (wp?.wsEvent) {
-                wp.wsEvent.dispatchEvent(
+            if (currentWp?.wsEvent) {
+                currentWp.wsEvent.dispatchEvent(
                     new CustomEvent(mo.context + (mo.location || ''), { detail: mo.payload })
                 )
             }
         }
-    }, [wp])
+    }, [])
+
+    // Refs estáveis para que `createController` (deps=[]) leia versões atuais
+    // de callbacks que poderiam mudar entre renders.
+    const enqueueSuccessToastRef = useRef(enqueueSuccessToast)
+    enqueueSuccessToastRef.current = enqueueSuccessToast
+    const processResponseMatchingObjectsRef = useRef(processResponseMatchingObjects)
+    processResponseMatchingObjectsRef.current = processResponseMatchingObjects
 
     const createController = useCallback((context, baseEndPoint) => {
         // Match SDK contract: when baseEndPoint is explicitly provided, use it as-is
@@ -128,7 +135,7 @@ export default function CoreServiceProvider({ children }) {
 
             onResponse(response, method) {
                 if (method !== 'GET' && method !== 'PATCH') {
-                    enqueueSuccessToast('Dados processados com sucesso', {
+                    enqueueSuccessToastRef.current('Dados processados com sucesso', {
                         appearance: 'success',
                         autoDismiss: true,
                         autoDismissTimeout: 2000,
@@ -137,7 +144,7 @@ export default function CoreServiceProvider({ children }) {
                 if (response.data?.newToken) dispatch(setToken(response.data.newToken))
                 const gatewayNewToken = response.headers?.get?.('x-new-token')
                 if (gatewayNewToken) dispatch(setToken(gatewayNewToken))
-                processResponseMatchingObjects(response.data?.matchingObjects)
+                processResponseMatchingObjectsRef.current(response.data?.matchingObjects)
                 return response.data?.content || response.data
             },
 
@@ -195,7 +202,13 @@ export default function CoreServiceProvider({ children }) {
         }
 
         return new FetchHttpAdapter(endpoint, {}, interceptors)
-    }, [dispatch, enqueueSuccessToast, processResponseMatchingObjects])
+        // deps=[] LITERAL — `enqueueSuccessToast` e `processResponseMatchingObjects`
+        // são lidos via ref (enqueueSuccessToastRef, processResponseMatchingObjectsRef)
+        // dentro dos interceptors em runtime. `dispatch` do redux é estável por
+        // contrato. Resultado: createController NUNCA muda → consumers param de
+        // recriar controllers → useEffect([controller]) só dispara no mount.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const value = useMemo(() => ({
         createController,
