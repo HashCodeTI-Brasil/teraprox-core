@@ -1,4 +1,5 @@
-import React, { useMemo, useContext, useCallback } from 'react'
+// @agent-touched: 2026-05-21
+import React, { useMemo, useContext, useCallback, useRef } from 'react'
 import { CoreServiceContext, FetchHttpAdapter } from 'teraprox-core-sdk'
 import { getTenantFromHostname } from '../utils/tenantResolver.js'
 import { WebProvider } from '../websocket/wsProvider'
@@ -53,15 +54,28 @@ export default function CoreServiceProvider({ children }) {
     const toast = useToasts()
     const dispatch = useDispatch()
 
+    // `useToasts()` da react-toast-notifications retorna referência nova a cada
+    // render — sem ref-stabilization, todo `useCallback`/`useMemo` que tem
+    // `toast` em deps invalida a cada render. Resultado: `createController`
+    // refletiria nova instância cada render → consumers com `useMemo([createController])`
+    // recriariam controllers → useEffect com `[controller]` dispararia em loop
+    // infinito (observado pelo core ao abrir /cadernos/preset/:id em 2026-05-21:
+    // listPlanoView, /cadernoPreset/getOne, /colaborators rodando sem parar).
+    // Standalone do SGP-caderno usa StandaloneProvider próprio que não tem essa
+    // armadilha — por isso o bug só aparece no host.
+    const toastRef = useRef(toast)
+    toastRef.current = toast
+
     const successToastTimerRef = React.useRef(null)
 
     const enqueueSuccessToast = useCallback((message, options = {}, delay = 1000) => {
         if (successToastTimerRef.current) clearTimeout(successToastTimerRef.current)
         successToastTimerRef.current = setTimeout(() => {
-            if (toast?.addToast) toast.addToast(message, options)
+            const t = toastRef.current
+            if (t?.addToast) t.addToast(message, options)
             successToastTimerRef.current = null
         }, delay)
-    }, [toast])
+    }, [])
 
     const processResponseMatchingObjects = useCallback((matchingObjects) => {
         if (!matchingObjects) return
@@ -134,7 +148,7 @@ export default function CoreServiceProvider({ children }) {
                     const alreadyWaiting = store.getState().global.needUserLogin
                     if (!alreadyWaiting) {
                         dispatch(setNeedUserLogin(true))
-                        toast.addToast('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
+                        toastRef.current?.addToast?.('Sessão expirada, faça login novamente.', { appearance: 'warning', autoDismiss: true })
                     }
                     return Promise.reject(error)
                 }
@@ -142,11 +156,11 @@ export default function CoreServiceProvider({ children }) {
                 if (status === 400 || status === 404) {
                     if (status === 400 && Array.isArray(data?.errors)) {
                         data.errors.forEach((msg) =>
-                            toast.addToast(msg, { appearance: 'warning', autoDismiss: true })
+                            toastRef.current?.addToast?.(msg, { appearance: 'warning', autoDismiss: true })
                         )
                     }
                     if (status === 404) {
-                        toast.addToast('Recurso não encontrado.', { appearance: 'info', autoDismiss: true })
+                        toastRef.current?.addToast?.('Recurso não encontrado.', { appearance: 'info', autoDismiss: true })
                     }
                     return data
                 }
@@ -166,11 +180,11 @@ export default function CoreServiceProvider({ children }) {
                 if (isNotification) return Promise.reject(error)
 
                 if (status === 403) {
-                    toast.addToast('Você não tem permissão para acessar este recurso.', { autoDismiss: true })
+                    toastRef.current?.addToast?.('Você não tem permissão para acessar este recurso.', { autoDismiss: true })
                 }
                 if (status === 500 && Array.isArray(data?.errors)) {
                     data.errors.forEach((errMsg) =>
-                        toast.addToast(errMsg, { autoDismiss: true, autoDismissTimeout: 2000 })
+                        toastRef.current?.addToast?.(errMsg, { autoDismiss: true, autoDismissTimeout: 2000 })
                     )
                 }
 
@@ -181,16 +195,18 @@ export default function CoreServiceProvider({ children }) {
         }
 
         return new FetchHttpAdapter(endpoint, {}, interceptors)
-    }, [dispatch, enqueueSuccessToast, processResponseMatchingObjects, toast])
+    }, [dispatch, enqueueSuccessToast, processResponseMatchingObjects])
 
     const value = useMemo(() => ({
         createController,
 
+        // Wrappers leem do ref — `toast` (referência) muda a cada render mas o
+        // método `.addToast` resolve corretamente em runtime via toastRef.current.
         toast: {
-            success: (msg, opts) => toast.addToast(msg, { appearance: 'success', autoDismiss: true, ...opts }),
-            warning: (msg, opts) => toast.addToast(msg, { appearance: 'warning', autoDismiss: true, ...opts }),
-            error:   (msg, opts) => toast.addToast(msg, { appearance: 'error', autoDismiss: true, ...opts }),
-            info:    (msg, opts) => toast.addToast(msg, { appearance: 'info', autoDismiss: true, ...opts }),
+            success: (msg, opts) => toastRef.current?.addToast?.(msg, { appearance: 'success', autoDismiss: true, ...opts }),
+            warning: (msg, opts) => toastRef.current?.addToast?.(msg, { appearance: 'warning', autoDismiss: true, ...opts }),
+            error:   (msg, opts) => toastRef.current?.addToast?.(msg, { appearance: 'error', autoDismiss: true, ...opts }),
+            info:    (msg, opts) => toastRef.current?.addToast?.(msg, { appearance: 'info', autoDismiss: true, ...opts }),
         },
 
         subscribe: wp.subscribe,
@@ -200,7 +216,7 @@ export default function CoreServiceProvider({ children }) {
         handleLogout: wp.handleLogout,
         hostedByCore: true,
         rateLimits: wp.rateLimits ?? {},
-    }), [createController, wp, toast])
+    }), [createController, wp])
 
     return (
         <CoreServiceContext.Provider value={value}>
