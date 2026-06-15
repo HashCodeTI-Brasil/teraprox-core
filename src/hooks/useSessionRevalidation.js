@@ -1,3 +1,4 @@
+// @agent-touched: 2026-06-15
 import { useEffect, useRef, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -12,8 +13,9 @@ import { getTenantFromHostname } from '../utils/tenantResolver.js'
 /**
  * Valida o token persistido ao montar (após redux-persist rehydrate).
  *
- * Faz PATCH /user/loginFromToken direto via fetch (sem interceptors)
- * para não disparar o fluxo de 401 → logOut que existe nos adapters.
+ * Faz PATCH /loginFromToken direto via fetch (sem interceptors) — roteado
+ * para a api-user pelo header x-teraprox-host:user — para não disparar o
+ * fluxo de 401 → logOut que existe nos adapters.
  *
  * Retorna { validating: true } enquanto valida — App deve exibir loading.
  */
@@ -41,7 +43,7 @@ export function useSessionRevalidation() {
                 }
                 if (tenant) headers['x-tenant'] = tenant
 
-                const res = await fetch(`${gatewayUrl}/user/loginFromToken`, {
+                const res = await fetch(`${gatewayUrl}/loginFromToken`, {
                     method: 'PATCH',
                     headers,
                 })

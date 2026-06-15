@@ -1,3 +1,4 @@
+// @agent-touched: 2026-06-15
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useToasts } from "react-toast-notifications"
@@ -23,7 +24,11 @@ const useLogin = () => {
     const dispatch = useDispatch()
     const { controller, handleLogout } = useWebProvider()
     const { loadInitialNotifications } = useNotifications()
-    const { authOnSGP, loginFromToken } = useUserService()
+    // Roteamento por header x-teraprox-host (não mais por path): passar
+    // endPointUser como base faz o adapter montar paths bare (/auth,
+    // /loginFromToken) que a api-user serve na raiz. Sem a base, o
+    // createController prefixava o contexto → /user/auth → 404. (host, não MF)
+    const { authOnSGP, loginFromToken } = useUserService({ endPointUser })
     const isAuth = global.isAuth
 
     const connect = (userName, company, userId) => {
